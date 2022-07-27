@@ -1,0 +1,6 @@
+channels:
+ - bioconda
+dependencies:
+ - odgi=0.7.3
+ - tabix=1.11
+ - bedtools=2.30.0

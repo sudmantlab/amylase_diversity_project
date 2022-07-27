@@ -1,2 +1,8 @@
 .*
+pangenome/exploratory_copy_number/results/*
+pangenome/exploratory_copy_number/.snakemake/*
+pangenome/exploratory_copy_number/logs/*
+pangenome/exploratory_copy_number/resources/*
 !.gitignore
+!*/.gitignore
+

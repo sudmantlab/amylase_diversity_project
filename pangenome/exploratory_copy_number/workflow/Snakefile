@@ -1,0 +1,12 @@
+##### setup report #####
+configfile: 'config/config.yaml'
+
+##### load rules #####
+include: 'rules/odgi.conda.smk'
+
+##### run #####
+
+rule odgi:
+	input:
+		'results/odgi_results/subpaths/AMY.subpaths.fa.gz',
+		expand('results/odgi_results/untangle/{m}/grch38.dotplot.pdf', m=[256,1000,2000,5000,10000])
