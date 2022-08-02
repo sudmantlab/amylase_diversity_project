@@ -12,8 +12,10 @@ cd ..
 
 # Run on slurm
 #requires snakemake
+#requires singularity
 
 ```bash
 module load snakemake/6.15.1-python-3.9.10
+module load singularity/3.6.3
 snakemake --profile config/slurm 
 ```
