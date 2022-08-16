@@ -11,5 +11,7 @@
         - **SOLUTION**: most of these reads goes in chrEBV which is not present on chm13. This is because the LCCs of 1000G are generated with EBV.
 - The two references have similar numbers of reads in AMY region. For HG00438 for example we have about 55,044 reads chm13 and 55,041 using GRCh38 aligned regardless of the aligner used. Even if the lengths of the sequences after the liftover are different - chm13 = 438K while GRCh38 = 250K
 
-- Mapping the whole reads on HPRC AMY region + chm13 and extracting how many maps on the haplotypes and on the region of interest give these results: 54,183 and ~ 991 still mapping on chm13 chr1 even if the haplotype of chm13 is present on the multi-fasta extracted by Davide/Erik - however it has a different dimensioin
+- Mapping the whole reads on HPRC AMY region + chm13 and extracting how many maps on the haplotypes and on the region of interest give these results on HG00438 54,183 and ~ 991 still mapping on chm13 chr1 even if the haplotype of chm13 is present on the multi-fasta extracted by Davide/Erik on which around 850 reads are mapped. 
+
+    - Looking at HG02257 the reads mapped on the pangenome are 112,169 while 2,107 on the chm13 selected region while 1,773 on the region chm13 on the pangenome. 
 
