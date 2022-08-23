@@ -59,29 +59,31 @@ pop_info = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects
 
 ```{r}
 
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/output"
 
 #t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_100000_EUROPEAN.tsv",sep="\t",header=TRUE)
 #t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_100000_modern-ancient-EUR.tsv",sep="\t",header=TRUE)
 #t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_100000_EASTASIA.tsv",sep="\t",header=TRUE)
 #fn_out = paste(outdir,"/100kb_modern_ancient_euro_AMY_samples_colored_paths.png",sep="")
 
-t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_100000_EASTASIA.tsv",sep="\t",header=TRUE)
+t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/output/AMY_100000_EASTASIA.tsv",sep="\t",header=TRUE)
 fn_out = paste(outdir,"/100kb_modern_ASIA_AMY_samples_colored_paths.png",sep="")
 
 #t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_100000_modern.tsv",sep="\t",header=TRUE)
 #fn_out = paste(outdir,"/100kb_modern_ALL_AMY_samples_colored_paths.png",sep="")
 
-t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_100000_modern-ancient-EUR.tsv",sep="\t",header=TRUE)
+t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/output/AMY_100000_modern-ancient-EUR.tsv",sep="\t",header=TRUE)
 fn_out = paste(outdir,"/100kb_modern_EUROPE_AMY_samples_w_ancients_colored_paths.png",sep="")
 colors =pnw_palette("Bay",5)
 
-t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_100000_modern-ancient.tsv",sep="\t",header=TRUE)
+t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/output/AMY_100000_modern-ancient.tsv",sep="\t",header=TRUE)
 fn_out = paste(outdir,"/100kb_modern_ALL_AMY_samples_w_ancients_colored_paths.png",sep="")
 colors =pnw_palette("Bay",8)
 
-t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output/AMY_50000_modern-ancient.tsv",sep="\t",header=TRUE)
+t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/output/AMY_50000_modern-ancient.tsv",sep="\t",header=TRUE)
 fn_out = paste(outdir,"/50kb_modern_ALL_AMY_samples_w_ancients_colored_paths.png",sep="")
 fn_out_2 = paste(outdir,"/50kb_modern_ALL_AMY_samples_w_ancients_haploslice.png",sep="")
+fn_out_3 = paste(outdir,"/50kb_modern_ALL_AMY_samples_w_ancients_haploslice_byage.png",sep="")
 colors =pnw_palette("Bay",8)
 
 
@@ -129,16 +131,15 @@ g=g+geom_segment(aes(x=position,xend=next_pos,y=path_y,yend=path_y,color=popGrou
              alpha=0.5)
   
   
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output"
 #fn_out = paste(outdir,"/100kb_modern_ancient_euro_AMY_samples_colored_paths.png",sep="")
 png(fn_out,width=6.5,height=3,units='in',res=600)
 print(g)
 dev.off()
 
-
+pos=104327640
 node_props = t_indiv_paths %>% 
   ungroup() %>%
-  filter(position==104327640) %>%
+  filter(position==pos) %>%
   mutate(total_haps = n()) %>%
   group_by(popGrouping) %>%
   mutate(total_n_of_pop = n()) %>%
@@ -149,19 +150,47 @@ node_props = t_indiv_paths %>%
   summarize(n_pop = n()) %>%
   mutate(pop_prop_of_node = n_pop/node_size,
          node_prop_of_total = node_size/total_haps) %>%
-  mutate(node_prop_of_pop=n_pop/total_n_of_pop) #%>%
-  #filter(node_prop_of_total>0.01)
+  mutate(node_prop_of_pop=n_pop/total_n_of_pop) 
 
-# g=ggplot(node_props)
-# g+geom_bar(aes(x=factor(node),y=pop_prop_of_node,fill=popGrouping),stat='identity')+
-#   theme_bw()+
-#   scale_fill_manual(values=colors)
-
-# ex = node_props %>% 
-#   dplyr::select(popGrouping,node,node_size) %>% 
-#   unique()
-
+age_bins = c(">8000","6000-8000","4700-6000","3500-4700","<3500","current")
+t_hap_by_age = t_indiv_paths %>% 
+      mutate(year_bin = case_when(
+            ageAverage >8000 ~ 5,
+            ageAverage >6000 ~ 4,
+            ageAverage >4700 ~ 3,
+            ageAverage >3500 ~ 2,
+            ageAverage >0 ~ 1,
+            TRUE ~ 0)) %>%
+  ungroup() %>%
+  filter(position==pos) %>%
+  mutate(total_haps = n()) %>%
+  group_by(year_bin) %>%
+  mutate(total_n_of_age = n()) %>%
+  ungroup() %>%
+  group_by(node,total_haps,total_n_of_age) %>%
+  mutate(node=node,node_size=n()) %>%
+  group_by(year_bin,node_size,node,total_haps,total_n_of_age) %>%
+  summarize(n_age = n()) %>%
+  mutate(pop_prop_of_node = n_age/node_size,
+         node_prop_of_total = node_size/total_haps) %>%
+  mutate(node_prop_of_age=n_age/total_n_of_age) 
+  
 cutoff = 0.05
+
+t_age_plot_gt = t_hap_by_age %>% 
+  filter(node_prop_of_age>=cutoff) %>%
+  dplyr::select(year_bin,node,node_prop_of_age) %>%
+  mutate(node = as.character(node))
+
+t_age_plot_lt = t_hap_by_age %>% 
+  filter(node_prop_of_age<cutoff) %>%
+  group_by(year_bin) %>%
+  summarize(node_prop_of_age=sum(node_prop_of_age)) %>%
+  mutate(node=paste("<",cutoff*100,"%")) %>%
+  dplyr::select(year_bin,node,node_prop_of_age)
+
+t_plot_age = rbind(t_age_plot_gt,t_age_plot_lt)
+
 
 t_plot_gt = node_props %>% 
   filter(node_prop_of_pop>=cutoff) %>%
@@ -190,19 +219,30 @@ pop_order = c("modern-AFRICA",
               
 t_plot$popGrouping = factor(t_plot$popGrouping,levels = pop_order)
 
-
-
-g=ggplot(t_plot )
+g=ggplot(t_plot)
 g=g+geom_bar(aes(x=popGrouping,y=node_prop_of_pop,fill=node),stat='identity')+
   theme_bw()+
   scale_fill_viridis_d("Haplotype Node")+
   coord_flip()
   #scale_fill_manual(values=colors)
 
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/haplotype_analysis/output"
 png(fn_out_2,width=5,height=3,units='in',res=600)
 print(g)
 dev.off()
+
+g=ggplot(t_plot_age)
+g=g+geom_point(aes(x=-year_bin,y=node_prop_of_age,color=factor(node)))+
+  geom_line(aes(x=-year_bin,y=node_prop_of_age,color=factor(node)))+
+  theme_bw(base_size=6)+
+  theme(legend.key.size=unit(.5,"cm"))+
+  scale_color_viridis_d("Haplotype Node")+
+  scale_x_continuous("sample age",labels = age_bins,breaks=seq(-5,0,1))+
+  scale_y_continuous("f")
+
+png(fn_out_3,width=3,height=2,units='in',res=600)
+print(g)
+dev.off()
+
 
 
 ```
