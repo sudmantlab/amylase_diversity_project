@@ -1,0 +1,19 @@
+#!vim set syntax=python
+
+rule all:
+    input:
+        "output/chr1.haps"
+
+rule make_haps_from_vcf:
+    output:
+        haps="output/chr1.haps",
+        sample="output/chr1.sample"
+    run:
+        cmd = ("~/Documents/science/programs/relate_v1.1.9_MacOSX_M1/bin/RelateFileFormats "
+                "--mode ConvertFromVcf "
+                "--haps {haps} "
+                "--sample {sample} "
+                "-i ../input/1.neo.impute.1000g "
+                "".format(haps=output.haps,
+                          sample=output.sample))
+        shell(cmd)
