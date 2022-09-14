@@ -20,3 +20,42 @@ Principal bundle generation parameters:
 principal_bundles, sid_smps = new_sdb.get_principal_bundle_decomposition(0,8)
 smp_partitions = group_smps_by_principle_bundle_id(smps, 2500, 10000)
 ```
+
+
+## Files
+
+
+### `AMY1A_region_principal_bundles.bed`: the bed file for the principal bundle decomposition of each contig
+
+example:
+`HG002#1#JAHKSE010000012.1_16776806_17183707_1   17081452        17183645        1:0:0:605`
+
+columns:
+- col1: contig name
+- bgn
+- end
+- bundle info, four fields seperated by ":", bundle_id:orientation:entry_idx:exit_idx
+
+
+
+### `rough_clustering.txt`: the rough clustering using PCA
+
+columns:
+- col1: group
+- col2: PCA x-coordinate
+- col3: PCA y-coordinate
+- col4: contig name
+- col5: ethic group
+
+### `bundle_groups.txt`: 
+
+example: `1.0-2.0-5.1-2.1-4.1-2.0-5.0-4.0-3.0-0.0 HG002#1#JAHKSE010000012.1_16776806_17183707_1`
+
+- col1: bundle_id.orientation seperated by "-". this is the bundle while traversing througgh the contigs
+- col2: contig name
+
+### `bundle_groups_count.txt`
+
+- col1: number of contig
+- col2: bundle_id list
+
