@@ -34,7 +34,7 @@ columns:
 - col1: contig name
 - col2: bundle bgn coordinate in the contig
 - col3: bundle end coordinate in the contig
-- bundle info, four fields seperated by ":", bundle_id:orientation:entry_idx:exit_idx
+- col4: bundle info, four fields seperated by ":", bundle_id:orientation:entry_idx:exit_idx
 
 
 
