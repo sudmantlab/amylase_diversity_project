@@ -59,3 +59,7 @@ example: `1.0-2.0-5.1-2.1-4.1-2.0-5.0-4.0-3.0-0.0 HG002#1#JAHKSE010000012.1_1677
 - col1: number of contig
 - col2: bundle_id list
 
+
+### `AMY1A-clustering.pdf`
+
+`AMY1A-clustering.pdf` has the PCA and the view of rough clusters
