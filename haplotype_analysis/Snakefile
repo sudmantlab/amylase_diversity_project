@@ -5,17 +5,18 @@ configfile: "config.json"
 
 rule all:
     input:
+        "output/AMY_50000_modern-ancient-EUR.tsv",
+        "output/AMY_100000_modern-ancient-EUR.tsv"
         #"output/LCT_50000_modern-ancient-EUR.tsv",
         #"output/LCT_100000_modern-ancient-EUR.tsv",
-        "output/AMY_100000_modern-ancient-EUR.tsv",
-        "output/AMY_50000_modern-ancient-EUR.tsv",
-        "output/AMY_100000_EUROPEAN.tsv",
-        "output/AMY_50000_EUROPEAN.tsv",
-        "output/AMY_50000_EASTASIA.tsv",
-        "output/AMY_100000_EASTASIA.tsv",
-        "output/AMY_100000_modern.tsv",
-        "output/AMY_100000_modern-ancient.tsv",
-        "output/AMY_50000_modern-ancient.tsv"
+        #"output/AMY_100000_modern-ancient-EUR.tsv",
+        #"output/AMY_100000_EUROPEAN.tsv",
+        #"output/AMY_50000_EUROPEAN.tsv",
+        #"output/AMY_50000_EASTASIA.tsv",
+        #"output/AMY_100000_EASTASIA.tsv",
+        #"output/AMY_100000_modern.tsv",
+        #"output/AMY_100000_modern-ancient.tsv",
+        #"output/AMY_50000_modern-ancient.tsv"
 
 
 # TO DOs
@@ -27,10 +28,10 @@ rule make_haplograph:
         fn_sample_subset = config['sample_groupings'][wildcards.population]
         info = config['loci'][wildcards.locus]
         shell("python ./haplotype_graph/haploplot.py "
-                    "--fn_vcf ./input/2.neo.impute.1000g.vcf.gz "
+                    "--fn_vcf ./input/1.neo.impute.1000g.vcf.gz "
                     "--fn_out {output} "
                     "--width {width} "
-                    "--contig 2 "
+                    "--contig 1 "
                     "--min_AF 0.05 "
                     "--sample_subset {fn_sample_subset} "
                     "--label {population} "

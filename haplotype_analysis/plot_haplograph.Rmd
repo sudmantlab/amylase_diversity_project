@@ -86,7 +86,7 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 
 
 ###PLOT haplotgraph
-t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/output/AMY_50000_modern-ancient.tsv",sep="\t",header=TRUE) %>%
+t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/output/AMY_50000_modern-ancient-EUR.tsv",sep="\t",header=TRUE) %>%
   mutate(dir=ifelse(dir=="left","distal","proximal"))
 
 fn_out = paste(outdir,"/50kb_modern_ALL_AMY_samples_w_ancients_colored_paths.png",sep="")
@@ -161,18 +161,20 @@ g=g+geom_segment(aes(x=position,xend=next_pos,y=path_y,yend=path_y,color=popGrou
   scale_color_manual(values=colors)+
   theme(strip.background=element_blank(),
         panel.border = element_blank(),
-        legend.key.size = unit(.1,"cm"))+
-  geom_vline(aes(xintercept = position),
-             data=positions,
-             linetype="dotted",
-             alpha=0.5)
-  
+        legend.key.size = unit(.1,"cm"))
+  # geom_vline(aes(xintercept = position),
+  #            data=positions,
+  #            linetype="dotted",
+  #            alpha=0.5)
+  # 
 
 #fn_out = paste(outdir,"/100kb_modern_ancient_euro_AMY_samples_colored_paths.png",sep="")
 png(fn_out,width=6.5,height=3,units='in',res=600)
 print(g)
 dev.off()
 
+
+positions
 ```
 
 
@@ -242,12 +244,12 @@ selection_coefs = t_plot_age %>%
   filter(traj_inc) %>% 
   pivot_wider(names_from = year_bin,
               values_from = f) %>%
-  # mutate(d=delta/(8000/25),
-  #        p=`5`,
-  #        q=1-`5`) %>%
-  mutate(d=delta/(4500/25),
-         p=`4`,
-         q=1-`4`) %>%
+  mutate(d=delta/(8000/30),
+          p=`5`,
+          q=1-`5`) %>%
+  # mutate(d=delta/(4500/30),
+  #        p=`4`,
+  #        q=1-`4`) %>%
   mutate(s=2*d / (q*(d+p)*(p+2*q))) %>%
   dplyr::select(position,dir,s) %>%
   mutate(label = paste("s==",signif(s,2),sep=""),x=-3,y=.75)
@@ -329,12 +331,13 @@ g=g+geom_point(aes(x=-year_bin,y=node_prop_of_age,color=factor(node)))+
 print(g)
 #dev.off()
 
+positions
 
 ```
 
 ```{r}
 
-
+pos=104080169
 node_props = t_indiv_paths %>% 
   ungroup() %>%
   filter(position==pos) %>%
@@ -349,6 +352,7 @@ node_props = t_indiv_paths %>%
   mutate(pop_prop_of_node = n_pop/node_size,
          node_prop_of_total = node_size/total_haps) %>%
   mutate(node_prop_of_pop=n_pop/total_n_of_pop) 
+
 
 age_bins = c(">8000","6000-8000","4700-6000","3500-4700","<3500","current")
 t_hap_by_age = t_indiv_paths %>% 
@@ -424,9 +428,9 @@ g=g+geom_bar(aes(x=popGrouping,y=node_prop_of_pop,fill=node),stat='identity')+
   coord_flip()
   #scale_fill_manual(values=colors)
 
-png(fn_out_2,width=5,height=3,units='in',res=600)
+#png(fn_out_2,width=5,height=3,units='in',res=600)
 print(g)
-dev.off()
+#dev.off()
 
 g=ggplot(t_plot_age)
 g=g+geom_point(aes(x=-year_bin,y=node_prop_of_age,color=factor(node)))+
@@ -437,9 +441,9 @@ g=g+geom_point(aes(x=-year_bin,y=node_prop_of_age,color=factor(node)))+
   scale_x_continuous("sample age",labels = age_bins,breaks=seq(-5,0,1))+
   scale_y_continuous("f")
 
-png(fn_out_3,width=3,height=2,units='in',res=600)
+#png(fn_out_3,width=3,height=2,units='in',res=600)
 print(g)
-dev.off()
+#dev.off()
 
 
 t_indiv_paths %>% ungroup() %>% dplyr::select(position) %>% unique() %>% arrange(position)
