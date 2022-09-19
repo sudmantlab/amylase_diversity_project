@@ -1,0 +1,44 @@
+{
+
+    "sample_groupings":{
+        "EUROPEAN":"metadata/1000_genomes_simple_EUROPEAN.tsv",
+        "AFRICAN":"metadata/1000_genomes_simple_AFRICAN.tsv",
+        "ANCIENT":"metadata/ancient_info.tsv",
+        "EASTASIA":"metadata/1000_genomes_simple_EASTASIA.tsv",
+        "modern-ancient-EUR":"metadata/modern_and_ancient_european.tsv",
+        "modern":"metadata/1000_genomes_simple_NO_ADMIXED.tsv",
+        "modern-ancient":"metadata/modernALL_ancientEuro_relabled.tsv"
+    },
+    "generation_time":30,
+    "loci":{
+        "LCT":{
+                "contig":2,
+                "start": 136494220,
+                "end":136594220 
+        },
+        "AMY":{
+                "contig":1,
+
+                "_100k":"-",
+                "start": 103500000,
+                "end":   104910000,
+
+                "_100k":"-",
+                "_start": 104000000,
+                "_end": 104410000,
+
+                "_50K":"-",
+                "_start": 104050000,
+                "_end": 104360000,
+                "testing_start": 104157000,
+                "testing_end":104157020 
+        }
+    }
+
+
+
+
+
+
+
+}

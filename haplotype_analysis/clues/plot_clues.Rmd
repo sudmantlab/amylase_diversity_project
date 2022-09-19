@@ -1,0 +1,129 @@
+---
+title: "Untitled"
+output: html_document
+date: "2022-09-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(PNWColors)
+
+#fn_clues="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/clues/output_no_anc_AFR_or_AMR/ancient_timecourse/AMY/combined_clues.tsv"
+fn_clues="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/clues/output_TSI_FIN_GBR_all_ancient/ancient_timecourse/AMY/combined_clues.tsv"
+t_clues=read.table(fn_clues,header=TRUE,sep="\t")
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/clues/output_plots"
+```
+
+```{r}
+
+n_sig = 15
+colors = c("grey",pnw_palette("Bay",6))
+colors = c("grey",pnw_palette("Bay",50))
+#colors = c("grey",pnw_palette("Bay",16))
+p_values = t_clues %>%
+            dplyr::select(position,p,f,s) %>%
+            unique() %>% 
+            arrange(p) %>%
+            mutate(n=n()) %>%
+            mutate(p_adj = p*n)
+n=p_values$n[1]
+
+bon_cutoff = -log10(0.05/n)
+
+
+#best_p = (p_values %>% arrange(p) %>% filter(-log10(p)>bon_cutoff))$position[c(1:n_sig)]
+
+best_p = p_values %>% 
+         filter(-log10(p)>bon_cutoff) %>%
+         arrange(p) 
+         #mutate(round_pos = signif(position/2e5,3)) %>%
+         #group_by(round_pos) %>%
+         #summarize(position=position[which.min(p)])
+          
+p_values=p_values %>% mutate(color = ifelse(position%in%best_p$position,position,0))
+
+breaks = seq(signif(min(p_values$position),4),signif(max(p_values$position),4),2e5)
+labels = breaks/1e6
+label = paste("chr1:",labels[1],"-",labels[-1],"Mb",sep="")
+amy_block_df = data.frame(s=104111088,e=104304225)
+
+g=ggplot(p_values)
+g=g+geom_rect(aes(xmin=s,xmax=e,ymin=-Inf,ymax=Inf),alpha=1/5,fill="grey",data=amy_block_df)+
+  geom_point(aes(x=position,y=-log10(p),size=s,color=factor(color),alpha=.8))+
+  #geom_vline(aes(xintercept=snp),data=snps)+
+  geom_hline(yintercept=bon_cutoff,linetype='dotted')+
+  #theme_bw(base_size=8)+
+  theme_classic(base_size=8)+
+  theme(legend.position = "None")+
+  #theme(panel.grid=element_blank())+
+  scale_size_continuous(range=c(0.1,1.5))+
+  scale_color_manual(values=colors)+
+  scale_x_continuous(label,breaks=breaks,labels = labels)+
+  geom_segment(aes(y=0,yend=10,x=-Inf,xend=-Inf),lineend = "round")+
+  geom_segment(aes(x=103.5*1e6,xend=104.9*1e6,y=-Inf,yend=-Inf),lineend = "round")+
+  theme(axis.line=element_blank())
+  
+pdf(paste(outdir,"/p_values.pdf",sep=""),width=2.25,height=1.75) 
+print(g)
+dev.off()
+
+```
+
+
+
+```{r}
+
+g_time = 30
+traj = t_clues %>% 
+        filter(position %in% best_p$position) %>%
+        mutate(t = -1*gens_bp*g_time) %>%
+        mutate(color = ifelse(position%in%best_p$position,position,0))
+  
+breaks = seq(-15000,0,5000)
+labels = paste(breaks/1000)
+label = "kyr BP"
+
+g=ggplot(traj)
+g=g+geom_line(aes(x=t,y=freq,group=position,color=factor(color)),alpha=0.8)+ 
+  #theme_bw(base_size=8)+
+  theme_classic(base_size=8)+
+  scale_y_continuous("DAF",lim=c(0,.25))+
+  theme(panel.grid=element_blank())+
+  scale_color_manual(values=colors[2:length(colors)])+
+  theme(legend.position="None")+
+  scale_x_continuous(label,breaks=breaks,labels = labels)+
+  geom_segment(aes(x=-15000,xend=0,y=-Inf,yend=-Inf),lineend = "round")+
+  geom_segment(aes(y=0,yend=0.25,x=-Inf,xend=-Inf),lineend = "round")+
+  theme(axis.line=element_blank())
+  
+
+pdf(paste(outdir,"/traj.pdf",sep=""),width=1.25,height=1.75) 
+print(g)
+dev.off()
+
+mean(best_p$s)
+median(best_p$s)
+
+```
+```{r}
+# snps = data.frame(snp = c(104040027,
+#                   104360512,
+#                   104329877,
+#                   104324819,
+#                   104065653,
+#                   104895687,
+#                   104321349,
+#                   104311712,
+#                   104580702,
+#                   104017778,
+#                   104063941,
+#                   104321349,
+#                   104067608,
+#                   104321349))
+
+```
