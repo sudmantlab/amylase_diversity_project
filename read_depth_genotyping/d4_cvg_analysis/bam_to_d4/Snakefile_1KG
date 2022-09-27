@@ -1,0 +1,52 @@
+#!vim set syntax=python
+import pandas as pd
+import pdb
+
+configfile: "1KG_config.json"
+
+
+def get_inputs(wildcards):
+    inputs = [] 
+    t = pd.read_csv("./meta_data/1000G_2504_high_coverage.sequence.index", sep="\t") 
+    for ix,row in t.iterrows():
+        SID = row['SAMPLE_ID']
+        name= row['SAMPLE_NAME'].rstrip()
+        pop = row['POPULATION']
+        run_id = row['RUN_ID']
+        fn = "{name}.{run_id}.{pop}.d4".format(name=name,
+                                               run_id=run_id,
+                                               pop=pop)
+                                                 
+        cram_path = "{path}/{run_id}/{name}.final.cram".format(path=config['path'],
+                                                          run_id=run_id,
+                                                          name=name)
+        if cram_path in config['failed_paths']: continue
+        inputs.append("d4_files/1KG/q0/{fn}".format(fn=fn))
+        inputs.append("d4_files/1KG/q20/{fn}".format(fn=fn))
+    return inputs
+
+rule all:
+    input:
+        get_inputs
+
+
+rule make_d4:
+    output:
+        "d4_files/1KG/{mapq}/{name}.{run_id}.{pop}.d4"
+    run:
+        d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
+        path = "{path}/{run_id}/{name}.final.cram".format(path=config['path'],
+                                                          run_id=wildcards.run_id,
+                                                          name=wildcards.name)
+        #cmd = "{d4} create -r {fai_path} -z -q20 {path} {output}"
+        cmd = "{d4} create -r {fai_path} -z -{mapq} {path} {output}"
+        cmd = cmd.format(d4=d4_tools,
+                         path=path,
+                         mapq=wildcards.mapq,
+                         fai_path=config["fn_fai"],
+                         output=output[0])
+        shell(cmd)
+        #print(cmd)
+
+
+

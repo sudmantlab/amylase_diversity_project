@@ -1,0 +1,41 @@
+#!vim set syntax=python
+
+
+configfile: "HGDP_config.json"
+
+
+def get_inputs(wildcards):
+    inputs = [] 
+    for p in config['sample_paths']:
+        s = p.split("/")[-1].replace(".cram","") 
+        inputs.append("d4_files/HGDP/q20/{sample}.d4".format(sample=s))
+        inputs.append("d4_files/HGDP/q0/{sample}.d4".format(sample=s))
+                                                                 
+    return inputs
+
+rule all:
+    input:
+        get_inputs
+
+
+rule make_d4:
+    output:
+        "d4_files/HGDP/{mapq}/{sample}.d4"
+    run:
+        d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
+        id,build,date,pop = wildcards.sample.split(".")
+        path = "{path}/{pop}/{id}/alignment/{sample}.cram".format(path=config['path'],
+                                                                  pop=pop,
+                                                                  id=id,
+                                                                  sample=wildcards.sample)
+        cmd = "{d4} create -r {fai_path} -z -{mapq} {path} {output}"
+        cmd = cmd.format(d4=d4_tools,
+                         path=path,
+                         mapq=wildcards.mapq,
+                         fai_path=config["fn_fai"],
+                         output=output[0])
+        shell(cmd)
+        #print(cmd)
+
+
+

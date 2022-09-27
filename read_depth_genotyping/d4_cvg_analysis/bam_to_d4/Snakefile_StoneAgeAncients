@@ -1,0 +1,40 @@
+#!vim set syntax=python
+
+configfile: "StoneAgeAncients_config.json"
+#configfile: "StoneAgeAncients_config_subset.json"
+
+
+def get_inputs(wildcards):
+    inputs = [] 
+    for s in config['hg38_bams']:
+        inputs.append("d4_files/StoneAgeAncients/q20/{sample}.d4".format(sample=s))
+        inputs.append("d4_files/StoneAgeAncients/q0/{sample}.d4".format(sample=s))
+        #inputs.append("d4_files/StoneAgeAncients_q0/{sample}.d4".format(sample=s))
+                                                                 
+    return inputs
+
+rule all:
+    input:
+        get_inputs
+
+
+rule make_d4:
+    output:
+        "d4_files/StoneAgeAncients/{mapq}/{sample}.d4"
+        #"d4_files/StoneAgeAncients_q0/{sample}.d4"
+    run:
+        d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
+        path = "{path}/{sample}.bam".format(path=config['hg38_bam_dir'],
+                                            sample=wildcards.sample)
+        #cmd = "{d4} create -z -q 60 {path} {output}"
+        #cmd = "{d4} create -z -q0 {path} {output}"
+        cmd = "{d4} create -z -{mapq} {path} {output}"
+        cmd = cmd.format(d4=d4_tools,
+                         path=path,
+                         mapq=wildcards.mapq,
+                         output=output[0])
+        shell(cmd)
+        #print(cmd)
+
+
+
