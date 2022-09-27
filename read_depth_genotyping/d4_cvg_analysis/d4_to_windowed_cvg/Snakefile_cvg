@@ -1,0 +1,99 @@
+#!vim set syntax=python
+import pandas as pd
+import numpy as np
+import pyd4 as d4
+import pdb
+
+#PLAN
+#read in locus
+#smooth locus
+#get mean / median
+#output to table to examine
+#np.savetxt("test", c, newline = "\n")
+
+configfile: "configs/allsamples_config.json"
+#configfile: "./configs/1kgsamples.json"
+#configfile: "./configs/1kgsamples_subset.json"
+#configfile: "genotype_ancient_subset.json"
+configfile: "./configs/cvg_loci.config"
+#locus_contig = "chr1"
+#locus_start = 103100000
+#locus_end = 104200000
+
+#fn_loci = "usher_et_al_hg38_loci.bed"
+#fn_loci = "genotype_loci.bed"
+
+
+def get_all_inputs(wildcards):
+    inputs = []
+    for locus,inf in config['loci'].items():
+        #inputs.append("output/cvg/{locus}/{locus}.1000.200.tsv.gz".format(locus=locus))
+        inputs.append("output/cvg/combined/{locus}.{w}.{s}.tsv.gz".format(locus=locus,
+                                                                          s=inf['slide'],
+                                                                          w=inf['window']))
+        #inputs.append("output/cvg/{locus}/{locus}.2500.200.tsv.gz".format(locus=locus))
+    return inputs
+
+rule all:
+    input:
+        #"output/cvg/amylase_locus_SGDP.tsv.gz"
+        #"output/cvg/amylase_locus_all.tsv.gz"
+        get_all_inputs
+
+def get_inputs(wildcards):
+    inputs = []
+    for sample, path in config['sample_paths'].items():
+        inputs.append("output/cvg/{locus}/subfiles/{locus}.{w}.{s}/{sample}.tsv.gz".format(sample=sample,
+                                                                        locus=wildcards.locus,
+                                                                        w=wildcards.w,
+                                                                        s=wildcards.s))
+    return inputs
+
+
+rule combine_genotypes:
+    input:
+        get_inputs
+    output:
+        "output/cvg/combined/{locus}.{w}.{s}.tsv.gz"
+    run:
+        cmd = "zcat output/cvg/{locus}/subfiles/{locus}.{w}.{s}/* | gzip -c >{output}"
+        print(wildcards.locus)
+        cmd = cmd.format(locus=wildcards.locus,
+                   output=output[0],
+                   w=wildcards.w,
+                   s=wildcards.s)
+        print(cmd)
+        shell(cmd)
+
+
+rule get_cvg:
+    output:
+        "output/cvg/{locus}/subfiles/{locus}.{w}.{s}/{sample}.tsv.gz"
+    run:
+        d4_tools = "/global/scratch/users/psudmant/software/d4-format//target/release/d4tools"
+        path = config['sample_paths'][wildcards.sample]
+        locus_inf = config['loci'][wildcards.locus]
+        locus_coords = "{c}:{s}-{e}".format(c=locus_inf['contig'],
+                                            s=locus_inf['start'],
+                                            e=locus_inf['end'])
+        fn_mappability = "/global/scratch/users/psudmant/projects/amylase/mappability/windowmaskerSdust.bed"
+        cmd = ("{d4_tools} show "
+               "{d4_path} " 
+               "{locus_coords} | awk -v OFS='\\t' -v s='{sample}' '{{{{print $0,s }}}}' | "
+               #"bedtools subtract -a - -b {fn_map} |" 
+               "awk -v w={w} -v s={s} -f bedgraph_to_windowed_cvg_slide.awk |"
+               "gzip -c >"
+               "{fn_out}".format(d4_tools=d4_tools,
+                                 d4_path=path,
+                                 locus_coords = locus_coords,
+                                 sample = wildcards.sample,
+                                 s=wildcards.s,
+                                 w=wildcards.w,
+                                 fn_map = fn_mappability,
+                                 fn_out=output[0]))
+        shell(cmd)
+
+
+
+
+

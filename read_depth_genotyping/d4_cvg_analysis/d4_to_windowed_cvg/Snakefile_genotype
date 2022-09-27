@@ -1,0 +1,60 @@
+#!vim set syntax=python
+import pandas as pd
+
+#configfile: "genotype_config.json"
+configfile: "SGDPsamples.json"
+#fn_loci = "usher_et_al_hg38_loci.bed"
+fn_loci = "genotype_loci.bed"
+
+rule all:
+    input:
+        "output/genotype/amylase_genotypes.tsv"
+
+
+def get_inputs(wilcards):
+    inputs = []
+    for sample, path in config['sample_paths'].items():
+        inputs.append("output/genotype/subfiles/{sample}.tsv".format(sample=sample))
+    return inputs
+
+rule combine_genotypes:
+    input:
+        get_inputs
+    output:
+        "output/genotype/amylase_genotypes.tsv"
+    run:
+        tables = []
+        names = ["contig","start","end","mean"]
+        for f in input:
+            name = f.split("/")[-1].replace(".tsv","")
+            t=pd.read_csv(f, header=None, 
+                          names=names,
+                          sep="\t")
+            t["name"] = name
+            tables.append(t)
+        t = pd.concat(tables)
+        t.to_csv(output[0], sep="\t", index=False)
+
+
+rule genotype:
+    output:
+        #temp("output/subfiles/{sample}.tsv")
+        "output/genotype/subfiles/{sample}.tsv"
+    run:
+        d4_tools = "/global/scratch2/psudmant/software/d4-format-d4tools-v0.3.7/target/release/d4tools"
+        path = config['sample_paths'][wildcards.sample]
+        cmd = ("{d4_tools} stat "
+               "-s median "
+               "-r {fn_loci}  "
+               "{d4_path} > " 
+               "{fn_out}".format(d4_tools=d4_tools,
+                                 d4_path=path,
+                                 fn_loci = fn_loci,
+                                 fn_out=output[0]))
+        #print(cmd)
+        shell(cmd)
+
+
+
+
+

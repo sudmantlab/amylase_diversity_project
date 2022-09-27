@@ -1,0 +1,163 @@
+#!vim set syntax=python
+import pandas as pd
+import pdb
+import json
+import glob
+
+configfile: "../meta_data/config_final_ancient_info.json"
+
+
+pop_dict = {"South Asia": "SA",
+            "Africa": "AFR",
+            "West Eurasia":"WEA", 
+            "Oceania":"OCN",
+            "East Asia":"EA",
+            "America":"AMR",
+            "Central Asia and Siberia":"CAS"}
+
+exclude = ["SGDP.LP6005441-DNA_C06.Japanese.EA",
+           "SGDP.LP6005519-DNA_F06.Dusun.OCN",
+           "1KG.HG03025.GWD.AFR",
+           "1KG.HG03366.ESN.AFR",
+           "1KG.HG02635 .GWD.AFR",
+           "1KG.HG03689.STU.SA",
+           "1KG.NA18974.JPT.EA",
+           "1KG.HG03689.STU.SA",
+           "1KG.HG02635.GWD.AFR",
+           "1KG.HG02635.GWD.AFR",
+           "1KG.NA18974.JPT.EA"]
+
+pop_to_region = {"ACB":"AMR",
+                 "ASW":"AMR",
+                 "BEB":"SA",
+                 "CDX":"EA",
+                 "CEU":"WEA",
+                 "CHB":"EA",
+                 "CHS":"EA",
+                 "CLM":"AMR",
+                 "ESN":"AFR",
+                 "FIN":"WEA",
+                 "GBR":"WEA",
+                 "GIH":"SA",
+                 "GWD":"AFR",
+                 "IBS":"WEA",
+                 "ITU":"SA",
+                 "JPT":"EA",
+                 "KHV":"EA",
+                 "LWK":"AFR",
+                 "MSL":"AFR",
+                 "MXL":"AMR",
+                 "PEL":"AMR",
+                 "PJL":"SA",
+                 "PUR":"AMR",
+                 "STU":"SA",
+                 "TSI":"WEA",
+                 "YRI":"AFR"}
+
+
+
+rule all:
+    input:
+        "configs/allsamples_config.json"
+
+
+rule make_config:
+    output:
+        "configs/allsamples_config.json",
+        "configs/SGDPsamples.json",
+        "configs/HGDPsamples.json",
+        "configs/ancientsamples.json",
+        "configs/1kgsamples.json",
+        "configs/1kgsamples_subset.json"
+    run:
+        t = pd.read_csv("../meta_data/HGDP_SGDP_human_table.tsv",header=0,sep="\t")
+
+
+        t_1kg = pd.read_csv("../meta_data/1000G_2504_high_coverage.sequence.index", sep="\t") 
+        
+        mapq = "q0"        
+
+        config_out = {"sample_paths":{}} 
+        config_HGDP = {"sample_paths":{}} 
+        config_SGDP = {"sample_paths":{}} 
+        config_ancient = {"sample_paths":{}} 
+        config_1kg = {"sample_paths":{}} 
+        config_1kg_subset = {"sample_paths":{}} 
+
+
+        d4_path="/global/scratch2/psudmant/projects/amylase/d4_files"
+
+        for ix,row in t_1kg.iterrows():
+            SID = row['SAMPLE_ID']
+            name= row['SAMPLE_NAME'].rstrip()
+            pop = row['POPULATION']
+            run_id = row['RUN_ID']
+            #1KG.ID.SUPERPOP.SUBPOP
+            sample_path = "{d4_path}/1KG/{mapq}/{name}.{run_id}.{pop}.d4".format(d4_path=d4_path,
+                                                                 name=name,
+                                                                 run_id=run_id,
+                                                                 mapq=mapq,
+                                                                 pop=pop)
+            region = pop_to_region[pop] 
+            sample_name = "1KG.{name}.{pop}.{region}".format(name=name,
+                                                             pop=pop,
+                                                             region=region)
+            if sample_name in exclude: continue
+
+            config_out["sample_paths"][sample_name] = sample_path
+            config_1kg["sample_paths"][sample_name] = sample_path
+            if ix%50 == 0:
+                print(ix)
+                config_1kg_subset["sample_paths"][sample_name] = sample_path
+
+
+
+        for ix, row in t[t.DATSET=="SGDP"].iterrows():
+            pop = row["ETHNIC GROUP"].replace(" ","")
+            sample_path = "{d4_path}/SGDP/{mapq}/{id}.d4".format(d4_path=d4_path,
+                                                          mapq=mapq,
+                                                          id = row["NAME"])
+                                                        
+            sample_name = "SGDP.{ID}.{E}.{R}".format(ID=row["NAME"],
+                                                     E=pop,
+                                                     R=pop_dict[row["REGION"]])
+            if sample_name in exclude: continue
+            #config_out["sample_paths"][sample_name] = sample_path
+            config_SGDP["sample_paths"][sample_name] = sample_path
+                                          
+
+        for ix, row in t[t.DATSET=="HGDP"].iterrows():
+            pop = row["ETHNIC GROUP"].replace(" ","")
+            sample_path = "{d4_path}/HGDP/{mapq}/{id}.alt_bwamem_GRCh38DH.20181023.{pop}.d4".format(d4_path=d4_path,
+                                                          mapq=mapq,
+                                                          id = row["NAME"],
+                                                          pop = pop)
+                                                        
+            sample_name = "HGDP.{ID}.{E}.{R}".format(ID=row["NAME"],
+                                                     E=pop,
+                                                     R=pop_dict[row["REGION"]])
+            config_out["sample_paths"][sample_name] = sample_path
+            config_HGDP["sample_paths"][sample_name] = sample_path
+
+
+        for sample_path in glob.glob("{path}/StoneAgeAncients/{mapq}/*".format(path=d4_path,mapq=mapq)):
+            sample = sample_path.split("/")[-1].split(".")[0] 
+            sample_inf = config[sample]
+            pop = sample_inf["region"].replace("(","").replace(")","")
+            region = sample_inf["popGrouping"].replace(" ","").replace("(","").replace(")","")
+            sample_name = "StoneAgeAncient.{ID}.{E}.{R}".format(ID=sample,
+                                                                E=pop,
+                                                                R=region)
+            config_out["sample_paths"][sample_name] = sample_path
+            config_ancient["sample_paths"][sample_name] = sample_path
+
+        #print(json.dumps(config_out, indent=4, sort_keys=True))
+        open(output[0],"w").write(json.dumps(config_out, indent=4, sort_keys=True))
+        open(output[1],"w").write(json.dumps(config_SGDP, indent=4, sort_keys=True))
+        open(output[2],"w").write(json.dumps(config_HGDP, indent=4, sort_keys=True))
+        open(output[3],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
+        open(output[4],"w").write(json.dumps(config_1kg, indent=4, sort_keys=True))
+        open(output[5],"w").write(json.dumps(config_1kg_subset, indent=4, sort_keys=True))
+
+
+
