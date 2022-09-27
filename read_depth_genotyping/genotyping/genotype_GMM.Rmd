@@ -1,0 +1,201 @@
+---
+title: "Untitled"
+output: html_document
+date: '2022-07-15'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r }
+library(tidyverse)
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+fn_gts = paste(outdir,"/genotypes.tsv",sep="")
+g_gts = read.table(fn_gts, sep="\t",header=T)
+
+g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_grid(name~.,scales="free")+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+to_gt = t_gt %>% filter(name=="AMY2A") %>% dplyr::select(sample,gt) 
+to_gt = t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt) 
+to_gt = t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) 
+```
+```{r}
+
+###FUNCTIONS
+
+E_step = function(X,k,mu,offset,sigma,pi,iter){
+  #calc responsibilities
+  resps = list()
+  for (i in seq(k)){
+    resps[[i]] = data.frame(r=dnorm(X,mu[i]+offset,sigma)*pi[i],i=i,X=X,iter=iter) %>% mutate(obs=row_number())
+  }
+  df_resps = do.call(rbind, resps) %>%
+    group_by(obs) %>%
+    mutate(t = sum(r)) %>%
+    mutate(r=r/t) %>%
+    dplyr::select(r,obs,i,X)
+  return(df_resps)
+}
+
+M_step = function(df_resps,k,mu,offset,iter){
+  #update sigma, pi
+  pi = (df_resps %>% 
+        group_by(i) %>%
+        summarize(pi = sum(r)))$pi
+
+  pi = pi/sum(pi)
+  ###HOW DO I UPDATE THE OFFSET!??!
+  
+  ###HAVE NOT ADDED OFFSET YET!!! who bfoken?
+  num = df_resps %>% 
+    ungroup() %>%
+    #inner_join(data.frame(mu+offset) %>% mutate(i=row_number()),on=i) %>%
+    inner_join(data.frame(mu=mu+offset) %>% mutate(i=row_number()),on=i) %>%
+    summarize(num=sum(r*(X-mu)^2))
+  
+  denom = df_resps %>% 
+          ungroup() %>%
+          summarize(den=sum(r))
+  sigma = sqrt(num$num/denom$den)
+  
+  return(list("sigma"=sigma,
+              "pi"=pi,
+              "offset"=offset,
+              "iter"=iter))
+}
+
+get_dists = function(k,mx_copy,mu,offset,sigma,pi,iter){
+  plot_df = list()
+  for (i in seq(k)){
+    x_vals = seq(0,mx_copy+1,0.01)
+    y_vals = pi[i]*dnorm(x_vals,mu[i]+offset,sigma)
+    plot_df[[i]]=data.frame(x=x_vals,y=y_vals,i=i,iter=iter)
+  }
+  plot_df = do.call(rbind, plot_df)
+  return(plot_df)
+}
+
+
+```
+```{r}
+### number of clusters
+mn_copy = round(min(to_gt$gt))
+mx_copy = round(max(to_gt$gt))
+k = mx_copy - mn_copy + 1
+
+##initialize parameters
+mu = seq(mn_copy,mx_copy)
+pi = rep(1/k,k)
+sigma = 0.5
+offset = 0
+
+##data
+X = to_gt$gt
+
+params = list()
+dists = list()
+dists[[1]] = get_dists(k,mx_copy,mu,offset,sigma,pi,1)
+
+for (j in seq(2,10)){
+  df_resps = E_step(X,k,mu,offset,sigma,pi,j)
+  params = M_step(df_resps,k,mu,offset,j)
+  pi = params$pi
+  sigma = params$sigma
+  offset = params$offset
+  dists[[j]] = get_dists(k,mx_copy,mu,offset,sigma,pi,j)
+}
+dists = do.call(rbind, dists)
+
+adj = 100
+g=ggplot(dists)+
+  geom_histogram(aes(x=gt),data=to_gt,binwidth = 0.1)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,mx_copy))
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+fn_out = paste(outdir,"/gmm_genotypes.pdf",sep="")
+pdf(fn_out,width=8,height=5)
+print(g)
+dev.off()
+
+g=ggplot(dists %>% filter(iter==10))+
+  geom_histogram(aes(x=gt),data=to_gt,binwidth = 0.1)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,mx_copy))
+print(g)
+
+# df_resps = E_step(X,k,mu,sigma,pi,1)
+# params = M_step(df_resps,k,mu,resps,1)
+# pi = params$pi
+# sigma = params$sigma
+# 
+# ggplot(get_dists(k,mx_copy,mu,sigma,pi))+
+#   geom_line(aes(x=x,y=y,color=factor(i)))+theme_bw()
+# 
+# df_resps = E_step(X,k,mu,sigma,pi,2)
+# params = M_step(df_resps,k,mu,resps,1)
+# pi = params$pi
+# sigma = params$sigma
+# 
+# ggplot(get_dists(k,mx_copy,mu,sigma,pi))+
+#   geom_line(aes(x=x,y=y,color=factor(i)))+theme_bw()
+# 
+
+
+```
+```{r}
+
+mus = x_amy1$parameters$mean
+weights = x_amy1$parameters$pro
+var = x_amy1$parameters$variance$sigmasq
+
+x_vals = seq(0,6,0.01)
+y_vals = x_vals*0
+  
+for (i in seq(1,9)){
+  #y_vals = y_vals + weights[i]*dnorm(x_vals,mus[i],sqrt(var))
+  y_vals = y_vals + weights[i]*dnorm(x_vals,mus[i],sqrt(var))
+}
+E_step = function(X,k,mu,sigma,pi,iter){
+  # grid <- seq()
+  #   expand.grid(x = seq(0, 6, length.out=200), y = seq(40, 100, length.out=200))
+  # G1 = cbind(grid, p=dmvnorm(grid, mu[[1]], cov[[1]])*a[[1]]) %>% mutate(d="G1")
+  # G2 = cbind(grid, p=dmvnorm(grid, mu[[2]], cov[[2]])*a[[2]]) %>% mutate(d="G2")
+  # df_dists = rbind(G1,G2) %>% mutate(iteration=iteration)
+  
+  resps = list()
+  t_gt[[i]]=t_sub_gt
+  
+  for (i in seq(k)){
+    resps[[i]] = data.frame(r=dnorm(X,mu[i],sigma)*pi[i],i=i) %>% mutate(obs=row_number())
+  }
+  resps = do.call(rbind, resps) %>%
+    group_by(obs) %>%
+    mutate(t = sum(r))
+  return resps
+  # df_resps = cbind(X, dnorm(X,mus[1],sqrt(var))
+  #                  
+  #                 G1=dmvnorm(as.matrix(data), mu[[1]], cov[[1]])*pi[[1]],
+  #                 G2=dmvnorm(as.matrix(data), mu[[2]], cov[[2]])*pi[[2]]) %>%
+  #           mutate(t=G1+G2) %>%
+  #           gather(key=d, value=r,-c(x,y,t)) %>%
+  #           mutate(r=r/t) %>%
+  #           mutate(iteration=iteration)
+  
+  # return(list("df_dists"=df_dists,
+  #             "df_resps"=df_resps))
+}
+
+```

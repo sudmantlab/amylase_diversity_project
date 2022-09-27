@@ -1,0 +1,308 @@
+---
+title: "Untitled"
+output: html_document
+date: '2022-07-14'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(tidyverse)
+#install.packages("R.utils")
+#t_cvg = data.table::fread("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/amylase_locus_SGDP.tsv.gz",header=T,sep="\t") %>% 
+  t_wnd_cvg_dist = data.table::fread("/Users/petersudmant/tmp/amylase/input/combined/chr1_p_control_dist1M_1000.1000.500.tsv.gz",header=F,sep="\t",col.names = c("contig","start","end","cvg","sample"))
+  t_wnd_cvg_prox = data.table::fread("/Users/petersudmant/tmp/amylase/input/combined/chr1_p_control_prox1M_1000.1000.500.tsv.gz",header=F,sep="\t",col.names = c("contig","start","end","cvg","sample"))
+t_cvg = rbind(t_wnd_cvg_dist,t_wnd_cvg_prox)
+
+  #separate(name,into = c("source","ID","pop","region"),sep="\\.")
+```
+```{r}
+#calculate coverage stats for QC and to transform to copy later
+t_wnd_cvg_subset = t_wnd_cvg #%>% filter(grepl("Ancient",sample))
+
+# quants = t_wnd_cvg_subset %>% 
+#   group_by(sample) %>%
+#   summarize(x = quantile(cvg, c(0.1,0.25, 0.5, 0.75,0.9)), q = c(0.1,0.25, 0.5, 0.75,0.9))
+
+mus = t_wnd_cvg_subset %>% 
+  group_by(sample) %>%
+  summarize(sdev = sd(cvg),
+         mu=mean(cvg),
+         med = median(cvg))
+
+t_wnd_cvg_subset =t_wnd_cvg_subset %>% inner_join(mus,by="sample")
+
+summary_inf = t_wnd_cvg_subset %>% 
+  group_by(sample) %>%
+  mutate(cp=2*cvg/med) %>%
+  mutate(sq_delta_med = (cp-2)^2) %>%
+  summarize(cvg_med = mean(med),
+            cvg_mu = mean(cvg),
+            cvg_sd = sd(cvg),
+            cp_sd = sd(cp),
+            cp_med_sd = sqrt(mean(sq_delta_med))) %>%
+  arrange(cp_med_sd) 
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4/"
+fn_out = paste(outdir,"/genome_summary_stats.tsv",sep="")
+write.table(summary_inf,fn_out,sep="\t",row.names = FALSE)
+
+```
+
+
+```{r}
+summary_inf %>% arrange(-cp_sd)
+
+select_samples = summary_inf$sample[1:10]
+select_samples = summary_inf %>% filter(cvg_med==0) 
+select_samples = off_samples
+t_wnd_cvg_hist = t_wnd_cvg_subset %>% filter(sample %in% select_samples)
+summary_inf_subset = summary_inf %>% filter(sample %in% select_samples)
+
+df_lines = data.frame(x=seq(0,6,1))
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+fn_out = paste(outdir,"/means.pdf",sep="")
+pdf(fn_out,width=4,height=8)
+g=ggplot(t_wnd_cvg_hist)
+g+#geom_histogram(aes(x=2*cvg/med),binwidth=.01)+
+  geom_histogram(aes(x=cvg),binwidth=10)+
+  #geom_vline(aes(xintercept=x),data=df_lines,color="orange",size=.1)+
+  #geom_text(aes(x=5,y=),data=df_lines,color="orange",size=.1)+
+  #geom_vline(aes(xintercept=med),data=summary_inf_subset,color="red",size=.1)+
+  #geom_vline(aes(xintercept=mu),data=mus,color="blue",size=.1)+
+  #scale_x_continuous(lim=c(0,10))+   
+  theme_bw(base_size=3)+
+  facet_wrap(~sample,ncol=1,scales="free")
+dev.off()
+
+summary_inf_subset
+#max(t_wnd_cvg_subset$start)
+```
+
+```{r}
+  #geom_line(aes(x=start,y=depth))+theme_bw()
+#dev.off()
+
+
+#t_wnd_cvg %>% filter(sample=="StoneAgeAncient.NEO119.WesternEurope.EarlyFarmer") %>% filter(cvg>60)
+# chr1	1006999	1007999
+# t_wnd_cvg %>% filter(start==1006999)
+# 1006999 1008799
+
+
+
+
+
+# t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/amylase_genotypes.tsv",header=T,sep="\t") 
+# 
+# loci = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/genotype_loci.bed",header=F,sep="\t",col.names=c("contig","start","end","locus")) 
+#   
+# #t_hq$sample
+# #t_sum = 
+#   
+# t_sum = t %>% inner_join(loci,by=c("contig","start","end")) %>%
+#   dplyr::select(name,locus,mean) %>%
+#   pivot_wider(names_from = "locus",values_from = "mean") %>%
+#   mutate(AMY1_sum = AMY1A+AMY1B+AMY1C) %>%
+#   pivot_longer(cols=-c("control","name"),names_to = "locus",values_to = "value") %>%
+#   mutate(cp = 2*(value/control)) %>%
+#   separate(name,into = c("source","ID","pop","region"),sep="\\.",remove =FALSE) %>%
+#   filter((source %in% c("HGDP","SGDP")))
+
+```
+```{r}
+# g=ggplot(loci %>% mutate(y=row_number()))
+# g+geom_segment(aes(x=start,xend=end,y=y,yend=y))+
+#   geom_text(aes(x=start,y=y,label=locus))+
+#     theme_bw()
+# s=103550000
+# e=103800000
+```
+
+```{r}
+
+# #### THIS DOES NOT WORK -> I DUNNO WHY
+# outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output"
+# 
+# fn_out = paste(outdir,"/d4/facet_SGDP.pdf",sep="")
+# pdf(fn_out,width=12,height=8)
+#   
+# g=ggplot(t_sum)# %>% filter(locus %in% c("AMY2B_B1","AMY2A_FIRST_B1")))
+# g+geom_histogram(aes(x=cp),binwidth = 0.05)+
+#   theme_bw()+
+#   facet_grid(locus~.,scales="free")+
+#   scale_x_continuous(breaks=seq(0,18))
+#   #facet_grid(locus~region)
+# dev.off()
+
+```
+
+
+###COVERAGE!!!! The code above here is based on my dumb genotyper which doesn't smooth etc
+```{r}
+
+
+```
+```
+
+
+```
+
+```{r}
+###ORIGINAL CODE
+mx_d = 500
+library(RcppRoll)
+
+
+###NEEDS FIXING
+
+s = 103100000
+e = 103400000
+size = e-s
+
+t_smoothed_cvg = t_cvg %>%
+  group_by(sample) %>%
+  mutate(smooth_cvg = roll_mean(cvg,1000,fill=TRUE,na.rm=TRUE))
+  
+mus = t_smoothed_cvg %>% 
+  filter(end<103400000) %>%
+  group_by(sample) %>%
+  filter(cvg<mx_d) %>%
+  filter(start%%500==0) %>%
+  #summarize(mu=median(smooth_cvg))
+  summarize(mu=mean(cvg))
+  #summarize(mu = sum((end-start)*cvg/size))
+
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+fn_out = paste(outdir,"/means.pdf",sep="")
+pdf(fn_out,width=4,height=8)
+g=ggplot(t_smoothed_cvg %>% filter(start<103400000))
+g+geom_violin(aes(x=smooth_cvg,y=sample))+
+  geom_point(aes(x=mu,y=sample),data=mus)+
+  scale_x_continuous(lim=c(0,30))+
+  theme_bw(base_size=3)
+  #geom_line(aes(x=start,y=depth))+theme_bw()
+dev.off()
+
+
+highcov_ancients = (mus %>% filter(grepl("Ancient",sample)) %>% arrange(-mu))$sample
+```
+
+```{r}
+
+genes = data.frame(names=c("RNPC3", "AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
+                   start=c(103525691,103571100,103617427,103655760,103687415,103749898),
+                   end=c(103553343,103579530,103625780,103664554,103696210,103758692))
+s=103550000
+e=103800000
+
+Ancients = (mus %>% filter(grepl("Ancient",sample)))$sample
+yamnaya = (mus %>% filter(grepl("Yamnaya",sample)))$sample
+t_plot_full = t_cvg %>%
+  #filter(sample %in% unique(t_cvg$sample)[1:10]) %>%
+  #filter(sample %in% yamnaya) %>%
+  inner_join(mus,by="sample") %>%
+  #filter(start>s,end<e) %>% 
+  mutate(cp = 2*cvg/mu) %>%
+  mutate(smooth_cp = cp) 
+  #mutate(smooth_cp = roll_mean(cp,1000,fill=TRUE,na.rm=TRUE))
+
+#1000 seems best
+
+t_plot_subset = t_plot_full %>%
+                filter(start%%1000==0)
+                #filter(sample %in% highcov_ancients[1:20])
+                #filter(sample %in% Ancients[1:20])
+
+```
+```{r}
+
+#t_usher_gt_blocks = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/usher_et_al_hg38_loci.bed",header=F,col.names=c("chr","start","end","name"),sep="\t") %>%
+ # mutate(y=(row_number()%%7)/3)
+
+genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
+                             start=c(103566100,103613000,103635500,103687415,103733898),
+                             end=  c(103586530,103617780,103662000,103696210,103748000))
+# genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
+#                              start=c(103566100,103613000,103635500,103687415,103723898),
+#                              end=  c(103586530,103617780,103662000,103715210,103745000))
+
+
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+fn_out = paste(outdir,"/explore.pdf",sep="")
+pdf(fn_out,width=8,height=4)
+g=ggplot(t_plot_subset %>% mutate(is_ancient = grepl("Ancient",sample)))
+g+geom_line(aes(x=start,y=smooth_cp,color=sample),size=.1)+
+  geom_segment(aes(x=start,xend=end,y=-1,yend=-1),size=1,data=genes)+
+  geom_segment(aes(x=start,xend=end,y=0,yend=0),size=1,data=genotype_blocks,color='blue')+
+  #geom_segment(aes(x=start,xend=end,y=y-1,yend=y-1),size=1,data=t_usher_gt_blocks,color='red')+
+  #geom_text(aes(x=start,y=y-1,label=name),size=1,data=t_usher_gt_blocks)+
+  theme_bw()+
+  scale_y_continuous(lim=c(0,12),breaks=seq(0,12))+
+  theme(legend.position="None")+
+  coord_cartesian(xlim=c(s,e))+
+  facet_wrap(~is_ancient)
+dev.off()
+
+
+```
+```{r}
+
+t_gt = list()
+for (i in seq(dim(genotype_blocks)[1])){
+  curr_start = genotype_blocks$start[i]
+  curr_end = genotype_blocks$end[i]
+  locus = genotype_blocks$name[i]
+  size = curr_end-curr_start
+  t_sub_gt = t_plot_subset %>% 
+    filter(start>curr_start,end<curr_end) %>%
+    group_by(sample) %>%
+    summarize(gt = sum((end-start)*smooth_cp/size)) %>%
+    #summarize(gt = mean(smooth_cp)) %>%
+    mutate(locus=locus)
+  t_gt[[i]]=t_sub_gt
+}
+t_gt = do.call(rbind, t_gt) %>%
+        pivot_wider(values_from = "gt",names_from="locus") %>%
+        mutate(amy1_sum = AMY1A + AMY1B + AMY1C) %>%
+        pivot_longer(cols=-c("sample"),values_to="gt") %>%
+        separate(sample,into = c("source","ID","pop","region"),sep="\\.",remove=FALSE)
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+fn_out = paste(outdir,"/genotypes.tsv",sep="")
+write.table(t_gt,fn_out,sep="\t",row.names = FALSE)
+
+```
+```{r}
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+
+fn_out = paste(outdir,"/re_genotyped.pdf",sep="")
+pdf(fn_out,width=5,height=4)
+length(unique(t_gt$sample))
+g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))) %>% mutate(is_ancient=grepl("Ancient",sample)))
+#g=ggplot(t_gt %>% filter(!(grepl("Ancient",sample)))%>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))))
+g+geom_histogram(aes(x=gt,fill=is_ancient),binwidth=0.05)+
+  facet_grid(name~is_ancient,scales="free")+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+dev.off()
+
+fn_out = paste(outdir,"/re_genotyped_by_region.pdf",sep="")
+pdf(fn_out,width=5,height=4)
+length(unique(t_gt$sample))
+g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))) %>% mutate(is_ancient=grepl("Ancient",sample)))
+#g=ggplot(t_gt %>% filter(!(grepl("Ancient",sample)))%>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))))
+g+geom_histogram(aes(x=gt,fill=region),binwidth=0.05)+
+  facet_grid(region~name,scales="free_y")+
+  #facet_grid(name~is_ancient,scales="free")+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+dev.off()
+
+
+
+```
