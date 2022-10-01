@@ -28,7 +28,7 @@ rule make_d4:
                                             sample=wildcards.sample)
         #cmd = "{d4} create -z -q 60 {path} {output}"
         #cmd = "{d4} create -z -q0 {path} {output}"
-        cmd = "{d4} create -z -{mapq} {path} {output}"
+        cmd = "{d4} create -F ~256 -z -{mapq} {path} {output}"
         cmd = cmd.format(d4=d4_tools,
                          path=path,
                          mapq=wildcards.mapq,

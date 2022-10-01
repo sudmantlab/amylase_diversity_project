@@ -76,11 +76,15 @@ rule get_cvg:
         locus_coords = "{c}:{s}-{e}".format(c=locus_inf['contig'],
                                             s=locus_inf['start'],
                                             e=locus_inf['end'])
-        fn_mappability = "/global/scratch/users/psudmant/projects/amylase/mappability/windowmaskerSdust.bed"
+        #fn_repeat = "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/d4_to_windowed_cvg/mappability/simpleRepeat.pad250.bed"
+        fn_repeat = "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/d4_to_windowed_cvg/mappability/windowmaskerSdust/windowmaskerSdust.pad250.bed"
+        #fn_mappability="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/d4_to_windowed_cvg/mappability/umap/k36.Unique.Mappability.sorted.INV.bed"
+        #do not use windowmaskerSdust!!!
+        #actually do :)
         cmd = ("{d4_tools} show "
                "{d4_path} " 
                "{locus_coords} | awk -v OFS='\\t' -v s='{sample}' '{{{{print $0,s }}}}' | "
-               #"bedtools subtract -a - -b {fn_map} |" 
+               #"bedtools subtract -a - -b {fn_repeat} |" 
                "awk -v w={w} -v s={s} -f bedgraph_to_windowed_cvg_slide.awk |"
                "gzip -c >"
                "{fn_out}".format(d4_tools=d4_tools,
@@ -89,7 +93,8 @@ rule get_cvg:
                                  sample = wildcards.sample,
                                  s=wildcards.s,
                                  w=wildcards.w,
-                                 fn_map = fn_mappability,
+                                 fn_repeat = fn_repeat,
+                                 #fn_mappability = fn_mappability,
                                  fn_out=output[0]))
         shell(cmd)
 
