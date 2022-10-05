@@ -13,9 +13,12 @@ library(tidyverse)
 #t_cvg = data.table::fread("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/amylase_locus_SGDP.tsv.gz",header=T,sep="\t") %>% 
   t_wnd_cvg_dist = data.table::fread("/Users/petersudmant/tmp/amylase/input/combined/chr1_p_control_dist1M_1000.1000.500.tsv.gz",header=F,sep="\t",col.names = c("contig","start","end","cvg","sample"))
   t_wnd_cvg_prox = data.table::fread("/Users/petersudmant/tmp/amylase/input/combined/chr1_p_control_prox1M_1000.1000.500.tsv.gz",header=F,sep="\t",col.names = c("contig","start","end","cvg","sample"))
-t_cvg = rbind(t_wnd_cvg_dist,t_wnd_cvg_prox)
+t_wnd_cvg = rbind(t_wnd_cvg_dist,t_wnd_cvg_prox) 
 
-  #separate(name,into = c("source","ID","pop","region"),sep="\\.")
+
+```
+```{r}
+t_cvg %>% dplyr::select(sample) %>% unique() %>% tail()
 ```
 ```{r}
 #calculate coverage stats for QC and to transform to copy later
@@ -44,40 +47,45 @@ summary_inf = t_wnd_cvg_subset %>%
             cp_med_sd = sqrt(mean(sq_delta_med))) %>%
   arrange(cp_med_sd) 
 
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4/"
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
 fn_out = paste(outdir,"/genome_summary_stats.tsv",sep="")
 write.table(summary_inf,fn_out,sep="\t",row.names = FALSE)
 
+# u=50556.50
+# d=24816.00
+# 3*u+d
 ```
 
 
 ```{r}
+
+
 summary_inf %>% arrange(-cp_sd)
 
-select_samples = summary_inf$sample[1:10]
-select_samples = summary_inf %>% filter(cvg_med==0) 
-select_samples = off_samples
+select_samples = (summary_inf %>% filter(grepl("StoneAgeAncient",sample)))$sample[1:10]
+#select_samples = summary_inf %>% filter(cvg_med==0) 
+#select_samples = off_samples
 t_wnd_cvg_hist = t_wnd_cvg_subset %>% filter(sample %in% select_samples)
 summary_inf_subset = summary_inf %>% filter(sample %in% select_samples)
 
 df_lines = data.frame(x=seq(0,6,1))
 
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
-fn_out = paste(outdir,"/means.pdf",sep="")
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures"
+fn_out = paste(outdir,"/control_histogram.pdf",sep="")
 pdf(fn_out,width=4,height=8)
 g=ggplot(t_wnd_cvg_hist)
-g+#geom_histogram(aes(x=2*cvg/med),binwidth=.01)+
-  geom_histogram(aes(x=cvg),binwidth=10)+
+g+#geom_histogram(aes(x=2*cvg/mu),binwidth=.01)+
+  geom_histogram(aes(x=cvg),binwidth=.1)+
   #geom_vline(aes(xintercept=x),data=df_lines,color="orange",size=.1)+
   #geom_text(aes(x=5,y=),data=df_lines,color="orange",size=.1)+
-  #geom_vline(aes(xintercept=med),data=summary_inf_subset,color="red",size=.1)+
-  #geom_vline(aes(xintercept=mu),data=mus,color="blue",size=.1)+
-  #scale_x_continuous(lim=c(0,10))+   
+  geom_vline(aes(xintercept=cvg_med),data=summary_inf_subset,color="red",size=.1)+
+  geom_vline(aes(xintercept=cvg_mu),data=summary_inf_subset,color="blue",size=.1)+
+  #scale_x_continuous(lim=c(0,4))+   
   theme_bw(base_size=3)+
   facet_wrap(~sample,ncol=1,scales="free")
 dev.off()
 
-summary_inf_subset
+#summary_inf_subset
 #max(t_wnd_cvg_subset$start)
 ```
 

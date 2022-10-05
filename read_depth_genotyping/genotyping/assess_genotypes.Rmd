@@ -1,0 +1,259 @@
+---
+title: "Untitled"
+output: html_document
+date: "2022-10-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars}
+library(tidyverse)
+library(PNWColors)
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
+fn_gts = paste(outdir,"/genotypes.raw.tsv",sep="")
+t_genotypes = read.table(fn_gts, header=T, sep="\t")
+
+ancient_info = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/metadata/ancient_info.tsv",header=T,sep="\t") %>%
+  mutate(ID = sample, age=ageAverage) %>%
+  dplyr::select(ID, age)
+
+t_genotypes = left_join(t_genotypes,ancient_info,by="ID") %>%
+  mutate(age=ifelse(dataset!="StoneAgeAncient",0,as.numeric(age))) %>%
+  filter(sample!="StoneAgeAncient.VK117.NorthernEurope.Yamnaya") %>%
+  mutate(gt = round(gt))
+
+#filter this individual, looks funky, need to check more
+#StoneAgeAncient.VK117.NorthernEurope.Yamnaya	
+
+#unique(t_genotypes$dataset)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+library(ggjoy)
+library(cowplot)
+lmp <- function (modelobject) {
+    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(modelobject)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+}
+
+```
+```{r}
+
+########NOTE we jittered the moderns
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/trajectories"
+
+c = pnw_palette("Bay",5)[5]
+colors = pnw_palette("Bay",5)[1:4]
+
+t_amy1 = t_genotypes %>% 
+          filter(name=="amy1_sum") %>% 
+          filter(age<15000) %>%
+          filter(p2 %in% c("WEA",
+                           "Hunter-GathererE",
+                           "Hunter-GathererW",
+                           "Yamnaya",
+                           "EarlyFarmer")) %>%
+          mutate(nage=-1*age,
+                 gt_round=round(gt)) %>%
+          rowwise() %>%
+          mutate(j_age = ifelse(age==0,age+runif(1,-100,100),age))
+
+m=lm(gt~nage,data=t_amy1)
+p=lmp(m)
+df_label = data.frame(x=-11000,y=16.5,label=paste("P==",signif(p,3)))
+
+breaks = seq(-15000,0,5000)
+labels = paste(breaks/1000)
+label = "kyr BP"
+
+fn_out = paste(outdir,"/genotypes_amy1_by_age.pdf",sep="")
+
+#pdf(fn_out,width=2,height=1.75)
+g1=ggplot(t_amy1)
+g1=g1+geom_point(aes(x=-j_age, y=gt),alpha=.25,size=.01)+
+  geom_smooth(aes(x=-age, y=gt),color=c)+
+  geom_text(aes(x=x,
+                y=y,
+                label=label),
+            parse=TRUE,
+            size=3,
+            data=df_label,
+            hjust=0)+
+  scale_y_continuous("AMY1 copy",breaks=seq(0,16,2))+
+  scale_x_continuous(label,labels=labels,breaks=breaks)+
+  theme_bw()+
+  theme(legend.position="None")
+#print(g1)
+#dev.off()
+
+fn_out = paste(outdir,"/genotypes_amy1_by_age_traj.pdf",sep="")
+#pdf(fn_out,width=2,height=1.75)
+g2=ggplot(t_amy1)
+g2=g2+geom_smooth(aes(x=-age, y=gt),color=c)+
+  scale_y_continuous("AMY1 copy",breaks=seq(4,7,1))+
+  scale_x_continuous(label,labels=labels,breaks=breaks)+
+  theme_bw()
+#print(g2)
+#dev.off()
+
+fn_out = paste(outdir,"/genotypes_amy1_by_age_both.pdf",sep="")
+pdf(fn_out,width=4,height=1.75)
+g3=plot_grid(g1,g2,ncol=2,rel_widths=c(1,1),rel_heights=c(1,1))
+print(g3)
+dev.off()
+```
+```{r}
+
+########NOTE we jittered the moderns
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/trajectories"
+
+c = pnw_palette("Bay",5)[5]
+colors = pnw_palette("Bay",5)[1:4]
+
+t_amy2A = t_genotypes %>% 
+          filter(name=="AMY2A") %>% 
+          filter(age<15000) %>%
+          filter(p2 %in% c("WEA",
+                           "Hunter-GathererE",
+                           "Hunter-GathererW",
+                           "Yamnaya",
+                           "EarlyFarmer")) %>%
+          mutate(nage=-1*age,
+                 gt_round=round(gt)) %>%
+          rowwise() %>%
+          mutate(j_age = ifelse(age==0,age+runif(1,-100,100),age))
+
+m=lm(gt~nage,data=t_amy2A)
+p=lmp(m)
+df_label = data.frame(x=-11000,y=5,label=paste("P==",signif(p,3)))
+
+breaks = seq(-15000,0,5000)
+labels = paste(breaks/1000)
+label = "kyr BP"
+
+fn_out = paste(outdir,"/genotypes_amy2A_by_age.pdf",sep="")
+
+#pdf(fn_out,width=2,height=1.75)
+g1=ggplot(t_amy2A)
+g1=g1+geom_point(aes(x=-j_age, y=gt),alpha=.25,size=.01)+
+  geom_smooth(aes(x=-age, y=gt),color=c)+
+  geom_text(aes(x=x,
+                y=y,
+                label=label),
+            parse=TRUE,
+            size=3,
+            data=df_label,
+            hjust=0)+
+  scale_y_continuous("AMY2A copy",breaks=seq(0,5,1))+
+  scale_x_continuous(label,labels=labels,breaks=breaks)+
+  theme_bw()+
+  theme(legend.position="None")
+#print(g1)
+#dev.off()
+
+#fn_out = paste(outdir,"/genotypes_amy2A_by_age_traj.pdf",sep="")
+#pdf(fn_out,width=2,height=1.75)
+g2=ggplot(t_amy2A)
+g2=g2+geom_smooth(aes(x=-age, y=gt),color=c)+
+  #scale_y_continuous("AMY1 copy",breaks=seq(,7,1))+
+  scale_x_continuous(label,labels=labels,breaks=breaks)+
+  theme_bw()
+#print(g2)
+#dev.off()
+
+fn_out = paste(outdir,"/genotypes_amy2A_by_age_both.pdf",sep="")
+pdf(fn_out,width=4,height=1.75)
+g3=plot_grid(g1,g2,ncol=2,rel_widths=c(1,1),rel_heights=c(1,1))
+print(g3)
+dev.off()
+
+#HGDP01406
+#t_genotypes %>% filter(ID=="HGDP01406")
+#filter(name=="AMY2A") %>% arrange(-gt)
+```
+```{r}
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/trajectories"
+
+c = pnw_palette("Bay",5)[5]
+colors = pnw_palette("Bay",5)[1:4]
+
+t_amy2B = t_genotypes %>% 
+          filter(name=="AMY2B") %>% 
+          filter(age<15000) %>%
+          filter(p2 %in% c("WEA",
+                           "Hunter-GathererE",
+                           "Hunter-GathererW",
+                           "Yamnaya",
+                           "EarlyFarmer")) %>%
+          mutate(nage=-1*age,
+                 gt_round=round(gt)) %>%
+          rowwise() %>%
+          mutate(j_age = ifelse(age==0,age+runif(1,-100,100),age))
+
+m=lm(gt~nage,data=t_amy2B)
+p=lmp(m)
+df_label = data.frame(x=-11000,y=4,label=paste("P==",signif(p,3)))
+
+breaks = seq(-15000,0,5000)
+labels = paste(breaks/1000)
+label = "kyr BP"
+
+fn_out = paste(outdir,"/genotypes_amy2B_by_age.pdf",sep="")
+
+#pdf(fn_out,width=2,height=1.75)
+g1=ggplot(t_amy2B)
+g1=g1+geom_point(aes(x=-j_age, y=gt),alpha=.25,size=.01)+
+  geom_smooth(aes(x=-age, y=gt),color=c)+
+  geom_text(aes(x=x,
+                y=y,
+                label=label),
+            parse=TRUE,
+            size=3,
+            data=df_label,
+            hjust=0)+
+  scale_y_continuous("AMY2B copy",breaks=seq(0,5,1))+
+  scale_x_continuous(label,labels=labels,breaks=breaks)+
+  theme_bw()+
+  theme(legend.position="None")
+print(g1)
+#dev.off()
+
+#fn_out = paste(outdir,"/genotypes_amy2A_by_age_traj.pdf",sep="")
+#pdf(fn_out,width=2,height=1.75)
+g2=ggplot(t_amy2B)
+g2=g2+geom_smooth(aes(x=-age, y=gt),color=c)+
+  #scale_y_continuous("AMY1 copy",breaks=seq(,7,1))+
+  scale_x_continuous(label,labels=labels,breaks=breaks)+
+  theme_bw()
+#print(g2)
+#dev.off()
+
+fn_out = paste(outdir,"/genotypes_amy2B_by_age_both.pdf",sep="")
+pdf(fn_out,width=4,height=1.75)
+g3=plot_grid(g1,g2,ncol=2,rel_widths=c(1,1),rel_heights=c(1,1))
+print(g3)
+dev.off()
+
+#t_amy2B %>% arrange(-gt)
+#t_amy2A %>% arrange(-gt)
+#StoneAgeAncient.VK117.NorthernEurope.Yamnaya	
+```
+
+
+
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

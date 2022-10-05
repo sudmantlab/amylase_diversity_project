@@ -12,23 +12,31 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(ggcorrplot)
-
+library(tidyverse)
+library(PNWColors)
 exclude = c("1KG.HG00403.CHS.EA", "1KG.HG00662.CHS.EA", "1KG.HG01773.IBS.WEA", "1KG.HG01857.KHV.EA", 
             "1KG.NA18644.CHB.EA", "1KG.NA18916.YRI.AFR", "1KG.NA18985.JPT.EA", "1KG.NA19159.YRI.AFR",
             "1KG.NA19201.YRI.AFR", "1KG.NA19204.YRI.AFR", "1KG.NA20892.GIH.SA") 
 
+ancient_qc = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/info/ancients_passed_QC.tsv", header=T,sep="\t")
 
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4/"
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
 fn = paste(outdir,"/genome_summary_stats.tsv",sep="")
 stats = read.table(fn,header=T,sep="\t") %>%
         filter(cvg_med>0) %>%
-        filter(!(sample %in% exclude))
+        filter(!(sample %in% exclude)) %>%
+        separate(sample,c("group","ID","y","z"),sep="\\.",remove=FALSE) %>%
+        dplyr::select(-c(y,z)) %>%
+        filter((group!="StoneAgeAncient")|ID %in% ancient_qc$sample)
+  #separate(name,into = c("source","ID","pop","region"),sep="\\.")
+
 
 #samples w/ median 0
 
-t_wnd_raw = data.table::fread("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/amylase_1000_200.1000.200.tsv.gz",header=F,sep="\t",col.names = c("contig","start","end","cvg","sample")) %>%
+t_wnd_raw = data.table::fread("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/combined/amylase_1000_200.1000.200.tsv.gz",header=F,sep="\t",col.names = c("contig","start","end","cvg","sample")) %>%
   inner_join(stats,on="sample") %>%
   mutate(cp = 2*cvg/cvg_mu) %>%
+  #mutate(cp = 2*cvg/cvg_med) %>%
   separate(sample,c("source","sample_id",'p1','p2'),remove=FALSE) %>%
   filter(start>0)
 
@@ -65,16 +73,17 @@ usher_blocks = read.table("/Users/petersudmant/Documents/science/sudmantlab/proj
 #   filter(!isAncient)
 
 
-usher_blocks
+#usher_blocks
+
 ```
 
 
 ```{r}
-modern_colors = pnw_palette("Bay",7)[1:7]
-modern_colors = pnw_palette("Bay",7)[1:5]
+modern_colors = pnw_palette("Bay",7)[1:8]
+#modern_colors = pnw_palette("Bay",7)[1:5]
 ancient_colors = pnw_palette("Sunset2",7)[1:4]
 
-
+colors = c(ancient_colors,modern_colors)
 
 genes = data.frame(names=c("RNPC3", "AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
                    start=c(103525691,103571100,103617427,103655760,103687415,103749898),
@@ -96,7 +105,7 @@ genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
 
 
   
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures"
 fn_out = paste(outdir,"/amylase_distribution.pdf",sep="")
 pdf(fn_out,width=8,height=8)
 
@@ -116,68 +125,13 @@ g+geom_line(aes(x=start,y=cp,group=sample,color=p2),size=.1,alpha=.5)+
   theme(strip.background = element_blank())+
   #scale_color_gradient2(low="grey",mid="yellow",high="orange")+
   #scale_color_gradient(low="grey",high="orange")+
-  scale_color_manual(values=c(modern_colors))+
+  scale_color_manual(values=colors)+
   geom_segment(aes(x=start,xend=end,y=0.5,yend=0.5),size=0.5,data=genes)+
   geom_segment(aes(x=start,xend=end,y=0,yend=0),size=0.5,data=genotype_blocks,color='blue')+
   geom_vline(aes(xintercept=start),size=0.15,data=genotype_blocks,color='blue',linetype='dotted')+
   geom_vline(aes(xintercept=end),size=0.15,data=genotype_blocks,color='blue',linetype='dotted')
 
 dev.off()
-
-```
-```{r}
-
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4/heatmaps"
-
-X = t_wnd_raw %>% 
-  dplyr::select(sample,start,cp) %>%
-  pivot_wider(values_from = "cp",
-              names_from = "start")
-X_mat = as.matrix(X %>% dplyr::select(-c(sample)))
-c = cor(X_mat)^2
-df_c = as.data.frame.table(c) %>% mutate(start = as.numeric(Var1), start_2 = as.numeric(Var2))
-
-
-
-fn_out = paste(outdir,"/corr_plot_locus_all.pdf",sep="")
-pdf(fn_out,width=4,height=4)
-ggcorrplot(c,outline.color = "NA")+
-#ggplot(df_c)+
-  #geom_tile(aes(x=start,start_2,fill=Freq))+
-  #theme_bw(base_size=8)+
-  scale_fill_viridis_c()+
-  ggtitle("All")+
-  theme(legend.position="bottom")
-dev.off()
-
-
-
-```
-```{r}
-for (p in unique(t_wnd_raw$p2)){
-  X = t_wnd_raw %>% 
-    filter(p2==p) %>%
-    dplyr::select(sample,start,cp) %>%
-    pivot_wider(values_from = "cp",
-                names_from = "start")
-  X_mat = as.matrix(X %>% dplyr::select(-c(sample)))
-  c = cor(X_mat)^2
-
-  fn_out = paste(outdir,"/corr_plot_locus_",p,".pdf",sep="")
-  pdf(fn_out,width=4,height=4)
-  g= ggcorrplot(c,outline.color = "NA")+
-    theme_bw(base_size=8)+
-    theme(legend.position="None")+
-    scale_fill_viridis_c(begin = 0)+
-    ggtitle(p)
-  print(g)
-  dev.off()
-    
-
-}
-
-
-
 
 ```
 
@@ -204,36 +158,61 @@ for (i in seq(dim(genotype_blocks)[1])){
 t_gt = do.call(rbind, t_gt) %>%
         pivot_wider(values_from = "gt",names_from="locus") %>%
         mutate(amy1_sum = AMY1A + AMY1B + AMY1C) %>%
-        pivot_longer(cols=-c("sample"),values_to="gt") #%>%
+        pivot_longer(cols=-c("sample"),values_to="gt") %>%
+        separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE)
   #inner_join(t_stats,on="sample") 
 
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4/"
-fn_out = paste(outdir,"/genotypes.tsv",sep="")
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
+fn_out = paste(outdir,"/genotypes.raw.tsv",sep="")
 write.table(t_gt,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 
+length(unique(t_gt$sample))
 ```
 ```{r}
 
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4/genotypes"
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures"
 
 fn_out = paste(outdir,"/genotypes_amy1_sum.pdf",sep="")
 pdf(fn_out,width=3,height=2)
 g=ggplot(t_gt %>% filter(name == "amy1_sum"))
-g+geom_histogram(aes(x=gt,fill=sample%in%off_samples),binwidth=0.05)+
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
   theme_bw(base_size=8)+
-  #facet_wrap(~p2,scales="free_y",ncol=1)+
+  facet_wrap(~dataset,scales="free_y",ncol=1)+
   scale_x_continuous(breaks=seq(0,18,1))+
   coord_cartesian(xlim=c(0,20))+
-  theme(legend.position = "None")
+  theme(legend.position = "None",
+        strip.background = element_blank(),
+        strip.text = element_text(size=4))
 dev.off()
+# unique(t_gt$p1)
+# t_test = t_gt %>% 
+#           filter(name == "amy1_sum") %>% 
+#           filter(dataset%in% c("1KG","StoneAgeAncient")) %>%
+#           filter((dataset =="StoneAgeAncient")|(p1 %in% c("GBR","FIN","TSI")))
+# g=ggplot(t_test)
+# g+geom_boxplot(aes(x=reorder(p2,gt),y=gt))+
+#   theme_bw(base_size=8)
+
+# g=ggplot(t_test)
+# g+geom_point(aes(x=reorder(p2,gt),y=gt),position=position_jitter(width=.1,height=0))+
+#   theme_bw(base_size=8)
+# 
+# 
+# g=ggplot(t_test)
+# g+stat_summary(aes(x=reorder(p1,gt),y=gt))+
+#   theme_bw(base_size=8)
+
 
 fn_out = paste(outdir,"/genotypes_amy2A.pdf",sep="")
 pdf(fn_out,width=2 ,height=2)
 g=ggplot(t_gt %>% filter(name == "AMY2A"))
-g+geom_histogram(aes(x=gt,fill=sample%in%off_samples),binwidth=0.05)+
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
   theme_bw(base_size=8)+
+  facet_wrap(~dataset,scales="free_y",ncol=1)+
   scale_x_continuous(breaks=seq(0,8,1))+
-  theme(legend.position = "None")
+  theme(legend.position = "None",
+        strip.background = element_blank(),
+        strip.text = element_text(size=4))
 
   #facet_grid(isAncient~.,scales="free_y")
 dev.off()
@@ -242,11 +221,15 @@ fn_out = paste(outdir,"/genotypes_amy2B.pdf",sep="")
 pdf(fn_out,width=2,height=2)
 g=ggplot(t_gt %>% filter(name == "AMY2B"))
 
-g+geom_histogram(aes(x=gt,fill=sample%in%off_samples),binwidth=0.05)+
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
   theme_bw(base_size=8)+
+  facet_wrap(~dataset,scales="free_y",ncol=1)+
   scale_x_continuous(breaks=seq(0,8,1))+
   theme(legend.position = "None")
-  #$facet_grid(isAncient~.,scales="free_y")
+  theme(legend.position = "None",
+        strip.background = element_blank(),
+        strip.text = element_text(size=4))
+
 dev.off()
 
 
@@ -259,7 +242,11 @@ pdf(fn_out,width=5,height=3)
 g=ggplot(t_combined)
 g+geom_point(aes(x=amy1_sum,y=AMY2B))+
   theme_bw(base_size=8)+
-  theme(legend.position = "None")
+  facet_wrap(~dataset,scales="free_y",ncol=1)+
+  theme(legend.position = "None",
+        strip.background = element_blank(),
+        strip.text = element_text(size=4))
+
   #$facet_grid(isAncient~.,scales="free_y")
 dev.off()
 
@@ -268,8 +255,11 @@ pdf(fn_out,width=5,height=3)
 g=ggplot(t_combined)
 g+geom_point(aes(x=amy1_sum,y=AMY2A))+
   theme_bw(base_size=8)+
-  theme(legend.position = "None")
-  #$facet_grid(isAncient~.,scales="free_y")
+  facet_wrap(~dataset,scales="free_y",ncol=1)+
+  theme(legend.position = "None",
+        strip.background = element_blank(),
+        strip.text = element_text(size=4))
+
 dev.off()
 
 fn_out = paste(outdir,"/genotypes_amy2A_vs_amy2B.pdf",sep="")
@@ -277,8 +267,11 @@ pdf(fn_out,width=5,height=3)
 g=ggplot(t_combined)
 g+geom_point(aes(x=AMY2B,y=AMY2A))+
   theme_bw(base_size=8)+
-  theme(legend.position = "None")
-  #$facet_grid(isAncient~.,scales="free_y")
+  facet_wrap(~dataset,scales="free_y",ncol=1)+
+  theme(legend.position = "None",
+        strip.background = element_blank(),
+        strip.text = element_text(size=4))
+
 dev.off()
 
 
@@ -320,5 +313,94 @@ off_samples = (t_gt %>%
 
   
 ```
+```{r}
+
+s=103780000
+e=103799858
+
+simple_repeats = read.table("/Users/petersudmant/tmp/amylase/input/repeats/simpleRepeat.txt.gz",header=F,sep="\t") %>%
+                  mutate(chr=V2,start=V3,end=V4) %>%
+                  dplyr::select(chr,start,end) %>%
+                  filter(chr=="chr1",start>s,end<e)
+trf_alma = read.table("/Volumes/GoogleDrive/Shared\ drives/sudmantlab/projects/ancient_DNA/masking/hg38.trf.bed",header=F,sep="\t") %>%
+                  mutate(chr=V1,start=V2,end=V3) %>%
+                  dplyr::select(chr,start,end) %>%
+                  filter(chr=="chr1",start>s,end<e)
+
+wm = read.table("/Users/petersudmant/tmp/amylase/input/repeats/windowmaskerSdust.txt.gz",header=F,sep="\t") %>%
+                  mutate(chr=V2,start=V3,end=V4) %>%
+                  dplyr::select(chr,start,end) %>%
+                  filter(chr=="chr1",start>s,end<e)
+
+
+x=t_wnd_raw %>% 
+  filter(grepl("StoneAgeAncient",sample)) %>%
+  filter(start>103670000,end<103799858)
+
+
+x_sum = x %>% group_by(sample) %>%summarize(mu = mean(cp))
+g=ggplot(x)
+g+geom_line(aes(x=start,y=cp,group=sample),size=.1,alpha=1) +
+  geom_segment(aes(x=start,xend=end,y=-1,yend=-1),data=simple_repeats,color='blue',size=1)+
+  geom_segment(aes(x=start,xend=end,y=-2,yend=-2),data=wm)+
+  geom_segment(aes(x=start,xend=end,y=-3,yend=-3),color='red',size=1,data=trf_alma)+
+  scale_y_continuous(lim=c(-3,15))+
+  geom_hline(aes(yintercept=2),color='red')
+
+#g=ggplot(x_sum)
+#g+geom_histogram(aes(x=mu),binwidth=0.01)
+```
+```{r}
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4/heatmaps"
+
+X = t_wnd_raw %>% 
+  dplyr::select(sample,start,cp) %>%
+  pivot_wider(values_from = "cp",
+              names_from = "start")
+X_mat = as.matrix(X %>% dplyr::select(-c(sample)))
+c = cor(X_mat)^2
+df_c = as.data.frame.table(c) %>% mutate(start = as.numeric(Var1), start_2 = as.numeric(Var2))
+
+
+
+fn_out = paste(outdir,"/corr_plot_locus_all.pdf",sep="")
+pdf(fn_out,width=4,height=4)
+ggcorrplot(c,outline.color = "NA")+
+#ggplot(df_c)+
+  #geom_tile(aes(x=start,start_2,fill=Freq))+
+  #theme_bw(base_size=8)+
+  scale_fill_viridis_c()+
+  ggtitle("All")+
+  theme(legend.position="bottom")
+dev.off()
+
+for (p in unique(t_wnd_raw$p2)){
+  X = t_wnd_raw %>% 
+    filter(p2==p) %>%
+    dplyr::select(sample,start,cp) %>%
+    pivot_wider(values_from = "cp",
+                names_from = "start")
+  X_mat = as.matrix(X %>% dplyr::select(-c(sample)))
+  c = cor(X_mat)^2
+
+  fn_out = paste(outdir,"/corr_plot_locus_",p,".pdf",sep="")
+  pdf(fn_out,width=4,height=4)
+  g= ggcorrplot(c,outline.color = "NA")+
+    theme_bw(base_size=8)+
+    theme(legend.position="None")+
+    scale_fill_viridis_c(begin = 0)+
+    ggtitle(p)
+  print(g)
+  dev.off()
+    
+
+}
+
+
+
+
+```
+
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
