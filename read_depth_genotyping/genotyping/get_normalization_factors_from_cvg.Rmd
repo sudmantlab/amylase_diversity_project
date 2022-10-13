@@ -54,6 +54,7 @@ write.table(summary_inf,fn_out,sep="\t",row.names = FALSE)
 # u=50556.50
 # d=24816.00
 # 3*u+d
+summary_inf %>% filter(grepl("Archaic",sample))
 ```
 
 
@@ -62,7 +63,7 @@ write.table(summary_inf,fn_out,sep="\t",row.names = FALSE)
 
 summary_inf %>% arrange(-cp_sd)
 
-select_samples = (summary_inf %>% filter(grepl("StoneAgeAncient",sample)))$sample[1:10]
+select_samples = (summary_inf %>% filter(grepl("Archaic",sample)))$sample[1:10]
 #select_samples = summary_inf %>% filter(cvg_med==0) 
 #select_samples = off_samples
 t_wnd_cvg_hist = t_wnd_cvg_subset %>% filter(sample %in% select_samples)
