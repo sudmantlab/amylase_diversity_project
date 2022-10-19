@@ -181,8 +181,8 @@ p_values
 ########NOTE we jittered the moderns
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/trajectories"
 
-c = pnw_palette("Bay",5)[5]
-colors = pnw_palette("Bay",5)[1:4]
+#c = pnw_palette("Bay",5)[5]
+colors = pnw_palette("Sunset",6)
 
 t_amy1 = t_genotypes %>% 
           filter(name=="amy1_sum") %>% 
@@ -209,7 +209,7 @@ fn_out = paste(outdir,"/genotypes_amy1_by_age.pdf",sep="")
 
 #pdf(fn_out,width=2,height=1.75)
 g1=ggplot(t_amy1)
-g1=g1+geom_point(aes(x=-j_age, y=gt),alpha=.25,size=.01)+
+g1=g1+geom_point(aes(x=-j_age, y=gt,color=p2),size=.01)+#,alpha=.25
   geom_smooth(aes(x=-age, y=gt),color=c)+
   geom_text(aes(x=x,
                 y=y,
@@ -221,7 +221,8 @@ g1=g1+geom_point(aes(x=-j_age, y=gt),alpha=.25,size=.01)+
   scale_y_continuous("AMY1 copy",breaks=seq(0,16,2))+
   scale_x_continuous(label,labels=labels,breaks=breaks)+
   theme_bw()+
-  theme(legend.position="None")
+  theme(legend.position="None")+
+  scale_color_manual(values=colors)
 #print(g1)
 #dev.off()
 
