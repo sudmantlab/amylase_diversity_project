@@ -1,0 +1,141 @@
+---
+title: "Untitled"
+output: html_document
+date: "2022-10-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("pafr")
+library(pafr)
+library(gggenes)
+
+
+#paf_genes = read.table(fn_genes,header=FALSE,row.names = cols,sep="\t",comment.char="")
+
+fn="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY1A_region_principal_bundles.bed"
+
+t = read.table(fn, 
+               header=FALSE, 
+               sep="\t",
+               comment.char ="",
+               col.names = c("contig",
+                           "bstart",
+                           "bend",
+                           "binf")) %>%
+                separate(binf, sep=":", 
+                         c("bID",
+                            "bOrientation",
+                            "entryix",
+                            "exitix")) %>%
+                mutate(bOrientation = as.numeric(bOrientation))
+
+t=t %>% 
+  group_by(contig) %>%
+  mutate(seg_len = bend-bstart) %>%
+  mutate(rel_end = cumsum(seg_len)) %>%
+  mutate(rel_start = lag(rel_end,default=0))
+  
+hap_sums = t %>% 
+            group_by(contig) %>%
+            summarize(hap_struc = paste0(bID,collapse="-"))
+t = inner_join(t,hap_sums,by="contig")
+
+
+hap_info = t %>% group_by(contig,hap_struc) %>%
+                summarize(s = min(bstart))
+
+fn_genes = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/map_gene_locations/output/gene_alns.paf"
+
+gene_names = data.frame(qname = c("ENST00000361355.8",
+                                   "ENST00000370083.9",
+                                   "ENST00000414303.7"),
+                          name2 = c("AMY2B-201",
+                                  "AMY1A-201",
+                                  "AMY2A-201"),
+                          name = c("2B",
+                                   "1A",
+                                   "2A"))
+
+
+paf_genes = as.data.frame(read_paf(fn_genes)) %>%
+              mutate(contig=tname) %>%
+              inner_join(gene_names,by="qname") %>%
+              inner_join(hap_info,on="name") %>%
+              filter(dv<=0.001)
+              #filter(dv<=0.0005)
+
+
+```
+```{r}
+library(RColorBrewer)
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output"
+
+#xmin=rel_start,
+#xmax=rel_end,
+#g=ggplot(t %>% filter(contig=="HG002#1#JAHKSE010000012.1_16776806_17183707_1"))
+
+
+colors =  c(brewer.pal(length(unique(t$bID)),"Spectral"),
+            brewer.pal(3,"Set1"))
+
+shift = 10000
+g=ggplot(t)
+g=g+geom_gene_arrow(aes(xmin=rel_start,
+                        xmax=rel_end,
+                        y=contig,
+                        fill=bID,
+                        forward=!bOrientation),
+                    arrowhead_height = unit(1, "mm"), 
+                    arrowhead_width = unit(1, "mm"),
+                    arrow_body_height = unit(.5, "mm"),
+                    size=.1)+
+  geom_gene_arrow(aes(xmin=tstart-shift,
+                        xmax=tend-shift,
+                        y=contig,
+                        fill=name,
+                        forward=strand=="+"),
+                    arrowhead_height = unit(.5, "mm"), 
+                    arrowhead_width = unit(.5, "mm"),
+                    arrow_body_height = unit(.25, "mm"),
+                    position=position_nudge(x=0,y=.25),
+                    size=0,
+                    data = paf_genes)+
+  geom_text(aes(x=tstart-shift,
+                y=contig,
+                label=name,
+                color=name),
+               data=paf_genes,
+               hjust=1,
+               size=1,
+               position=position_nudge(x=0,y=.25))+
+  theme_bw(base_size=4)+
+  theme(legend.position="None")+
+  #scale_fill_brewer(palette="Spectral") +
+  scale_fill_manual(values=colors)+
+  scale_color_brewer(palette="Set1") +
+  facet_grid(hap_struc~.,scales="free_y",space = "free")
+
+fn_out = paste(outdir,"/haplotype_structures.pdf",sep="")
+
+pdf(fn_out,width=5,height=12)
+print(g)
+dev.off()  
+
+paf_genes
+```
+```{r}
+
+rel_starts
+paf_genes %>% 
+  inner_join(rel_starts,on="name") %>% 
+  filter(dv==0.0001) %>%
+  separate(contig,c("chr","contig_s","contig_e","contig_strand"),sep="_",remove=FALSE)
+
+g=ggplot(p)
+g+geom_segment(aes(x=tstart,xend=tend,y=contig,yend=contig,color=name))+theme_bw()
+
+```
