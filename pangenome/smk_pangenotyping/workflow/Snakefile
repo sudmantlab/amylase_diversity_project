@@ -1,0 +1,21 @@
+import sys
+from datetime import datetime
+configfile: 'config/config.yaml'
+
+##### load rules #####
+include: 'rules/common.smk'
+include: 'rules/extract_region.wrap.smk'
+include: 'rules/odgi.singularity.smk'
+
+##### organize reference #####
+organizer_reference()
+
+#### organize odgi input ####
+organizer_odgi_input()
+
+##### organize samples #####
+df=organizer_samples()
+
+rule all:
+	input:
+		expand("results/similarity/{sample}.best_genotype.tsv", sample=df['sample_id'].tolist())

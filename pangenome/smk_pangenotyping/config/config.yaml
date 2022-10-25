@@ -1,0 +1,30 @@
+# path or URL to sample sheet (TSV format, columns: sample, condition, ...)
+# file_ext: .cram
+# idx_ext: .crai
+
+samples: config/samples.tsv
+
+coord_AMY: "chr1:103456064-103863972"
+
+genotyper_bolo: "config/genotype.py"
+
+reference: 
+	localpath: /project/alfredo/pangenome/AMY_proj/shortreads_mapping/ref_GRCh38/GRCh38_full_analysis_set_plus_decoy_hla.fa
+	snakepath: resources/reference/GRCh38_full_analysis_set_plus_decoy_hla.fa
+
+extract_region:
+	threads: 4
+	mem_sort: 4G
+
+odgi:
+# This was extracted from Erik/Davide with odgi
+	chop_input_local_path: /scratch/alessandro.raveane/pangenome/genotyping/test_resource/AMY1A_region_seq.fa.gz.fdded84.417fcdf.07bc622.smooth.final.og
+	chop_input_snakepath: resources/odgi/AMY1A_region_seq.fa.gz.fdded84.417fcdf.07bc622.smooth.final.og
+	threads_odgi: 2
+	mem_odgi: 16
+
+vg:
+	threads_vg: 8
+	mem_vg: 8
+
+
