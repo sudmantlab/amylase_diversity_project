@@ -9,12 +9,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-#install.packages("pafr")
+###
+#Read in structures and genes mapped to fastas
+###
+
 library(pafr)
 library(gggenes)
-
-
-#paf_genes = read.table(fn_genes,header=FALSE,row.names = cols,sep="\t",comment.char="")
 
 fn="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY1A_region_principal_bundles.bed"
 
@@ -40,13 +40,19 @@ t=t %>%
   mutate(rel_start = lag(rel_end,default=0))
   
 hap_sums = t %>% 
+            mutate(bID_d = paste(bID,".",bOrientation,sep="")) %>%
             group_by(contig) %>%
-            summarize(hap_struc = paste0(bID,collapse="-"))
+            summarize(hap_struc = paste0(bID,collapse="-"),
+                      hap_struc_d = paste0(bID_d,collapse="-"))
+
 t = inner_join(t,hap_sums,by="contig")
 
+hap_info = t %>% group_by(contig,hap_struc,hap_struc_d) %>%
+                 summarize(hap_block_start = min(bstart))
 
-hap_info = t %>% group_by(contig,hap_struc) %>%
-                summarize(s = min(bstart))
+t=inner_join(t,hap_info,on=c("contig","hap_struc"))
+t=t %>% mutate(rel_start2 = bstart-hap_block_start,
+               rel_end2 = bend-hap_block_start)
 
 fn_genes = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/map_gene_locations/output/gene_alns.paf"
 
@@ -57,20 +63,412 @@ gene_names = data.frame(qname = c("ENST00000361355.8",
                                   "AMY1A-201",
                                   "AMY2A-201"),
                           name = c("2B",
-                                   "1A",
+                                   "1",
                                    "2A"))
 
 
 paf_genes = as.data.frame(read_paf(fn_genes)) %>%
               mutate(contig=tname) %>%
               inner_join(gene_names,by="qname") %>%
-              inner_join(hap_info,on="name") %>%
-              filter(dv<=0.001)
+              inner_join(hap_info,on="name") #%>%
+              #filter(dv<=0.001)
               #filter(dv<=0.0005)
+
+# g=ggplot(paf_genes)
+# g+geom_histogram(aes(x=dv,fill=tname=="chr1_chm13_103304997_103901127_0"))+
+#   geom_vline(xintercept=0.0025)+
+#   geom_vline(xintercept=0.01)+
+#   theme_bw()
+
+#paf_genes %>% filter(tname=="chr1_chm13_103304997_103901127_0")
+
+paf_genes = paf_genes %>% filter(dv<=0.0025)
+
+```
+
+```{r}
+### PLOT ALL THE HAPLOTYPES WITH GENES ON TOP for all individuals
+
+library(PNWColors)
+colors =  c(pnw_palette("Sunset2",length(unique(t$bID))),
+            brewer.pal(3,"Set1"))
+
+colors =  c(pnw_palette("Sunset2",length(unique(t$bID))))
+colors =  c("#CCCCCC","#666666",brewer.pal(length(unique(t$bID))-2,"Spectral"))
+# colors =  c(brewer.pal(length(unique(t$bID)),"Spectral"),
+#             brewer.pal(3,"Set1"))
+
+g=ggplot(t)
+g=g+geom_gene_arrow(aes(xmin=rel_start2,
+                        xmax=rel_end2,
+                        y=contig,
+                        fill=bID,
+                        forward=!bOrientation),
+                    arrowhead_height = unit(1, "mm"), 
+                    arrowhead_width = unit(1, "mm"),
+                    arrow_body_height = unit(.5, "mm"),
+                    position=position_nudge(x=0,y=-.2),
+                    size=.1)+
+  geom_gene_arrow(aes(xmin=tstart,
+                        xmax=tend,
+                        y=contig,
+                        #fill=name,
+                        color=name,
+                        forward=strand=="+"),
+                    arrowhead_height = unit(.5, "mm"),
+                    arrowhead_width = unit(.5, "mm"),
+                    arrow_body_height = unit(.25, "mm"),
+                    position=position_nudge(x=0,y=.2),
+                    size=.1,
+                    data = paf_genes)+
+  geom_text(aes(x=tstart,
+                y=contig,
+                label=name,
+                color=name),
+               data=paf_genes,
+               hjust=1,
+               size=1,
+               position=position_nudge(x=-1000,y=.25))+
+  theme_bw(base_size=4)+
+  theme(legend.position="None")+
+  #scale_fill_brewer(palette="Spectral") +
+  scale_fill_manual(values=colors)+
+  scale_color_brewer(palette="Set1") +
+  facet_grid(hap_struc_d~.,scales="free_y",space = "free")
+
+fn_out = paste(outdir,"/haplotype_structures_all.pdf",sep="")
+pdf(fn_out,width=5,height=12)
+print(g)
+dev.off()  
+
+
+
+```
+
+```{r}
+###SELECT ONE REPRESENTATIVE INDIVIDUAL / HAP to plot
+#EXCLUDING THESE TWO BECAUSE THEY ARE NOT FULLY ASSEMBLED ACROSS THE LOCUS
+exclude = c("HG01358#2#JAGYZA010000086.1_556_316498_0",
+            "HG01928#1#JAGYVQ010000195.1_211_358290_0")
+
+representative_haps = t %>% group_by(contig) %>%
+                        filter(row_number()==1) %>% 
+                        ungroup() %>%
+                        group_by(hap_struc_d) %>%
+                        mutate(n = n()) %>%
+                        filter(row_number()==1) %>% 
+                        ungroup() %>%
+                        dplyr::select(contig,n,hap_struc_d) %>%
+                        filter(!contig %in% exclude)
+
+
+t_rep = t %>% filter(contig %in% representative_haps$contig)
+paf_genes_rep = paf_genes %>% filter(tname %in% representative_haps$contig)
+
+bID_lens = t_rep %>% 
+  mutate(bID_d = paste(bID,bOrientation,sep=".")) %>%
+  mutate(l = bend-bstart) %>%
+  group_by(bID_d) %>%
+  summarize(l = median(l))
+
+### NOT PLOTTING THIS HERE BECAUSE I'll plot it WITH the tree below
+
+# g=ggplot(t_rep)
+# g=g+geom_gene_arrow(aes(xmin=rel_start2,
+#                         xmax=rel_end2,
+#                         y=contig,
+#                         fill=bID,
+#                         forward=!bOrientation),
+#                     arrowhead_height = unit(1, "mm"), 
+#                     arrowhead_width = unit(1, "mm"),
+#                     arrow_body_height = unit(.5, "mm"),
+#                     position=position_nudge(x=0,y=-.2),
+#                     size=.1)+
+#   geom_gene_arrow(aes(xmin=tstart,
+#                         xmax=tend,
+#                         y=contig,
+#                         #fill=name,
+#                         color=name,
+#                         forward=strand=="+"),
+#                     arrowhead_height = unit(.5, "mm"),
+#                     arrowhead_width = unit(.5, "mm"),
+#                     arrow_body_height = unit(.25, "mm"),
+#                     position=position_nudge(x=0,y=.2),
+#                     size=.1,
+#                     data = paf_genes_rep)+
+#   geom_text(aes(x=tstart,
+#                 y=contig,
+#                 label=name,
+#                 color=name),
+#                data=paf_genes_rep,
+#                hjust=1,
+#                size=1,
+#                position=position_nudge(x=-1000,y=.25))+
+#   theme_bw(base_size=4)+
+#   theme(legend.position="None")+
+#   theme(panel.grid=element_blank())+
+#   #scale_fill_brewer(palette="Spectral") +
+#   scale_fill_manual(values=colors)+
+#   scale_color_brewer(palette="Set1") +
+#   facet_grid(hap_struc_d~.,scales="free_y",space = "free")
+# 
+# fn_out = paste(outdir,"/haplotype_structures_rep.pdf",sep="")
+# 
+# pdf(fn_out,width=4,height=6)
+# print(g)
+# dev.off()  
+
+###OUTPUT these structures
+fn_out = paste(outdir,"/haplotype_representative_structures_rep.tsv",sep="")
+write.table(representative_haps,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+
+fn_out = paste(outdir,"/bundle_lengths.tsv",sep="")
+write.table(bID_lens,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+
+###NOW make alignments of these by running Snakefile_comp_hap_structs
+
+```
+```{r}
+#Load in pairwise distances between hap structures, cluster them, and plot
+
+library(ggtree)
+library(ade4)
+library(treeio)
+
+t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists.tsv",sep=""),header=T,sep="\t")
+
+dmat = t_hap_dists %>% 
+  dplyr::select(hap1,hap2,edit_d) %>%
+  spread(hap2,edit_d) %>%
+  column_to_rownames(var="hap1") %>% 
+  as.matrix
+
+c=hclust(as.dist(dmat),method="average")
+#phylo = hclust2phylog(c)
+#phylo = as.dendrogram(c)
+
+fn_out = paste(outdir,"/haplotype_struct_clusters.pdf",sep="")
+pdf(fn_out,width=4,height=12)
+ggtree(phylo) + geom_tiplab() + 
+  geom_nodelab(geom='label') + hexpand(.05)
+dev.off()  
+
+#phylo2 <- root(phylo, outgroup = "Int5", edgelabel = TRUE)
+
+#plot_order = rownames(dmat)[c$order]
+#t_rep$hap_struc_d = factor(t_rep$hap_struc_d,levels=plot_order) 
+
+#t_rep$hap_struc_d = factor(t_rep$hap_struc_d,levels=plot_order) 
+
+
+#https://shaunpwilkinson.github.io/post/phylogram_blog/
+#nj_tree = ape::nj(as.dist(dmat))
+hap_counts = t %>% ungroup() %>% 
+  dplyr::select(contig,hap_struc_d) %>%
+  unique() %>%
+  group_by(hap_struc_d) %>%
+  summarize(n=n())
+
+hap_order = data.frame(hap_struc_d=plot_order) %>% mutate(o = row_number()) 
+t_rep= inner_join(t_rep,hap_order,on=hap_struc_d) 
+
+paf_genes_rep = inner_join(paf_genes_rep,hap_order,on=hap_struc_d)
+```
+
+
+```{r}
+library(aplot)
+
+struc_phy = as.phylo(c)
+
+#t_rep %>% filter(hap_struc_d=="1.0-2.0-5.0-4.0-3.0-0.0")
+  
+
+label_haps = c("chr1_chm13_103304997_103901127_0",
+               "chr1_hg38_103456064_103863972_0",
+               "HG00438#2#JAHBCA010000012.1_51513023_51826723_0")
+labels = t %>% ungroup() %>% 
+  filter(contig %in% label_haps) %>% 
+  dplyr::select(contig,hap_struc_d) %>%
+  unique() %>%
+  mutate(label = hap_struc_d) %>%
+  mutate(txt = case_when(
+                      contig == "chr1_chm13_103304997_103901127_0" ~ "chm13",
+                      contig == "chr1_hg38_103456064_103863972_0" ~ "hg19/38",
+                      contig == "HG00438#2#JAHBCA010000012.1_51513023_51826723_0" ~ "Anc",
+                      TRUE ~ "")) %>%
+  inner_join(struc_phy %>% as_tibble,by="label")
+  
+
+df_tip_data = hap_counts %>% mutate(label=hap_struc_d) %>%
+  inner_join(struc_phy %>% as_tibble,by="label") 
+
+
+p = ggtree(struc_phy) %<+% df_tip_data +
+  geom_tippoint(aes(size=n),position=position_nudge(x=.02,y=0))+
+  scale_size_continuous(range=c(.25,2))+
+  hexpand(.1) + 
+  geom_cladelab(data=labels,mapping=aes(node=node, label=txt),fontsize=1,offset=0.1,hjust=1)+
+  theme(legend.position = "None")
+
+##NOTE THE y aesethetic needs to be in ggplot for the aplot to work
+g=ggplot(t_rep, aes(y=hap_struc_d))
+g=g+geom_gene_arrow(aes(xmin=rel_start2,
+                        xmax=rel_end2,
+                        fill=bID,
+                        forward=!bOrientation),
+                    arrowhead_height = unit(1.2, "mm"), 
+                    arrowhead_width = unit(1.2, "mm"),
+                    arrow_body_height = unit(.8, "mm"),
+                    #position=position_nudge(x=0,y=-.2),
+                    size=.1)+
+  geom_gene_arrow(aes(xmin=tstart,
+                        xmax=tend,
+                        y=hap_struc_d,
+                        #fill=name,
+                        color=name,
+                        forward=strand=="+"),
+                    arrowhead_height = unit(.5, "mm"),
+                    arrowhead_width = unit(.5, "mm"),
+                    arrow_body_height = unit(.25, "mm"),
+                    position=position_nudge(x=0,y=.4),
+                    size=.1,
+                    data = paf_genes_rep)+
+  geom_text(aes(x=tstart,
+                y=hap_struc_d,
+                label=name,
+                color=name),
+               data=paf_genes_rep,
+               hjust=1,
+               size=1,
+               position=position_nudge(x=-1000,y=.45))+
+   theme_bw(base_size=4)+
+   theme(legend.position="None")+
+   theme(panel.grid=element_blank())+
+   scale_fill_manual(values=colors)+
+   scale_color_brewer(palette="Set1")+
+   theme(axis.text.y=element_blank(),
+         panel.border = element_blank(),
+         axis.ticks.y=element_blank())+
+   scale_x_continuous("",expand=c(0,0),breaks=seq(0,6e5,1e5),labels=paste(seq(0,600,100),"kb")) +
+   scale_y_discrete("") 
+
+fn_out = paste(outdir,"/haplotype_structures_w_tree.pdf",sep="")
+
+pdf(fn_out,width=5,height=4)
+g  %>% insert_left(p, width=.25)
+dev.off()  
+
+#insert_left(g,p, width=.85)
+
+ 
+
 
 
 ```
 ```{r}
+
+library(ggplot2)
+library(ggtree)
+
+set.seed(2019-10-31)
+tr <- rtree(10)
+
+d1 <- data.frame(
+    # only some labels match
+    label = c(tr$tip.label[sample(5, 5)], "A"),
+    value = sample(1:6, 6))
+
+d2 <- data.frame(
+    label = rep(tr$tip.label, 5),
+    category = rep(LETTERS[1:5], each=10),
+    value = rnorm(50, 0, 3)) 
+
+g <- ggtree(tr) + geom_tiplab(align=TRUE) + hexpand(.01)
+
+p1 <- ggplot(d1, aes(label, value)) + geom_col(aes(fill=label)) + 
+    geom_text(aes(label=label, y= value+.1)) +
+    coord_flip() + theme_tree2() + theme(legend.position='none')
+ 
+p2 <- ggplot(d2, aes(x=category, y=label)) + 
+    geom_tile(aes(fill=value)) + scale_fill_viridis_c() + 
+    theme_minimal() + xlab(NULL) + ylab(NULL)
+
+library(aplot)
+
+p2 %>% insert_left(g) %>% insert_right(p1, width=.5)
+
+p2 %>%insert_left(g)
+```
+
+```{r}
+g=ggplot(t_rep)
+g=g+geom_gene_arrow(aes(xmin=rel_start2,
+                        xmax=rel_end2,
+                        y=o,
+                        fill=bID,
+                        forward=!bOrientation),
+                    arrowhead_height = unit(1, "mm"), 
+                    arrowhead_width = unit(1, "mm"),
+                    arrow_body_height = unit(.5, "mm"),
+                    position=position_nudge(x=0,y=-.2),
+                    size=.1)+
+  geom_gene_arrow(aes(xmin=tstart,
+                        xmax=tend,
+                        y=o,
+                        #fill=name,
+                        color=name,
+                        forward=strand=="+"),
+                    arrowhead_height = unit(.5, "mm"),
+                    arrowhead_width = unit(.5, "mm"),
+                    arrow_body_height = unit(.25, "mm"),
+                    position=position_nudge(x=0,y=.2),
+                    size=.1,
+                    data = paf_genes_rep)+
+  geom_text(aes(x=tstart,
+                y=o,
+                label=name,
+                color=name),
+               data=paf_genes_rep,
+               hjust=1,
+               size=1,
+               position=position_nudge(x=-1000,y=.25))+
+  theme_bw(base_size=4)+
+  theme(legend.position="None")+
+  theme(panel.grid=element_blank())+
+  #scale_fill_brewer(palette="Spectral") +
+  scale_fill_manual(values=colors)+
+  scale_color_brewer(palette="Set1")
+  #facet_grid(hap_struc_d~.,scales="free_y",space = "free")
+
+fn_out = paste(outdir,"/haplotype_structures_representative.pdf",sep="")
+
+pdf(fn_out,width=3,height=4)
+print(g)
+dev.off()  
+
+```
+
+```{r}
+
+library(ggtree)
+set.seed(2020-03-27)
+x <- rtree(10)
+d <- data.frame(taxa=x$tip.label, value = abs(rnorm(10)))
+p <- ggtree(x) + geom_tiplab(align = TRUE) + xlim(NA, 3)
+
+
+p2 <- ggplot(d,aes(x=value, y=taxa)) + geom_bar(stat='identity') + 
+  scale_x_continuous(expand=c(0,0)) 
+
+
+p2 %>% insert_left(p)
+
+```
+
+```{r}
+#### IGNORE THIS
+### OLD PLOTTING APPROACH -> WRONG
 library(RColorBrewer)
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output"
 
@@ -82,7 +480,6 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 colors =  c(brewer.pal(length(unique(t$bID)),"Spectral"),
             brewer.pal(3,"Set1"))
 
-shift = 10000
 g=ggplot(t)
 g=g+geom_gene_arrow(aes(xmin=rel_start,
                         xmax=rel_end,
@@ -126,16 +523,4 @@ print(g)
 dev.off()  
 
 paf_genes
-```
-```{r}
-
-rel_starts
-paf_genes %>% 
-  inner_join(rel_starts,on="name") %>% 
-  filter(dv==0.0001) %>%
-  separate(contig,c("chr","contig_s","contig_e","contig_strand"),sep="_",remove=FALSE)
-
-g=ggplot(p)
-g+geom_segment(aes(x=tstart,xend=tend,y=contig,yend=contig,color=name))+theme_bw()
-
 ```
