@@ -227,6 +227,12 @@ write.table(bID_lens,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 
 ###NOW make alignments of these by running Snakefile_comp_hap_structs
 
+#hg_19s = t %>% 
+#  filter(hap_struc_d=="1.0-2.0-5.0-2.1-6.1-4.1-2.0-5.0-4.0-3.0-0.0") %>%
+#  dplyr::select(contig) %>%
+#  unique()
+
+#t_rep %>% filter(contig %in% hg_19s$contig)
 ```
 ```{r}
 #Load in pairwise distances between hap structures, cluster them, and plot
@@ -273,6 +279,8 @@ hap_order = data.frame(hap_struc_d=plot_order) %>% mutate(o = row_number())
 t_rep= inner_join(t_rep,hap_order,on=hap_struc_d) 
 
 paf_genes_rep = inner_join(paf_genes_rep,hap_order,on=hap_struc_d)
+
+hap_counts %>% summarise(s=sum(n))
 ```
 
 
@@ -285,30 +293,38 @@ struc_phy = as.phylo(c)
   
 
 label_haps = c("chr1_chm13_103304997_103901127_0",
-               "chr1_hg38_103456064_103863972_0",
+               #"chr1_hg38_103456064_103863972_0",
+               "HG002#2#JAHKSD010000021.1_102757493_103165350_0",
                "HG00438#2#JAHBCA010000012.1_51513023_51826723_0")
 labels = t %>% ungroup() %>% 
-  filter(contig %in% label_haps) %>% 
+  #filter(contig %in% label_haps) %>% 
+  filter(contig %in% t_rep$contig) %>% 
   dplyr::select(contig,hap_struc_d) %>%
+  inner_join(hap_counts, on="hap_struc_d") %>%
   unique() %>%
   mutate(label = hap_struc_d) %>%
+  mutate(txt = paste("(",n,")",sep="")) %>%
   mutate(txt = case_when(
-                      contig == "chr1_chm13_103304997_103901127_0" ~ "chm13",
-                      contig == "chr1_hg38_103456064_103863972_0" ~ "hg19/38",
-                      contig == "HG00438#2#JAHBCA010000012.1_51513023_51826723_0" ~ "Anc",
-                      TRUE ~ "")) %>%
+                      contig == "chr1_chm13_103304997_103901127_0" ~ paste("chm13 ",txt,sep=""),
+                      #contig == "chr1_hg38_103456064_103863972_0" ~ paste("hg19/38 ",txt),
+                      contig == "HG002#2#JAHKSD010000021.1_102757493_103165350_0" ~ paste("hg38 ",txt),
+                      contig == "HG00438#2#JAHBCA010000012.1_51513023_51826723_0" ~ paste("Anc ",txt),
+                      TRUE ~ txt)) %>%
   inner_join(struc_phy %>% as_tibble,by="label")
   
+unique(t_rep$contig)
+```
 
+```{r}
 df_tip_data = hap_counts %>% mutate(label=hap_struc_d) %>%
   inner_join(struc_phy %>% as_tibble,by="label") 
 
 
 p = ggtree(struc_phy) %<+% df_tip_data +
-  geom_tippoint(aes(size=n),position=position_nudge(x=.02,y=0))+
+  geom_tippoint(aes(size=n),position=position_nudge(x=.02,y=0),alpha=.5)+
   scale_size_continuous(range=c(.25,2))+
   hexpand(.1) + 
-  geom_cladelab(data=labels,mapping=aes(node=node, label=txt),fontsize=1,offset=0.1,hjust=1)+
+  geom_cladelab(data=labels,mapping=aes(node=node, label=txt),fontsize=1.5,offset=0.12,hjust=.8)+
   theme(legend.position = "None")
 
 ##NOTE THE y aesethetic needs to be in ggplot for the aplot to work
@@ -322,6 +338,9 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrow_body_height = unit(.8, "mm"),
                     #position=position_nudge(x=0,y=-.2),
                     size=.1)+
+  # geom_text(aes(x=rel_start2+(rel_end2-rel_start2)/2,
+  #                       label=bID),
+  #                   size=1)+
   geom_gene_arrow(aes(xmin=tstart,
                         xmax=tend,
                         y=hap_struc_d,
@@ -360,11 +379,38 @@ g  %>% insert_left(p, width=.25)
 dev.off()  
 
 #insert_left(g,p, width=.85)
+```
+```{r}
 
- 
+#WRITE OUT NEW COLORS
+#t_rep$hap_struc_d
+
+df  = t_rep %>% ungroup() %>% dplyr::select(bID) %>% unique() 
+cols = colors[as.numeric(df$bID)+1]
+df = df %>% mutate(Color=cols) %>%
+  mutate(Bundle_ID = as.integer(bID)) %>%
+  dplyr::select(Color,Bundle_ID) %>%
+  arrange(Bundle_ID)
+
+p_color_csv = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_MAP_graphs/AMY1A_principal_color.csv",header=T,sep=",",comment.char = "")
 
 
+unique(p_color_csv_update$Bundle_ID)
 
+unique(p_color_csv$Color)
+
+p_color_csv_update = p_color_csv %>%
+  mutate(Color="#000000") %>%
+  dplyr::select(Name,Bundle_ID) %>% 
+  left_join(df, by="Bundle_ID")
+
+df
+p_color_csv_update
+
+
+fn_out = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_MAP_graphs/AMY1A_principal_color_UPDATE.csv"
+
+write.table(p_color_csv_update,fn_out,sep=",",row.names = FALSE)
 ```
 ```{r}
 
