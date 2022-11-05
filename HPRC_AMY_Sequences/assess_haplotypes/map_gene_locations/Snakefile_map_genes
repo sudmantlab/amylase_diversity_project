@@ -17,7 +17,7 @@ rule make_alns:
     output:
         "output/gene_alns.paf"
     run:   
-        cmd = "minimap2 -x splice:hq -uf {ref_hap} {gene} >>{out}" 
+        cmd = "minimap2 -N 30 -x splice:hq -uf {ref_hap} {gene} >>{out}" 
         for hap in config["haps"]:
             for g in config["genes"]:
                 print(hap, g)

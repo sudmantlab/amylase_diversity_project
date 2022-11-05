@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(pafr)
 library(gggenes)
 
-fn="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY1A_region_principal_bundles.bed"
+fn="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/output/AMY1A_region_PRINCIPAL_48_56_4_28_bundles.bed"
 
 t = read.table(fn, 
                header=FALSE, 
@@ -74,11 +74,11 @@ paf_genes = as.data.frame(read_paf(fn_genes)) %>%
               #filter(dv<=0.001)
               #filter(dv<=0.0005)
 
-# g=ggplot(paf_genes)
-# g+geom_histogram(aes(x=dv,fill=tname=="chr1_chm13_103304997_103901127_0"))+
-#   geom_vline(xintercept=0.0025)+
-#   geom_vline(xintercept=0.01)+
-#   theme_bw()
+g=ggplot(paf_genes)
+g+geom_histogram(aes(x=dv,fill=tname=="chr1_chm13_103304997_103901127_0"))+
+  geom_vline(xintercept=0.0025)+
+  geom_vline(xintercept=0.01)+
+  theme_bw()
 
 #paf_genes %>% filter(tname=="chr1_chm13_103304997_103901127_0")
 
@@ -170,53 +170,6 @@ bID_lens = t_rep %>%
   mutate(l = bend-bstart) %>%
   group_by(bID_d) %>%
   summarize(l = median(l))
-
-### NOT PLOTTING THIS HERE BECAUSE I'll plot it WITH the tree below
-
-# g=ggplot(t_rep)
-# g=g+geom_gene_arrow(aes(xmin=rel_start2,
-#                         xmax=rel_end2,
-#                         y=contig,
-#                         fill=bID,
-#                         forward=!bOrientation),
-#                     arrowhead_height = unit(1, "mm"), 
-#                     arrowhead_width = unit(1, "mm"),
-#                     arrow_body_height = unit(.5, "mm"),
-#                     position=position_nudge(x=0,y=-.2),
-#                     size=.1)+
-#   geom_gene_arrow(aes(xmin=tstart,
-#                         xmax=tend,
-#                         y=contig,
-#                         #fill=name,
-#                         color=name,
-#                         forward=strand=="+"),
-#                     arrowhead_height = unit(.5, "mm"),
-#                     arrowhead_width = unit(.5, "mm"),
-#                     arrow_body_height = unit(.25, "mm"),
-#                     position=position_nudge(x=0,y=.2),
-#                     size=.1,
-#                     data = paf_genes_rep)+
-#   geom_text(aes(x=tstart,
-#                 y=contig,
-#                 label=name,
-#                 color=name),
-#                data=paf_genes_rep,
-#                hjust=1,
-#                size=1,
-#                position=position_nudge(x=-1000,y=.25))+
-#   theme_bw(base_size=4)+
-#   theme(legend.position="None")+
-#   theme(panel.grid=element_blank())+
-#   #scale_fill_brewer(palette="Spectral") +
-#   scale_fill_manual(values=colors)+
-#   scale_color_brewer(palette="Set1") +
-#   facet_grid(hap_struc_d~.,scales="free_y",space = "free")
-# 
-# fn_out = paste(outdir,"/haplotype_structures_rep.pdf",sep="")
-# 
-# pdf(fn_out,width=4,height=6)
-# print(g)
-# dev.off()  
 
 ###OUTPUT these structures
 fn_out = paste(outdir,"/haplotype_representative_structures_rep.tsv",sep="")
@@ -338,9 +291,6 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrow_body_height = unit(.8, "mm"),
                     #position=position_nudge(x=0,y=-.2),
                     size=.1)+
-  # geom_text(aes(x=rel_start2+(rel_end2-rel_start2)/2,
-  #                       label=bID),
-  #                   size=1)+
   geom_gene_arrow(aes(xmin=tstart,
                         xmax=tend,
                         y=hap_struc_d,
@@ -378,6 +328,16 @@ pdf(fn_out,width=5,height=4)
 g  %>% insert_left(p, width=.25)
 dev.off()  
 
+fn_out = paste(outdir,"/haplotype_structures_w_tree_labeled.pdf",sep="")
+pdf(fn_out,width=5,height=4)
+g=g+geom_text(aes(x=rel_start2+(rel_end2-rel_start2)/2,
+                        label=bID),
+                    size=1)
+g  %>% insert_left(p, width=.25)
+dev.off()  
+
+  
+
 #insert_left(g,p, width=.85)
 ```
 ```{r}
@@ -392,7 +352,7 @@ df = df %>% mutate(Color=cols) %>%
   dplyr::select(Color,Bundle_ID) %>%
   arrange(Bundle_ID)
 
-p_color_csv = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_MAP_graphs/AMY1A_principal_color.csv",header=T,sep=",",comment.char = "")
+p_color_csv = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/output/AMY1A_region_PRINCIPAL_48_56_4_28_color.csv",header=T,sep=",",comment.char = "")
 
 
 unique(p_color_csv_update$Bundle_ID)
@@ -402,15 +362,20 @@ unique(p_color_csv$Color)
 p_color_csv_update = p_color_csv %>%
   mutate(Color="#000000") %>%
   dplyr::select(Name,Bundle_ID) %>% 
-  left_join(df, by="Bundle_ID")
+  left_join(df, by="Bundle_ID") %>%
+  mutate(Color = ifelse(is.na(Color),"#78e9fa",Color))
+
 
 df
 p_color_csv_update
 
 
-fn_out = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_MAP_graphs/AMY1A_principal_color_UPDATE.csv"
+fn_out = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/output/AMY1A_region_PRINCIPAL_48_56_4_28_color_UPDATED.csv"
 
 write.table(p_color_csv_update,fn_out,sep=",",row.names = FALSE)
+
+#p_color_csv_update %>% filter(Bundle_ID>7)
+#p_color_csv %>% mutate(Color="#000000")%>% filter(Bundle_ID>5)
 ```
 ```{r}
 
