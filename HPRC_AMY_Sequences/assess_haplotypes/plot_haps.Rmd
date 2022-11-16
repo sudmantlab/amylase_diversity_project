@@ -12,9 +12,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ###
 #Read in structures and genes mapped to fastas
 ###
+library(RColorBrewer)
 
 library(pafr)
 library(gggenes)
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output"
 
 fn="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/output/AMY1A_region_PRINCIPAL_48_56_4_28_bundles.bed"
 
@@ -83,6 +86,14 @@ g+geom_histogram(aes(x=dv,fill=tname=="chr1_chm13_103304997_103901127_0"))+
 #paf_genes %>% filter(tname=="chr1_chm13_103304997_103901127_0")
 
 paf_genes = paf_genes %>% filter(dv<=0.0025)
+
+contig_structs = t %>% 
+  dplyr::select(contig, hap_struc_d) %>% 
+  unique()
+
+fn_out = paste(outdir,"/haplotype_all_structures.tsv",sep="")
+write.table(contig_structs,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+
 
 ```
 
