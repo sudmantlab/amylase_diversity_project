@@ -8,6 +8,7 @@ date: "2022-10-02"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Code to analyze copy numbers across populations and over time
 
 ```{r cars}
 library(tidyverse)

@@ -7,6 +7,8 @@ date: '2022-07-14'
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Code to get normalization factors for read depth genotyping
+
 ```{r}
 library(tidyverse)
 #install.packages("R.utils")

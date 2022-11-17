@@ -11,9 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r }
 library(tidyverse)
-outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
-fn_gts = paste(outdir,"/genotypes.tsv",sep="")
-g_gts = read.table(fn_gts, sep="\t",header=T)
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
+fn_gts = paste(outdir,"/genotypes.raw.tsv",sep="")
+t_gt = read.table(fn_gts, sep="\t",header=T)
 
 g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
@@ -21,12 +22,11 @@ g+geom_histogram(aes(x=gt),binwidth=0.05)+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
 
-to_gt = t_gt %>% filter(name=="AMY2A") %>% dplyr::select(sample,gt) 
-to_gt = t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt) 
-to_gt = t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) 
+to_gt_AMY2A = t_gt %>% filter(name=="AMY2A") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+to_gt_AMY2B = t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+to_gt_AMY1 = t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
 ```
 ```{r}
-
 ###FUNCTIONS
 
 E_step = function(X,k,mu,offset,sigma,pi,iter){
@@ -55,7 +55,6 @@ M_step = function(df_resps,k,mu,offset,iter){
   ###HAVE NOT ADDED OFFSET YET!!! who bfoken?
   num = df_resps %>% 
     ungroup() %>%
-    #inner_join(data.frame(mu+offset) %>% mutate(i=row_number()),on=i) %>%
     inner_join(data.frame(mu=mu+offset) %>% mutate(i=row_number()),on=i) %>%
     summarize(num=sum(r*(X-mu)^2))
   
@@ -63,7 +62,20 @@ M_step = function(df_resps,k,mu,offset,iter){
           ungroup() %>%
           summarize(den=sum(r))
   sigma = sqrt(num$num/denom$den)
+
+  updated_mu_num = df_resps %>% 
+    group_by(i) %>%
+    inner_join(data.frame(mu=mu+offset) %>% mutate(i=row_number()),on=i) %>%
+    summarize(num=sum(r*X)) 
   
+  updated_mu_denom = df_resps %>% 
+    group_by(i) %>%
+    inner_join(data.frame(mu=mu+offset) %>% mutate(i=row_number()),on=i) %>%
+    summarize(denom=sum(r)) 
+
+  updated_mu = updated_mu_num$num/updated_mu_denom$denom
+  
+    
   return(list("sigma"=sigma,
               "pi"=pi,
               "offset"=offset,
@@ -84,35 +96,79 @@ get_dists = function(k,mx_copy,mu,offset,sigma,pi,iter){
 
 ```
 ```{r}
-### number of clusters
-mn_copy = round(min(to_gt$gt))
-mx_copy = round(max(to_gt$gt))
-k = mx_copy - mn_copy + 1
 
-##initialize parameters
-mu = seq(mn_copy,mx_copy)
-pi = rep(1/k,k)
-sigma = 0.5
-offset = 0
 
-##data
-X = to_gt$gt
+genotype = function(to_gt, iters, label){
 
-params = list()
-dists = list()
-dists[[1]] = get_dists(k,mx_copy,mu,offset,sigma,pi,1)
+  ### number of clusters
+  mn_copy = round(min(to_gt$gt))
+  mx_copy = round(max(to_gt$gt))
+  k = mx_copy - mn_copy + 1
+  
+  ##initialize parameters
+  mu = seq(mn_copy,mx_copy)
+  pi = rep(1/k,k)
+  sigma = 0.5
+  offset = 0
+  
+  ##data
+  X = to_gt$gt
+  
+  params = list()
+  dists = list()
+  dists[[1]] = get_dists(k,mx_copy,mu,offset,sigma,pi,1)
+  
+  for (j in seq(2,iters)){
+    df_resps = E_step(X,k,mu,offset,sigma,pi,j)
+    params = M_step(df_resps,k,mu,offset,j)
+    pi = params$pi
+    sigma = params$sigma
+    offset = params$offset
+    dists[[j]] = get_dists(k,mx_copy,mu,offset,sigma,pi,j)
+  }
+  dists = do.call(rbind, dists)
+  
+  final_resps = E_step(X,k,mu,offset,sigma,pi,-1)
 
-for (j in seq(2,10)){
-  df_resps = E_step(X,k,mu,offset,sigma,pi,j)
-  params = M_step(df_resps,k,mu,offset,j)
-  pi = params$pi
-  sigma = params$sigma
-  offset = params$offset
-  dists[[j]] = get_dists(k,mx_copy,mu,offset,sigma,pi,j)
+  final_resps = to_gt %>% 
+    mutate(obs=row_number()) %>%
+    inner_join(final_resps,by="obs") %>%
+    inner_join(data.frame(cp=mu) %>% mutate(i=row_number()),by="i") %>%
+    mutate(label=label) %>%
+    dplyr::select(sample, obs, r, i, X, cp, label)
+
+  
+  return(list("mu"=mu,
+              "sigma"=sigma,
+              "pi"=pi,
+              "offset"=offset,
+              "dists"=dists,
+              "final_resps"=final_resps))
 }
-dists = do.call(rbind, dists)
 
-adj = 100
+ 
+AMY1_gts = genotype(to_gt_AMY1, 20, "AMY1")
+AMY2B_gts = genotype(to_gt_AMY2B, 20, "AMY2B")
+AMY2A_gts = genotype(to_gt_AMY2A, 20, "AMY2A")
+
+all_gts = rbind(AMY1_gts$final_resps,
+                AMY2B_gts$final_resps,
+                AMY2A_gts$final_resps)
+
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
+fn_gts = paste(outdir,"/genotypes.likelihoods.tsv",sep="")
+write.table(all_gts, fn_gts, sep="\t",row.names = FALSE)
+
+
+```
+
+```
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
+fn_out = paste(outdir,"/gmm_genotypes.pdf",sep="")
+
+
+adj = 250
 g=ggplot(dists)+
   geom_histogram(aes(x=gt),data=to_gt,binwidth = 0.1)+
   geom_line(aes(x=x,y=y*adj,color=factor(i)))+
@@ -123,11 +179,11 @@ g=ggplot(dists)+
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
 fn_out = paste(outdir,"/gmm_genotypes.pdf",sep="")
-pdf(fn_out,width=8,height=5)
-print(g)
-dev.off()
+#pdf(fn_out,width=8,height=5)
+#print(g)
+#dev.off()
 
-g=ggplot(dists %>% filter(iter==10))+
+g=ggplot(dists %>% filter(iter==20))+
   geom_histogram(aes(x=gt),data=to_gt,binwidth = 0.1)+
   geom_line(aes(x=x,y=y*adj,color=factor(i)))+
   theme_bw()+
@@ -136,7 +192,15 @@ g=ggplot(dists %>% filter(iter==10))+
   scale_x_continuous(breaks=seq(0,mx_copy))
 print(g)
 
-# df_resps = E_step(X,k,mu,sigma,pi,1)
+final_resps = E_step(X,k,mu,offset,sigma,pi,-1)
+
+final_resps = to_gt %>% 
+  mutate(obs=row_number()) %>%
+  inner_join(final_resps,by="obs") %>%
+  inner_join(data.frame(cp=mu) %>% mutate(i=row_number()),by="i")
+
+
+
 # params = M_step(df_resps,k,mu,resps,1)
 # pi = params$pi
 # sigma = params$sigma
@@ -152,8 +216,18 @@ print(g)
 # ggplot(get_dists(k,mx_copy,mu,sigma,pi))+
 #   geom_line(aes(x=x,y=y,color=factor(i)))+theme_bw()
 # 
+```
+```{r}
 
-
+best_cp = final_resps %>% 
+            group_by(sample) %>%
+            filter(r==max(r))
+            
+g=ggplot(best_cp)
+g+geom_histogram(aes(x=gt,fill=factor(cp)),binwidth=.05)+
+  theme_bw()+
+  scale_fill_manual(values=sample(viridisLite::turbo(18)))+
+  scale_x_continuous(breaks=seq(1,20))
 ```
 ```{r}
 
