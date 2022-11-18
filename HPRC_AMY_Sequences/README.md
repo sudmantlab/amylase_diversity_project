@@ -1,3 +1,6 @@
+PGR-TK version used: `pgrtk 0.3.6 (heads/v0.3.5:42b268d, release build, linux [x86_64] [rustc 1.62.0 (a8314ef7d 2022-06-27)])`
+
+
 
 SHIMMER database parameters:
 
