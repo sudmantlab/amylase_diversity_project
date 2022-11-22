@@ -87,9 +87,14 @@ g+geom_histogram(aes(x=dv,fill=tname=="chr1_chm13_103304997_103901127_0"))+
 
 paf_genes = paf_genes %>% filter(dv<=0.0025)
 
+
+exclude = c("HG01358#2#JAGYZA010000086.1_556_316498_0",
+            "HG01928#1#JAGYVQ010000195.1_211_358290_0")
+
 contig_structs = t %>% 
   dplyr::select(contig, hap_struc_d) %>% 
-  unique()
+  unique() %>%
+  filter(!contig %in% exclude)
 
 fn_out = paste(outdir,"/haplotype_all_structures.tsv",sep="")
 write.table(contig_structs,fn_out,sep="\t",row.names = FALSE,quote=FALSE)

@@ -137,16 +137,15 @@ genotype = function(to_gt, iters, label){
     mutate(label=label) %>%
     dplyr::select(sample, obs, r, i, X, cp, label)
 
-  
-  return(list("mu"=mu,
+  return(list("k"=k,
+              "mu"=mu,
+              "offset"=offset,
               "sigma"=sigma,
               "pi"=pi,
-              "offset"=offset,
               "dists"=dists,
               "final_resps"=final_resps))
 }
 
- 
 AMY1_gts = genotype(to_gt_AMY1, 20, "AMY1")
 AMY2B_gts = genotype(to_gt_AMY2B, 20, "AMY2B")
 AMY2A_gts = genotype(to_gt_AMY2A, 20, "AMY2A")
@@ -155,15 +154,14 @@ all_gts = rbind(AMY1_gts$final_resps,
                 AMY2B_gts$final_resps,
                 AMY2A_gts$final_resps)
 
-
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
 fn_gts = paste(outdir,"/genotypes.likelihoods.tsv",sep="")
-write.table(all_gts, fn_gts, sep="\t",row.names = FALSE)
+write.table(all_gts, fn_gts, sep="\t",row.names = FALSE, quote = FALSE)
 
 
 ```
 
-```
+```{r}
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/output/d4"
 fn_out = paste(outdir,"/gmm_genotypes.pdf",sep="")
 

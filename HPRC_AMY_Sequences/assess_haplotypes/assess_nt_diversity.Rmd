@@ -1,0 +1,230 @@
+---
+title: "Untitled"
+output: html_document
+date: "2022-11-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggtree)
+library(ade4)
+library(treeio)
+library(tidyverse)
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output"
+
+
+#####THIS JUST is a path distance from ERik versus my bundling
+t= read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/OG_graphs/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og.hap.dist",sep="\t",header=T,comment="") %>%
+      mutate(path.a=str_replace(path.a,"chr1_hg","chr1#hg")) %>%
+      mutate(path.a=str_replace(path.a,"chr1_ch","chr1#ch")) %>%
+      mutate(path.b=str_replace(path.b,"chr1_hg","chr1#hg")) %>%
+      mutate(path.b=str_replace(path.b,"chr1_ch","chr1#ch"))
+
+a_structs = t_hap_structs %>% transmute(path.a=contig, hap_struc_a = hap_struc_d)
+b_structs = t_hap_structs %>% transmute(path.b=contig, hap_struc_b = hap_struc_d)
+
+length(unique(t$contig.b))
+length(unique(t$contig.a))
+
+t_comp = t %>% 
+  inner_join(a_structs,by = "path.a") %>%
+  inner_join(b_structs,by = "path.b") %>%
+  #filter(bundle==1) %>%
+  mutate(comparison = ifelse(hap_struc_a==hap_struc_b,"within","between"))
+
+g=ggplot(t_comp)
+g+geom_boxplot(aes(color=comparison,x=1-jaccard))+
+  theme_bw()+
+  scale_color_viridis_d()
+
+
+```
+
+```{r}
+dmat = t_comp %>% 
+  mutate(jd=1-jaccard) %>%
+  dplyr::select(path.a,path.b,jd) %>%
+  spread(path.a,jd) %>%
+  column_to_rownames(var="path.b") %>% 
+  as.matrix
+
+dim(dmat)
+
+c=hclust(as.dist(dmat),method="average")
+#phylo = hclust2phylog(c)
+#phylo = as.dendrogram(c)
+phylo_seq = as.phylo(c)
+fn_out = paste(outdir,"/haplotype_nt_clusters.pdf",sep="")
+pdf(fn_out,width=18,height=8)
+ggtree(phylo_seq) %<+% (a_structs %>% dplyr::select(path.a,hap_struc_d)) + 
+  #geom_tiplab(aes(label=hap_struc_d),size=4) + 
+  geom_tippoint(aes(color = hap_struc_d,shape=hap_struc_d))+
+  geom_nodelab(geom='label') + hexpand(.05)+
+  scale_shape_manual(values=rep(seq(1,8),8))
+dev.off()  
+#t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists.tsv",sep=""),header=T,sep="\t")
+
+
+```
+```{r}
+t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists_all.tsv",sep=""),header=T,sep="\t",comment="")
+
+dmat = t_hap_dists %>% 
+  dplyr::select(contig_a,contig_b,edit_d) %>%
+  spread(contig_b,edit_d) %>%
+  column_to_rownames(var="contig_a") %>% 
+  as.matrix
+
+c=hclust(as.dist(dmat),method="average")
+phylo_struc = as.phylo(c)
+#phylo = hclust2phylog(c)
+#phylo = as.dendrogram(c)
+
+fn_out = paste(outdir,"/haplotype_struct_clusters.pdf",sep="")
+#pdf(fn_out,width=4,height=12)
+ggtree(phylo_struc) + geom_tiplab() + 
+  geom_nodelab(geom='label') + hexpand(.05)
+#dev.off()  
+
+```
+```{r}
+library(ape)
+#https://stackoverflow.com/questions/31285542/plot-phylogenetic-trees-face-to-face-with-links-in-r
+#phylo_seq, phylo_struc
+#cophyloplot(tree1, tree2, assoc=association,length.line=4, space=28, gap=10, rotate=TRUE)
+cophyloplot(phylo_seq, phylo_struc,show.tip.label = FALSE)
+```
+
+
+```{r}
+#install.packages("TDbook")
+#library(ggimage)
+library(ggtree)
+library(TDbook)
+df_tip_data
+# load `tree_boots`, `df_tip_data`, and `df_inode_data` from 'TDbook'
+p <- ggtree(tree_boots) %<+% df_tip_data + xlim(-.1, 4)
+p2 <- p + geom_tiplab(offset = .6, hjust = .5) +
+    geom_tippoint(aes(shape = trophic_habit, color = trophic_habit, 
+                size = mass_in_kg)) + 
+    theme(legend.position = "right") + 
+    scale_size_continuous(range = c(3, 10))
+
+p2 %<+% df_inode_data + 
+    geom_label(aes(label = vernacularName.y, fill = posterior)) + 
+    scale_fill_gradientn(colors = RColorBrewer::brewer.pal(3, "YlGnBu"))
+
+```
+
+```{r}
+library(tidyverse)
+library(pafr)
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output"
+
+fn = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output/haplotype_nt_dists.paf"
+paf_bundles = read_paf(fn,tibble = TRUE) 
+
+fn = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output/haplotype_struc_dists.tsv"
+t_struct_difs = read.table(fn, header=T,sep="\t")
+
+fn_hap_structs = paste(outdir,"/haplotype_all_structures.tsv",sep="")
+t_hap_structs = read.table(fn_hap_structs,sep="\t",header=TRUE,comment="") %>%   
+                    group_by(hap_struc_d) %>%
+                    mutate(n=n())
+
+t_alns = paf_bundles %>% 
+          filter(!is.na(de)) %>%
+          separate(tname,into=c("contig","s","e","hap","bundle"),sep="_",remove=FALSE) %>%
+          mutate(tname=paste(contig,s,e,hap,sep="_")) %>%
+          dplyr::select(-c(contig,s,e,hap)) %>%
+          separate(qname,into=c("contig","s","e","hap","bundle"),sep="_",remove=FALSE) %>%
+          mutate(qname=paste(contig,s,e,hap,sep="_")) %>%
+          dplyr::select(-c(contig,s,e,hap)) %>%
+          dplyr::select(bundle,qname,tname,qlen,qstart,qend,strand,tlen,tstart,tend,nmatch,alen,mapq,de)
+        
+
+
+g=ggplot(t_alns)
+g+geom_histogram(aes(x=de))+theme_bw()
+t_alns
+
+
+```
+```{r}
+
+#t_alns %>% mutate(x=min(qname,tname)) %>% arrange(x)
+
+#inner_join(,
+q_structs = t_hap_structs %>% transmute(qname=contig,q_struct=hap_struc_d)
+t_structs = t_hap_structs %>% transmute(tname=contig,t_struct=hap_struc_d)
+
+t_comp = t_alns %>% 
+  inner_join(q_structs,by = "qname") %>%
+  inner_join(t_structs,by = "tname") %>%
+  #filter(bundle==1) %>%
+  mutate(comparison = ifelse(qname==tname,"within","between"))
+  
+#t_hap_structs %>% 
+high_freq = t_comp %>% 
+  dplyr::select(qname,q_struct)%>% 
+  unique() %>%
+  group_by(q_struct) %>%
+  summarize(n=n()) %>%
+  arrange(-n) %>%
+  filter(n>=5)
+
+
+high_freq
+```
+
+```{r}
+g=ggplot(t_comp %>% 
+           filter(bundle==0))# %>% 
+           #filter(q_struct %in% high_freq$q_struct) %>%
+           #filter(t_struct %in% high_freq$q_struct))
+g+geom_density(aes(color=comparison,x=de))+
+  theme_bw()+
+  facet_wrap(~bundle)+
+  scale_color_viridis_d()
+  
+
+```
+
+```{r}
+
+#Load in pairwise distances between hap structures, cluster them, and plot
+
+library(ggtree)
+library(ade4)
+library(treeio)
+
+
+dmat = t_alns %>% 
+  filter(bundle==1) %>%
+  dplyr::select(tname,qname,de) %>%
+  spread(tname,de) %>%
+  #spread(hap2,edit_d) %>%
+  filter(!(qname %in% c("chr1_chm13_103304997_103901127_0_1","chr1_hg19_103998686_104406594_0_1","chr1_hg38_103456064_103863972_0_1"))) %>%
+  column_to_rownames(var="qname") %>% 
+  as.matrix
+
+dim(dmat)
+
+c=hclust(as.dist(dmat),method="average")
+#phylo = hclust2phylog(c)
+#phylo = as.dendrogram(c)
+phylo = as.phylo(c)
+#fn_out = paste(outdir,"/haplotype_struct_clusters.pdf",sep="")
+#pdf(fn_out,width=4,height=12)
+ggtree(phylo) + geom_tiplab() + 
+  geom_nodelab(geom='label') + hexpand(.05)
+#dev.off()  
+t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists.tsv",sep=""),header=T,sep="\t")
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
