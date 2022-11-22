@@ -25,15 +25,21 @@ The gzipped `odgi` graph is available [here](http://hypervolu.me/~erik/amylase/a
 Fix the reference coordinates in the `AMY1A_region_principal_bundles.bed` file:
 
 ```shell
-grep chr1 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed -v > AMY1A_region_principal_bundles.fixed.bed
+rm AMY1A_region_principal_bundles.fixed.bed
 
-# Ugly (lazy) way to fix the coordinates for each reference
-grep chr1_chm13_103304997_103901127_0 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
-  awk -v OFS='\t' -v start=103304997 '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
-grep chr1_hg19_103998686_104406594_0 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
-  awk -v OFS='\t' -v start=103998686 '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
-grep chr1_hg38_103456064_103863972_0 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
-  awk -v OFS='\t' -v start=103456064 '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
+# Fix samples' coordinates
+grep chr1 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed -v | cut -f 1 | sort | uniq | while read c; do
+  start=$(echo $c | cut -f 2 -d '_');
+  grep "^$c" HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
+    awk -v OFS='\t' -v start=$start '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
+done
+
+# Fix references' coordinates
+grep chr1 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | cut -f 1 | sort | uniq | while read c; do
+  start=$(echo $c | cut -f 3 -d '_');
+  grep "^$c" HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
+    awk -v OFS='\t' -v start=$start '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
+done
 ```
 
 Get contig coordinates in each bundle:
