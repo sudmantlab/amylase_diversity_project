@@ -55,19 +55,13 @@ done
 Extract bundle subgraphs:
 
 ```shell
-# Hack path names for grouping by haplotype later
-$ODGI view -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og -g | sed 's/#/_/' \
-  > amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og.sed.gfa
-$ODGI build -g amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og.sed.gfa \
-  -o amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.og
-
 seq 0 1 | while read b; do
   echo "bundle $b"
-    
-  # Note: for bundles 0 and 1, -d 1000 is already fine, for others use at least -d 50000
+
+  # Note: for bundles 0 and 1, -d 1000 is already fine, for others higher values might be needed
   $ODGI extract \
-    -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.og \
-    -b <(sed 's/#/_/' AMY1A_region_principal_bundles.$b.bed) -d 1000 -P \
+    -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og \
+    -b AMY1A_region_principal_bundles.$b.bed -d 1000 -P \
     -o - | $ODGI sort -i - -o amy.29/AMY1A_region_principal_bundles.$b.og -O -p gYs -x 1000 -t 10 -P
 done
 ```
@@ -92,13 +86,13 @@ done
 Get the distance matrix of the full graph and each bundle subgraph, grouping contigs of the same haplotype:
 
 ```shell
-$ODGI paths -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.og -d -D '#' | \
+$ODGI paths -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.og -d | \
  gzip > amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.hap.dist.gz 
 
 seq 0 1 | while read b; do
   echo "bundle $b"
   
-  $ODGI paths -i amy.29/AMY1A_region_principal_bundles.$b.og -d -D '#' | \
+  $ODGI paths -i amy.29/AMY1A_region_principal_bundles.$b.og -d | \
    gzip > amy.29/AMY1A_region_principal_bundles.$b.hap.dist.gz 
 done
 ```
