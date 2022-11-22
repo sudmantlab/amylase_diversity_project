@@ -83,7 +83,7 @@ seq 0 1 | while read b; do
 done
 ```
 
-Get the distance matrix of the full graph and each bundle subgraph, grouping contigs of the same haplotype:
+Get the distance matrix of the full graph and each bundle subgraph:
 
 ```shell
 $ODGI paths -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.og -d | \
