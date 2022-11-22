@@ -22,13 +22,27 @@ sbatch -c 48 --wrap "$PGGB -i HPRC_AMY_Sequences/AMY1A_region_seq.fa.gz -o amy.2
 
 The gzipped `odgi` graph is available [here](http://hypervolu.me/~erik/amylase/amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og.gz). 
 
+Fix the reference coordinates in the `AMY1A_region_principal_bundles.bed` file:
+
+```shell
+grep chr1 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed -v > AMY1A_region_principal_bundles.fixed.bed
+
+# Ugly (lazy) way to fix the coordinates for each reference
+grep chr1_chm13_103304997_103901127_0 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
+  awk -v OFS='\t' -v start=103304997 '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
+grep chr1_hg19_103998686_104406594_0 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
+  awk -v OFS='\t' -v start=103998686 '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
+grep chr1_hg38_103456064_103863972_0 HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed | \
+  awk -v OFS='\t' -v start=103456064 '{print($1,$2-start,$3-start,$4)}' >> AMY1A_region_principal_bundles.fixed.bed
+```
+
 Get contig coordinates in each bundle:
 
 ```shell
 seq 0 1 | while read b; do
   echo "bundle $b"
   
-  grep -P "\t$b:" HPRC_AMY_Sequences/AMY_graphs/AMY1A_region_principal_bundles.bed > AMY1A_region_principal_bundles.$b.bed
+  grep -P "\t$b:" AMY1A_region_principal_bundles.fixed.bed > AMY1A_region_principal_bundles.$b.bed
 done
 ```
 
@@ -72,13 +86,13 @@ done
 Get the distance matrix of the full graph and each bundle subgraph, grouping contigs of the same haplotype:
 
 ```shell
-$ODGI paths -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.og -d -D '#' \
-  | gzip > amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.hap.dist.gz 
+$ODGI paths -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.og -d -D '#' | \
+ gzip > amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.sed.hap.dist.gz 
 
 seq 0 1 | while read b; do
   echo "bundle $b"
   
-  $ODGI paths -i amy.29/AMY1A_region_principal_bundles.$b.og -d -D '#' \
-    | gzip > amy.29/AMY1A_region_principal_bundles.$b.hap.dist.gz 
+  $ODGI paths -i amy.29/AMY1A_region_principal_bundles.$b.og -d -D '#' | \
+   gzip > amy.29/AMY1A_region_principal_bundles.$b.hap.dist.gz 
 done
 ```
