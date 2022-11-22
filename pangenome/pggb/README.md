@@ -22,7 +22,7 @@ sbatch -c 48 --wrap "$PGGB -i HPRC_AMY_Sequences/AMY1A_region_seq.fa.gz -o amy.2
 
 The gzipped `odgi` graph is available [here](http://hypervolu.me/~erik/amylase/amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og.gz). 
 
-Fix the reference coordinates in the `AMY1A_region_principal_bundles.bed` file:
+Shift coordinates in the `AMY1A_region_principal_bundles.bed` (where they are expressed with respect to the whole contigs):
 
 ```shell
 rm AMY1A_region_principal_bundles.fixed.bed
