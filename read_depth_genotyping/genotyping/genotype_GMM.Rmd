@@ -18,13 +18,18 @@ t_gt = read.table(fn_gts, sep="\t",header=T)
 
 g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
-  facet_grid(name~.,scales="free")+
+  facet_grid(name~dataset,scales="free")+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
 
-to_gt_AMY2A = t_gt %>% filter(name=="AMY2A") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-to_gt_AMY2B = t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-to_gt_AMY1 = t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+to_gt_train_AMY2A = t_gt %>% filter(name=="AMY2A")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+to_gt_train_AMY2B = t_gt %>% filter(name=="AMY2B")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+to_gt_train_AMY1 =  t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+
+#t_HPRC_indivs = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/map_gene_locations/HPRC_indivs",header=FALSE,col.names=c("ID"))
+#inner_join(t_HPRC_indivs,t_gt,on="ID")
+#t_gt %>% filter(grepl("HG00735",ID)) %>% dplyr::select(ID) %>% unique()
+#to_gt_train_AMY1 %>% filter(grepl("HGDP",sample))
 ```
 ```{r}
 ###FUNCTIONS
@@ -97,6 +102,19 @@ get_dists = function(k,mx_copy,mu,offset,sigma,pi,iter){
 ```
 ```{r}
 
+#to_gt has samples and gts
+gt_likelihood_table = function(to_gt, k,mu,offset,sigma, pi, label){
+  final_resps = E_step(to_gt$gt,k,mu,offset,sigma,pi,-1)
+
+  final_resps = to_gt %>% 
+    mutate(obs=row_number()) %>%
+    inner_join(final_resps,by="obs") %>%
+    inner_join(data.frame(cp=mu) %>% mutate(i=row_number()),by="i") %>%
+    mutate(label=label) %>%
+    dplyr::select(sample, obs, r, i, X, cp, label)
+  return(final_resps)
+}
+
 
 genotype = function(to_gt, iters, label){
 
@@ -128,14 +146,16 @@ genotype = function(to_gt, iters, label){
   }
   dists = do.call(rbind, dists)
   
-  final_resps = E_step(X,k,mu,offset,sigma,pi,-1)
+  final_resps = gt_likelihood_table(t_gt,k,mu,offset,sigma, pi, label)
+  
+  #final_resps = E_step(X,k,mu,offset,sigma,pi,-1)
 
-  final_resps = to_gt %>% 
-    mutate(obs=row_number()) %>%
-    inner_join(final_resps,by="obs") %>%
-    inner_join(data.frame(cp=mu) %>% mutate(i=row_number()),by="i") %>%
-    mutate(label=label) %>%
-    dplyr::select(sample, obs, r, i, X, cp, label)
+  #final_resps = to_gt %>% 
+  #  mutate(obs=row_number()) %>%
+  #  inner_join(final_resps,by="obs") %>%
+  #  inner_join(data.frame(cp=mu) %>% mutate(i=row_number()),by="i") %>%
+  #  mutate(label=label) %>%
+  #  dplyr::select(sample, obs, r, i, X, cp, label)
 
   return(list("k"=k,
               "mu"=mu,
@@ -146,19 +166,70 @@ genotype = function(to_gt, iters, label){
               "final_resps"=final_resps))
 }
 
-AMY1_gts = genotype(to_gt_AMY1, 20, "AMY1")
-AMY2B_gts = genotype(to_gt_AMY2B, 20, "AMY2B")
-AMY2A_gts = genotype(to_gt_AMY2A, 20, "AMY2A")
 
-all_gts = rbind(AMY1_gts$final_resps,
-                AMY2B_gts$final_resps,
-                AMY2A_gts$final_resps)
+AMY1_gt_trained = genotype(to_gt_train_AMY1, 20, "AMY1")
+AMY2B_gt_trained = genotype(to_gt_train_AMY2B, 20, "AMY2B")
+AMY2A_gt_trained = genotype(to_gt_train_AMY2A, 20, "AMY2A")
+
+gtl_AMY1 = gt_likelihood_table(t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt), 
+                               AMY1_gt_trained$k,
+                               AMY1_gt_trained$mu,
+                               AMY1_gt_trained$offset,
+                               AMY1_gt_trained$sigma, 
+                               AMY1_gt_trained$pi, 
+                               "AMY1")
+
+gtl_AMY2A = gt_likelihood_table(t_gt %>% filter(name=="AMY2A") %>% dplyr::select(sample,gt), 
+                               AMY2A_gt_trained$k,
+                               AMY2A_gt_trained$mu,
+                               AMY2A_gt_trained$offset,
+                               AMY2A_gt_trained$sigma, 
+                               AMY2A_gt_trained$pi, 
+                               "AMY2A")
+
+gtl_AMY2B = gt_likelihood_table(t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt), 
+                               AMY2B_gt_trained$k,
+                               AMY2B_gt_trained$mu,
+                               AMY2B_gt_trained$offset,
+                               AMY2B_gt_trained$sigma, 
+                               AMY2B_gt_trained$pi, 
+                               "AMY2B")
+
+all_gts = rbind(gtl_AMY1,
+                gtl_AMY2A,
+                gtl_AMY2B)
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
 fn_gts = paste(outdir,"/genotypes.likelihoods.tsv",sep="")
 write.table(all_gts, fn_gts, sep="\t",row.names = FALSE, quote = FALSE)
 
 
+```
+
+```{r}
+
+best_cp =  rbind(gtl_AMY2B,gtl_AMY1,gtl_AMY2A) %>%
+            group_by(sample,label) %>%
+            filter(r==max(r)) %>%
+            separate(sample,c("source","sample_id",'p1','p2'),remove=FALSE,sep="\\.")
+            
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures"
+fn_gts = paste(outdir,"/maximum_likelihood_genotypes.pdf",sep="")
+pdf(fn_gts,width=8,height=4)
+g=ggplot(best_cp)
+g+geom_histogram(aes(x=X,fill=factor(cp)),binwidth=.05)+
+  theme_bw()+
+  scale_fill_manual(values=sample(viridisLite::turbo(20)))+
+  scale_x_continuous(breaks=seq(0,20,2))+
+  #facet_grid(source~label,scales="free")
+  facet_wrap(source~label,scales="free",switch = "bottom")+
+  theme(strip.background = element_blank(),
+        strip.text = element_text(size=4))
+  #scale_y_log10()
+  #coord_cartesian(ylim=c(0,5))
+
+dev.off()
 ```
 
 ```{r}
@@ -215,18 +286,7 @@ final_resps = to_gt %>%
 #   geom_line(aes(x=x,y=y,color=factor(i)))+theme_bw()
 # 
 ```
-```{r}
 
-best_cp = final_resps %>% 
-            group_by(sample) %>%
-            filter(r==max(r))
-            
-g=ggplot(best_cp)
-g+geom_histogram(aes(x=gt,fill=factor(cp)),binwidth=.05)+
-  theme_bw()+
-  scale_fill_manual(values=sample(viridisLite::turbo(18)))+
-  scale_x_continuous(breaks=seq(1,20))
-```
 ```{r}
 
 mus = x_amy1$parameters$mean

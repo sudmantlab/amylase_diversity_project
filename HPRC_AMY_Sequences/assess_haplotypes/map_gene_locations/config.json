@@ -1,7 +1,9 @@
 {
     "genes":["./amylase_seqs/Homo_sapiens_ENST00000361355_8_sequence.fa",
              "./amylase_seqs/Homo_sapiens_ENST00000370083_9_sequence.fa",
-             "./amylase_seqs/Homo_sapiens_ENST00000414303_7_sequence.fa"],
+             "./amylase_seqs/Homo_sapiens_ENST00000414303_7_sequence.fa",
+             "./amylase_seqs/Homo_sapiens_ENST00000610648_1_sequence.fa",
+             "./amylase_seqs/Homo_sapiens_CHM13_AMYP1-201.fa"],
     "haps":[
         "./split_fastas/HG002#1#JAHKSE010000012.1_16776806_17183707_1.fa",
         "./split_fastas/HG002#2#JAHKSD010000021.1_102757493_103165350_0.fa",

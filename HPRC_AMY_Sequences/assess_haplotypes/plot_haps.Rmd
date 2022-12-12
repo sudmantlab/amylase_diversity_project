@@ -12,10 +12,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ###
 #Read in structures and genes mapped to fastas
 ###
+#install.packages('valr')
+#library(valr)
+# install.packages("tidyverse")
+# install.packages("RColorBrewer")
+# install.packages("pafr")
+# install.packages("gggenes")
+# install.packages("BiocManager")
+# BiocManager::install("rtracklayer")
+# BiocManager::install("ggtree")
+library(tidyverse)
 library(RColorBrewer)
-
 library(pafr)
 library(gggenes)
+library(valr)
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output"
 
@@ -59,15 +69,21 @@ t=t %>% mutate(rel_start2 = bstart-hap_block_start,
 
 fn_genes = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/map_gene_locations/output/gene_alns.paf"
 
-gene_names = data.frame(qname = c("ENST00000361355.8",
+gene_names = data.frame(qname = c(#"ENST00000361355.8",
                                    "ENST00000370083.9",
-                                   "ENST00000414303.7"),
-                          name2 = c("AMY2B-201",
+                                   "ENST00000414303.7",
+                                   "ENST00000610648.1",
+                                   "AMYP1-201"),
+                          name2 = c(#"AMY2B-201",
                                   "AMY1A-201",
-                                  "AMY2A-201"),
-                          name = c("2B",
+                                  "AMY2A-201",
+                                  "AMY2B-208",
+                                  "AMYP1-201"),
+                          name = c(#"2B",
                                    "1",
-                                   "2A"))
+                                   "2A",
+                                   "2B",
+                                   "2Ap"))
 
 
 paf_genes = as.data.frame(read_paf(fn_genes)) %>%
@@ -77,15 +93,28 @@ paf_genes = as.data.frame(read_paf(fn_genes)) %>%
               #filter(dv<=0.001)
               #filter(dv<=0.0005)
 
+
+
 g=ggplot(paf_genes)
 g+geom_histogram(aes(x=dv,fill=tname=="chr1_chm13_103304997_103901127_0"))+
   geom_vline(xintercept=0.0025)+
   geom_vline(xintercept=0.01)+
-  theme_bw()
+  geom_vline(xintercept=0.02)+
+  theme_bw()+
+  facet_wrap(~name2)+
+  theme(legend.position="None")
 
 #paf_genes %>% filter(tname=="chr1_chm13_103304997_103901127_0")
 
-paf_genes = paf_genes %>% filter(dv<=0.0025)
+
+paf_2Ap = paf_genes %>% 
+          filter(name=="2A") %>%
+          filter(dv>0.0025,dv<0.01)
+
+paf_plot_genes = paf_genes %>% 
+              filter(dv<=0.0025) %>%
+              mutate(chrom=tname,start=tstart,end=tend)
+#paf_genes = paf_genes %>% filter(dv<=0.01)
 
 
 exclude = c("HG01358#2#JAGYZA010000086.1_556_316498_0",
@@ -98,19 +127,47 @@ contig_structs = t %>%
 
 fn_out = paste(outdir,"/haplotype_all_structures.tsv",sep="")
 write.table(contig_structs,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+```
+```{r}
+##This code is to determine which of the genes are 2A pseudogenes and which are 2A
+
+bed_2Ap = paf_plot_genes %>% 
+  #filter(grepl("chm13",tname)) %>%
+  filter(name %in% c("2Ap")) %>%
+  arrange(tstart) %>%
+  mutate(chrom=tname,start=tstart,end=tend)
+
+bed_2A = paf_plot_genes %>% 
+  #filter(grepl("chm13",tname)) %>%
+  filter(name %in% c("2A")) %>%
+  arrange(tstart) %>%
+  mutate(chrom=tname,start=tstart,end=tend)
+
+paf_2Ap = bed_intersect(bed_2Ap,bed_2A,invert = TRUE)
+
+paf_plot_genes = rbind(paf_plot_genes %>% filter(name!="2Ap"),paf_2Ap)
 
 
+fn_out = paste(outdir,"/gene_locations_on_haplotypes.tsv",sep="")
+write.table(paf_plot_genes,fn_out,sep="\t",row.names=FALSE)
+
+#devtools::install_github('rnabioco/valr')
 ```
 
 ```{r}
 ### PLOT ALL THE HAPLOTYPES WITH GENES ON TOP for all individuals
-
+#install.packages("PNWColors")
 library(PNWColors)
 colors =  c(pnw_palette("Sunset2",length(unique(t$bID))),
             brewer.pal(3,"Set1"))
 
 colors =  c(pnw_palette("Sunset2",length(unique(t$bID))))
 colors =  c("#CCCCCC","#666666",brewer.pal(length(unique(t$bID))-2,"Spectral"))
+
+colors_genes = c(colors[3],"#088000","#87d97c","#f78902")
+
+#colors[c(3,6,6,4)]
+
 # colors =  c(brewer.pal(length(unique(t$bID)),"Spectral"),
 #             brewer.pal(3,"Set1"))
 
@@ -125,6 +182,19 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrow_body_height = unit(.5, "mm"),
                     position=position_nudge(x=0,y=-.2),
                     size=.1)+
+  # geom_gene_arrow(aes(xmin=tstart,
+  #                       xmax=tend,
+  #                       y=contig,
+  #                       #fill=name,
+  #                       color=name,
+  #                       forward=strand=="+"),
+  #                   arrowhead_height = unit(.5, "mm"),
+  #                   arrowhead_width = unit(.5, "mm"),
+  #                   arrow_body_height = unit(.25, "mm"),
+  #                   position=position_nudge(x=0,y=.2),
+  #                   size=.1,
+  #                   data = paf_2Ap,
+  #                   color="purple")+
   geom_gene_arrow(aes(xmin=tstart,
                         xmax=tend,
                         y=contig,
@@ -136,12 +206,12 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrow_body_height = unit(.25, "mm"),
                     position=position_nudge(x=0,y=.2),
                     size=.1,
-                    data = paf_genes)+
+                    data = paf_plot_genes)+
   geom_text(aes(x=tstart,
                 y=contig,
                 label=name,
                 color=name),
-               data=paf_genes,
+               data=paf_plot_genes,
                hjust=1,
                size=1,
                position=position_nudge(x=-1000,y=.25))+
@@ -149,7 +219,8 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
   theme(legend.position="None")+
   #scale_fill_brewer(palette="Spectral") +
   scale_fill_manual(values=colors)+
-  scale_color_brewer(palette="Set1") +
+  #scale_color_brewer(palette="Set1") +
+  scale_color_manual(values=colors_genes) +
   facet_grid(hap_struc_d~.,scales="free_y",space = "free")
 
 fn_out = paste(outdir,"/haplotype_structures_all.pdf",sep="")
@@ -179,7 +250,7 @@ representative_haps = t %>% group_by(contig) %>%
 
 
 t_rep = t %>% filter(contig %in% representative_haps$contig)
-paf_genes_rep = paf_genes %>% filter(tname %in% representative_haps$contig)
+paf_genes_rep = paf_plot_genes %>% filter(tname %in% representative_haps$contig)
 
 bID_lens = t_rep %>% 
   mutate(bID_d = paste(bID,bOrientation,sep=".")) %>%
@@ -205,7 +276,9 @@ write.table(bID_lens,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 ```
 ```{r}
 #Load in pairwise distances between hap structures, cluster them, and plot
-
+#install.packages("ggtree")
+#install.packages("ade4")
+#install.packages("treeio")
 library(ggtree)
 library(ade4)
 library(treeio)
@@ -221,10 +294,11 @@ dmat = t_hap_dists %>%
 c=hclust(as.dist(dmat),method="average")
 #phylo = hclust2phylog(c)
 #phylo = as.dendrogram(c)
+struc_phy = as.phylo(c)
 
 fn_out = paste(outdir,"/haplotype_struct_clusters.pdf",sep="")
 pdf(fn_out,width=4,height=12)
-ggtree(phylo) + geom_tiplab() + 
+ggtree(struc_phy) + geom_tiplab() + 
   geom_nodelab(geom='label') + hexpand(.05)
 dev.off()  
 
@@ -238,22 +312,22 @@ dev.off()
 
 #https://shaunpwilkinson.github.io/post/phylogram_blog/
 #nj_tree = ape::nj(as.dist(dmat))
-hap_counts = t %>% ungroup() %>% 
+hap_counts = t %>% ungroup() %>%
   dplyr::select(contig,hap_struc_d) %>%
   unique() %>%
   group_by(hap_struc_d) %>%
   summarize(n=n())
-
-hap_order = data.frame(hap_struc_d=plot_order) %>% mutate(o = row_number()) 
-t_rep= inner_join(t_rep,hap_order,on=hap_struc_d) 
-
-paf_genes_rep = inner_join(paf_genes_rep,hap_order,on=hap_struc_d)
-
-hap_counts %>% summarise(s=sum(n))
+# 
+# hap_order = data.frame(hap_struc_d=plot_order) %>% mutate(o = row_number()) 
+# t_rep= inner_join(t_rep,hap_order,on=hap_struc_d) 
+# 
+# paf_genes_rep = inner_join(paf_genes_rep,hap_order,on=hap_struc_d)
+# hap_counts %>% summarise(s=sum(n))
 ```
 
 
 ```{r}
+#install.packages("aplot")
 library(aplot)
 
 struc_phy = as.phylo(c)
@@ -331,17 +405,19 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
    theme(legend.position="None")+
    theme(panel.grid=element_blank())+
    scale_fill_manual(values=colors)+
-   scale_color_brewer(palette="Set1")+
+   #scale_color_brewer(palette="Set1")+
+   scale_color_manual(values=colors_genes) +
    theme(axis.text.y=element_blank(),
          panel.border = element_blank(),
          axis.ticks.y=element_blank())+
    scale_x_continuous("",expand=c(0,0),breaks=seq(0,6e5,1e5),labels=paste(seq(0,600,100),"kb")) +
-   scale_y_discrete("") 
+   scale_y_discrete("")+
+   theme(axis.text.x = element_text(size=6))
 
 fn_out = paste(outdir,"/haplotype_structures_w_tree.pdf",sep="")
 
 pdf(fn_out,width=5,height=4)
-g  %>% insert_left(p, width=.25)
+g  %>% insert_left(p, width=.35)
 dev.off()  
 
 fn_out = paste(outdir,"/haplotype_structures_w_tree_labeled.pdf",sep="")
@@ -355,6 +431,77 @@ dev.off()
   
 
 #insert_left(g,p, width=.85)
+```
+```{r}
+
+#g=ggplot(paf_genes_rep)
+gene_count_sum = paf_genes_rep %>% 
+  group_by(hap_struc_d,name) %>% 
+  summarize(n=n())
+
+#nice example where this came from: https://www.janknappe.com/blog/r-irish-elections-gender/
+histo_dots = gene_count_sum %>%
+  uncount(n) %>%
+  mutate(y=sequence(n()))
+
+#sequence(4)
+
+
+g1=ggplot(gene_count_sum,aes(y=hap_struc_d))
+g1=g1+geom_point(aes(x=n,color=name),alpha=.5)+
+  #geom_line()
+  theme_bw(base_size=8)+
+  scale_color_brewer(palette="Set1")+
+  theme(axis.text.y=element_blank())+
+  scale_y_discrete("")+
+  scale_x_continuous("gene copy",breaks=seq(0,8))+
+  theme(panel.grid=element_blank(),
+        panel.border = element_blank())
+
+g=ggplot(histo_dots,aes(y=hap_struc_d))
+g=g+geom_point(aes(x=y,color=name),alpha=1,shape=16)+
+  #geom_line()
+  theme_bw(base_size=8)+
+  #scale_color_brewer("",palette="Set1",labels=c("AMY1A","AMY2A","AMY2A-pseudogene","AMY2B"))+
+  scale_color_manual("",values=colors_genes,labels=c("AMY1A","AMY2A","AMY2A-pseudogene","AMY2B")) +
+  scale_fill_manual("",values=colors_genes,labels=c("AMY1A","AMY2A","AMY2A-pseudogene","AMY2B")) +
+  theme(axis.text.y=element_blank())+
+  scale_y_discrete("")+
+  scale_x_continuous("gene copies / haplotype",breaks=seq(0,16))+
+  theme(panel.grid=element_blank(),
+        panel.border = element_blank())+
+  theme(legend.position="None")
+
+g
+g1
+
+p = ggtree(struc_phy) %<+% df_tip_data +
+  #geom_tippoint(aes(size=n),position=position_nudge(x=.02,y=0),alpha=.5)+
+  scale_size_continuous(range=c(.25,2))+
+  hexpand(.1) + 
+  #geom_cladelab(data=labels,mapping=aes(node=node, label=txt),fontsize=1.5,offset=0.12,hjust=.8)+
+  theme(legend.position = "None")
+
+
+
+fn_out = paste(outdir,"/haplotype_structure_tree_w_copies.pdf",sep="")
+pdf(fn_out,width=2.5,height=3.5)
+#g=g+geom_text(aes(x=rel_start2+(rel_end2-rel_start2)/2,
+#                        label=bID),
+#                    size=1)
+g  %>% insert_left(p, width=.25)
+dev.off()  
+
+fn_out = paste(outdir,"/haplotype_structure_tree_w_copies_legend.pdf",sep="")
+pdf(fn_out,width=5,height=1)
+g+theme(legend.position="right",
+        legend.key.size=unit(.1,"cm"))
+dev.off()  
+
+
+
+
+
 ```
 ```{r}
 
