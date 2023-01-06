@@ -25,6 +25,18 @@ g+geom_histogram(aes(x=gt),binwidth=0.05)+
 to_gt_train_AMY2A = t_gt %>% filter(name=="AMY2A")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
 to_gt_train_AMY2B = t_gt %>% filter(name=="AMY2B")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
 to_gt_train_AMY1 =  t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+to_gt_train_AMY2Ap =  t_gt %>% filter(name=="AMY2Ap") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+
+
+
+
+g=ggplot(t_gt %>% 
+        filter(name %in% c("AMY2A","AMY2Ap")) %>%
+        dplyr::select(sample,dataset,gt,name) %>%
+        pivot_wider(names_from=name,values_from=gt))
+g+geom_point(aes(x=AMY2A,y=AMY2Ap))+
+  theme_bw(base_size=8)
+
 
 #t_HPRC_indivs = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/map_gene_locations/HPRC_indivs",header=FALSE,col.names=c("ID"))
 #inner_join(t_HPRC_indivs,t_gt,on="ID")
@@ -170,7 +182,9 @@ genotype = function(to_gt, iters, label){
 AMY1_gt_trained = genotype(to_gt_train_AMY1, 20, "AMY1")
 AMY2B_gt_trained = genotype(to_gt_train_AMY2B, 20, "AMY2B")
 AMY2A_gt_trained = genotype(to_gt_train_AMY2A, 20, "AMY2A")
+AMY2Ap_gt_trained = genotype(to_gt_train_AMY2Ap, 20, "AMY2Ap")
 
+                             
 gtl_AMY1 = gt_likelihood_table(t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt), 
                                AMY1_gt_trained$k,
                                AMY1_gt_trained$mu,
@@ -195,9 +209,20 @@ gtl_AMY2B = gt_likelihood_table(t_gt %>% filter(name=="AMY2B") %>% dplyr::select
                                AMY2B_gt_trained$pi, 
                                "AMY2B")
 
+gtl_AMY2Ap = gt_likelihood_table(t_gt %>% filter(name=="AMY2Ap") %>% dplyr::select(sample,gt), 
+                               AMY2Ap_gt_trained$k,
+                               AMY2Ap_gt_trained$mu,
+                               AMY2Ap_gt_trained$offset,
+                               AMY2Ap_gt_trained$sigma, 
+                               AMY2Ap_gt_trained$pi, 
+                               "AMY2Ap")
+
+
+
 all_gts = rbind(gtl_AMY1,
                 gtl_AMY2A,
-                gtl_AMY2B)
+                gtl_AMY2B,
+                gtl_AMY2Ap)
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
 fn_gts = paste(outdir,"/genotypes.likelihoods.tsv",sep="")
@@ -208,7 +233,7 @@ write.table(all_gts, fn_gts, sep="\t",row.names = FALSE, quote = FALSE)
 
 ```{r}
 
-best_cp =  rbind(gtl_AMY2B,gtl_AMY1,gtl_AMY2A) %>%
+best_cp =  rbind(gtl_AMY2B,gtl_AMY1,gtl_AMY2A,gtl_AMY2Ap) %>%
             group_by(sample,label) %>%
             filter(r==max(r)) %>%
             separate(sample,c("source","sample_id",'p1','p2'),remove=FALSE,sep="\\.")
