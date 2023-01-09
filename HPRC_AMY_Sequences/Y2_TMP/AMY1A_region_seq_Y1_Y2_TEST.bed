@@ -1,4 +1,4 @@
-# cmd: pgr-pbundle-decomp -w 48 -k 56 -r 4 --min-span 28 --min-cov 0 --min-branch-size 8 --bundle-length-cutoff 100 --bundle-merge-distance 10000 AMY1A_region_seq_Y1_Y2_TEST.fa AMY1A_region_seq_Y1_Y2_TEST.
+# cmd: pgr-pbundle-decomp -w 48 -k 56 -r 4 --min-span 28 --min-cov 0 --min-branch-size 8 --bundle-length-cutoff 100 --bundle-merge-distance 10000 AMY1A_region_seq_Y1_Y2_TEST.fa.gz AMY1A_region_seq_Y1_Y2_TEST.
 HG002#1#JAHKSE010000012.1_16776806_17183707_1	154	115514	0:672:0:0:671
 HG002#1#JAHKSE010000012.1_16776806_17183707_1	115458	115661	11:2:0:0:1
 HG002#1#JAHKSE010000012.1_16776806_17183707_1	115605	138438	3:132:0:0:131
