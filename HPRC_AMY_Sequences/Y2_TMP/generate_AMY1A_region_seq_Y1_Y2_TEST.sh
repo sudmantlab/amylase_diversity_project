@@ -4,6 +4,6 @@ pgr-pbundle-bed2sorted AMY1A_region_seq_Y1_Y2_TEST.bed AMY1A_region_seq_Y1_Y2_TE
 cat AMY1A_region_seq_Y1_Y2_TEST.ord | awk '{print $1"\t"$1"-"$2}' > AMY1A_region_seq_Y1_Y2_TEST.ord2
 pgr-pbundle-bed2svg --track-range 800000 --stroke-width 1.5 AMY1A_region_seq_Y1_Y2_TEST.bed  AMY1A_region_seq_Y1_Y2_TEST. --annotations AMY1A_region_seq_Y1_Y2_TEST.ord2
 
-#commit 29de88b5c464aa9ea39b68f5f6d2f3a88c2bf807
+#commit 605a2ed56f1bd64ea045a7d88ffa30f1804c004a
 pgr-pbundle-bed2dist AMY1A_region_seq_Y1_Y2_TEST.bed AMY1A_region_seq_Y1_Y2_TEST.
-pgr-pbundle-bed2svg --track-range 800000 --stroke-width 1.5 AMY1A_region_seq_Y1_Y2_TEST.bed AMY1A_region_seq_Y1_Y2_TEST.hc.  --annotations  AMY1A_region_seq_Y1_Y2_TEST.hc.ord
+pgr-pbundle-bed2svg --track-range 700000 --stroke-width 1.5 AMY1A_region_seq_Y1_Y2_TEST.bed  AMY1A_region_seq_Y1_Y2_TEST. --annotations AMY1A_region_seq_Y1_Y2_TEST.ord2 --ddg-file AMY1A_region_seq_Y1_Y2_TEST.ddg
