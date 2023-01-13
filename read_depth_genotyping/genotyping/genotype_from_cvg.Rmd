@@ -98,9 +98,10 @@ ancient_colors = pnw_palette("Sunset2",7)[1:4]
 
 colors = c(ancient_colors,modern_colors)
 
-genes = data.frame(names=c("RNPC3", "AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
-                   start=c(103525691,103571100,103617427,103655760,103687415,103749898),
-                   end=c(103553343,103579530,103625780,103664554,103696210,103758692))
+
+genes = data.frame(names=c("RNPC3", "AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","AMY2Ap"),
+                   start=c(103525691,103571100,103617427,103655760,103687415,103749898,103713720),
+                   end=c(103553343,103579530,103625780,103664554,103696210,103758692,  103719905))
 
 # genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","prox"),
 #                              start=c(103564100,103612500,103635500,103698415,103729898,103762000),
@@ -112,9 +113,10 @@ genes = data.frame(names=c("RNPC3", "AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
 #                              end=  c(103588530,103617000,103655000,103715210,103746000,103795000))
 
 #Usher coords for Amy 1
-genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
-                             start=c(103564100,103612500,103638544,103684142,103732686),
-                             end=  c(103588530,103617000,103667876,103712474,103762027))
+
+genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","AMY2Ap"),
+                             start=c(103564100,103612500,103638544,103684142,103732686,103713720),
+                             end=  c(103588530,103617000,103667876,103712474,103762027,103730686))
 
 control_blocks = data.frame(name=c("left_ctrl","right_ctrl"),
                             start = c(103550201,      103765027),

@@ -46,12 +46,20 @@ t = read.table(fn,
                             "exitix")) %>%
                 mutate(bOrientation = as.numeric(bOrientation))
 
+#bad samples determined from compare_RD_to_HPRC script
+bad_samples = c("HG00673", "HG00735", "HG01106", "HG01175", "HG01361", "HG01952", "HG02148", "HG02257", "HG02572")
+
 t=t %>% 
   group_by(contig) %>%
   mutate(seg_len = bend-bstart) %>%
   mutate(rel_end = cumsum(seg_len)) %>%
-  mutate(rel_start = lag(rel_end,default=0))
-  
+  mutate(rel_start = lag(rel_end,default=0)) %>%
+  separate(contig,c("sample_id","sample_hap",'sample_contig'),sep="#",remove=FALSE) %>%
+  dplyr::select(-c(sample_hap,sample_contig)) %>%
+  mutate(collapsed_assembly = sample_id %in% bad_samples)
+  #
+  #dplyr::select(sample,X,cp,label) %>%
+
 hap_sums = t %>% 
             mutate(bID_d = paste(bID,".",bOrientation,sep="")) %>%
             group_by(contig) %>%
@@ -60,7 +68,7 @@ hap_sums = t %>%
 
 t = inner_join(t,hap_sums,by="contig")
 
-hap_info = t %>% group_by(contig,hap_struc,hap_struc_d) %>%
+hap_info = t %>% group_by(contig,sample_id,hap_struc,hap_struc_d) %>%
                  summarize(hap_block_start = min(bstart))
 
 t=inner_join(t,hap_info,on=c("contig","hap_struc"))
@@ -147,7 +155,6 @@ paf_2Ap = bed_intersect(bed_2Ap,bed_2A,invert = TRUE)
 
 paf_plot_genes = rbind(paf_plot_genes %>% filter(name!="2Ap"),paf_2Ap)
 
-
 fn_out = paste(outdir,"/gene_locations_on_haplotypes.tsv",sep="")
 write.table(paf_plot_genes,fn_out,sep="\t",row.names=FALSE)
 
@@ -166,11 +173,6 @@ colors =  c("#CCCCCC","#666666",brewer.pal(length(unique(t$bID))-2,"Spectral"))
 
 colors_genes = c(colors[3],"#088000","#87d97c","#f78902")
 
-#colors[c(3,6,6,4)]
-
-# colors =  c(brewer.pal(length(unique(t$bID)),"Spectral"),
-#             brewer.pal(3,"Set1"))
-
 g=ggplot(t)
 g=g+geom_gene_arrow(aes(xmin=rel_start2,
                         xmax=rel_end2,
@@ -182,19 +184,6 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrow_body_height = unit(.5, "mm"),
                     position=position_nudge(x=0,y=-.2),
                     size=.1)+
-  # geom_gene_arrow(aes(xmin=tstart,
-  #                       xmax=tend,
-  #                       y=contig,
-  #                       #fill=name,
-  #                       color=name,
-  #                       forward=strand=="+"),
-  #                   arrowhead_height = unit(.5, "mm"),
-  #                   arrowhead_width = unit(.5, "mm"),
-  #                   arrow_body_height = unit(.25, "mm"),
-  #                   position=position_nudge(x=0,y=.2),
-  #                   size=.1,
-  #                   data = paf_2Ap,
-  #                   color="purple")+
   geom_gene_arrow(aes(xmin=tstart,
                         xmax=tend,
                         y=contig,
@@ -217,28 +206,94 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                position=position_nudge(x=-1000,y=.25))+
   theme_bw(base_size=4)+
   theme(legend.position="None")+
-  #scale_fill_brewer(palette="Spectral") +
   scale_fill_manual(values=colors)+
-  #scale_color_brewer(palette="Set1") +
-  scale_color_manual(values=colors_genes) +
-  facet_grid(hap_struc_d~.,scales="free_y",space = "free")
+  scale_color_manual(values=colors_genes)
+  #
 
 fn_out = paste(outdir,"/haplotype_structures_all.pdf",sep="")
 pdf(fn_out,width=5,height=12)
-print(g)
+print(g+facet_grid(sample_id~collapsed_assembly,scales="free_y",space = "free"))
 dev.off()  
 
+fn_out = paste(outdir,"/haplotype_structures_all_clustered.pdf",sep="")
+pdf(fn_out,width=5,height=12)
+print(g+facet_grid(hap_struc_d~.,scales="free_y",space = "free"))
+dev.off()  
+
+fn_out = paste(outdir,"/haplotype_structures_all_clustered_w_collapsed.pdf",sep="")
+pdf(fn_out,width=5,height=12)
+print(g+facet_grid(hap_struc_d~collapsed_assembly,scales="free_y",space = "free"))
+dev.off()  
+
+
+### collapsed haplotypes
+#HG01175#1#JAHAMA010000003.1_33204707_33808232_1
+#HG01952#2#JAHAMD010000045.1_4381722_4883708_1
+#HG01106#1#JAHAMC010000004.1_31121050_31623013_0
+#HG02257#2#JAGYVH010000034.1_98190388_98857961_0
 
 
 ```
 
 ```{r}
-###SELECT ONE REPRESENTATIVE INDIVIDUAL / HAP to plot
+# count the total number of haps plotted
+# NOTE that 2 are incomplete (see below)
+t %>% 
+  dplyr::select(contig) %>%
+  unique() %>%
+  ungroup() %>%
+  summarize(n=n())
+
+#count the copy of each gene per hap
+gene_counts_per_hap = paf_plot_genes %>% 
+  group_by(tname,hap_struc_d,name) %>% 
+  summarize(n=n())
+
+exclude = c("HG01358#2#JAGYZA010000086.1_556_316498_0",
+            "HG01928#1#JAGYVQ010000195.1_211_358290_0")
+
+#FIND samples with 2 haps that are not in the exclude bin
+samples = gene_counts_per_hap %>%
+  ungroup() %>%
+  filter(grepl("#",tname)) %>%
+  filter(!(tname %in% exclude)) %>%
+  separate(tname,c("sample","hap","contig"),sep="#") %>%
+  dplyr::select(sample,hap) %>%
+  unique() %>%
+  group_by(sample) %>%
+  summarize(n_haps = n()) %>%
+  filter(n_haps==2) %>%
+  dplyr::select(sample)
+
+
+gene_counts_per_indiv = gene_counts_per_hap %>%
+  ungroup() %>%
+  filter(grepl("#",tname)) %>%
+  separate(tname,c("sample","hap","contig"),sep="#") %>%
+  filter(sample %in% samples$sample) %>%
+  group_by(sample,name) %>%
+  summarize(total_copy = sum(n))
+
+fn_out = paste(outdir,"/gene_copy_counts_per_indiv.tsv",sep="")
+write.table(gene_counts_per_indiv,fn_out,sep="\t",row.names=FALSE)
+
+
+```
+
+```{r}
+#SELECT ONE REPRESENTATIVE INDIVIDUAL / HAP to plot
 #EXCLUDING THESE TWO BECAUSE THEY ARE NOT FULLY ASSEMBLED ACROSS THE LOCUS
 exclude = c("HG01358#2#JAGYZA010000086.1_556_316498_0",
             "HG01928#1#JAGYVQ010000195.1_211_358290_0")
 
+collapsed_haps = c("HG01175#1#JAHAMA010000003.1_33204707_33808232_1",
+                   "HG01952#2#JAHAMD010000045.1_4381722_4883708_1",
+                   "HG01106#1#JAHAMC010000004.1_31121050_31623013_0",
+                   "HG02257#2#JAGYVH010000034.1_98190388_98857961_0")
+
 representative_haps = t %>% group_by(contig) %>%
+                        #include this to exclude collapses
+                        #filter(collapsed_assembly==FALSE) %>%
                         filter(row_number()==1) %>% 
                         ungroup() %>%
                         group_by(hap_struc_d) %>%
@@ -246,7 +301,8 @@ representative_haps = t %>% group_by(contig) %>%
                         filter(row_number()==1) %>% 
                         ungroup() %>%
                         dplyr::select(contig,n,hap_struc_d) %>%
-                        filter(!contig %in% exclude)
+                        filter(!contig %in% exclude) %>%
+                        mutate(is_collapsed = contig %in% collapsed_haps)
 
 
 t_rep = t %>% filter(contig %in% representative_haps$contig)
@@ -313,9 +369,10 @@ dev.off()
 #https://shaunpwilkinson.github.io/post/phylogram_blog/
 #nj_tree = ape::nj(as.dist(dmat))
 hap_counts = t %>% ungroup() %>%
-  dplyr::select(contig,hap_struc_d) %>%
+  mutate(is_collapsed = contig %in% collapsed_haps) %>%
+  dplyr::select(contig,hap_struc_d,is_collapsed) %>%
   unique() %>%
-  group_by(hap_struc_d) %>%
+  group_by(hap_struc_d,is_collapsed) %>%
   summarize(n=n())
 # 
 # hap_order = data.frame(hap_struc_d=plot_order) %>% mutate(o = row_number()) 
@@ -353,7 +410,10 @@ labels = t %>% ungroup() %>%
                       contig == "HG002#2#JAHKSD010000021.1_102757493_103165350_0" ~ paste("hg38 ",txt),
                       contig == "HG00438#2#JAHBCA010000012.1_51513023_51826723_0" ~ paste("Anc ",txt),
                       TRUE ~ txt)) %>%
-  inner_join(struc_phy %>% as_tibble,by="label")
+  inner_join(struc_phy %>% as_tibble,by="label") %>%
+  mutate(is_collapsed = contig %in% collapsed_haps) %>%
+  mutate(txt=ifelse(is_collapsed,"(*1)",txt))
+
   
 unique(t_rep$contig)
 ```
@@ -364,11 +424,12 @@ df_tip_data = hap_counts %>% mutate(label=hap_struc_d) %>%
 
 
 p = ggtree(struc_phy) %<+% df_tip_data +
-  geom_tippoint(aes(size=n),position=position_nudge(x=.02,y=0),alpha=.5)+
+  geom_tippoint(aes(size=n,color=is_collapsed),position=position_nudge(x=.02,y=0),alpha=.5)+
   scale_size_continuous(range=c(.25,2))+
   hexpand(.1) + 
-  geom_cladelab(data=labels,mapping=aes(node=node, label=txt),fontsize=1.5,offset=0.12,hjust=.8)+
-  theme(legend.position = "None")
+  geom_cladelab(data=labels,mapping=aes(node=node, label=txt,color=is_collapsed),fontsize=1.5,offset=0.12,hjust=.8)+
+  theme(legend.position = "None")+
+  scale_color_manual(values=c("black","purple"))
 
 ##NOTE THE y aesethetic needs to be in ggplot for the aplot to work
 g=ggplot(t_rep, aes(y=hap_struc_d))
