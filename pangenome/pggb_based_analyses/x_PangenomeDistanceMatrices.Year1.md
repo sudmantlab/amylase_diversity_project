@@ -61,10 +61,8 @@ seq 0 1 | while read b; do
   # Note: for bundles 0 and 1, -d 1000 is already fine, for others higher values might be needed
   $ODGI extract \
     -i amy.29/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og \
-    -b AMY1A_region_principal_bundles.$b.bed -d 100000000 -e 10 \
-    -o - | $ODGI sort -i - -o amy.29/AMY1A_region_principal_bundles.$b.og -O -p gYs -x 1000 -t 10 
-    
-  $ODGI stats -i amy.29/AMY1A_region_principal_bundles.$b.og -S
+    -b AMY1A_region_principal_bundles.$b.bed -d 1000 -P \
+    -o - | $ODGI sort -i - -o amy.29/AMY1A_region_principal_bundles.$b.og -O -p gYs -x 1000 -t 10 -P
 done
 ```
 
