@@ -47,7 +47,11 @@ t = read.table(fn,
                 mutate(bOrientation = as.numeric(bOrientation))
 
 #bad samples determined from compare_RD_to_HPRC script
-bad_samples = c("HG00673", "HG00735", "HG01106", "HG01175", "HG01361", "HG01952", "HG02148", "HG02257", "HG02572")
+bad_samples = data.frame(id=c("HG00673", "HG00735", "HG01106", "HG01175", "HG01361", "HG01952", "HG02148", "HG02257", "HG02572"))
+
+fn_out_bad = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output/bad_samples.txt"
+
+write.table(bad_samples,fn_out_bad,row.names = FALSE)
 
 t=t %>% 
   group_by(contig) %>%
@@ -135,6 +139,15 @@ contig_structs = t %>%
 
 fn_out = paste(outdir,"/haplotype_all_structures.tsv",sep="")
 write.table(contig_structs,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+```
+```{r}
+mt_range = seq(1e-5,7e-5,1e-5)
+mt = 1.5e-5
+nc_range = seq(50,90,10)/3e9
+
+mt/nc_range
+
+
 ```
 ```{r}
 ##This code is to determine which of the genes are 2A pseudogenes and which are 2A
@@ -389,6 +402,9 @@ library(aplot)
 
 struc_phy = as.phylo(c)
 
+fn_phy_out = paste(outdir,"/haplotype_structures_tree.nwk",sep="")
+
+write.tree(struc_phy,fn_phy_out)
 #t_rep %>% filter(hap_struc_d=="1.0-2.0-5.0-4.0-3.0-0.0")
   
 
