@@ -33,6 +33,8 @@ A repo for code and methods related to analyses as well as for a manuscript
 
 - Andrea look into trying to run VERKKO ?
 - Peter make the final set of haplotypes, no broken haps! EXCLUDE THOSE
+    - Y1 genomes minus 9 fails
+    - Y2 genomes 
 - Peter Alma Nicolas figgs
 
 
