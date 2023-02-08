@@ -1,12 +1,5 @@
 {
-    "bundle_colors":["#CCCCCC", 
-                     "#666666", 
-                     "#D53E4F", 
-                     "#FC8D59", 
-                     "#FEE08B", 
-                     "#E6F598", 
-                     "#99D594", 
-                     "#3288BD"], 
+    "bundle_colors":["#CCCCCC", "#666666", "#D53E4F", "#FC8D59", "#FEE08B", "#99D594", "#E6F598", "#3288BD", "#FFFFBF"],
     "excluded_hifiasm":[
         "HG02809.hifiasm_filt_pat.fa:h1tg000007l_103415673_103822536_0" ,
         "HG01099.hifiasm_filt_pat.fa:h1tg000003l_56136922_56638856_1" ,
