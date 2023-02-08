@@ -38,4 +38,29 @@ A repo for code and methods related to analyses as well as for a manuscript
 - Peter Alma Nicolas figgs
 
 
+20230208
+    - Peter
+        - 89 or 90 haplotyupes 
+        - how does tree change w/ different bunldes
 
+    - Andrea has verkko done
+        - will try to extract amylase to look at it
+
+    - Erik
+        - Erik will build the graph for Davide
+        - odge distance matrix for Davide
+        - discovered problem with extracting alignments out of the graph
+        - EKG will try to fix
+
+    - Davide
+        - remade the tree
+        - tried at different cuts of the tree
+        - 14 clusters, 11, 3 and 2 works well, can get up to 80 % w/ 14 groups 
+        - 80% with first 14 groups
+        - Erik suggests using distance matrix based approach
+        - Davide tries w/ DBscan, or aglomerative clustering
+
+    - Alessandro
+        - really beautiful genotyping
+        - I'll give you the right one
+        - alessandro will extend
