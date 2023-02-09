@@ -7,10 +7,10 @@ For the phenotypes: check the columns in UKBB https://biobank.ndph.ox.ac.uk/show
 These two resources are used to see if GWAS was performed on these traits:
 - https://www.ebi.ac.uk/gwas/search?query=bread and then you can click on diet measurement and download the summary stat for these variants. I ended up downloading the summary statistics of Cole et al., Nat Comm 2020  from this link (http://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics/GCST90132001-GCST90133000/GCST90132981/) which is 'Bread consumption (slices per week) (UKB data field 1438)' aka bread intake
 
--  Another dataset that be worth exploring is this one (https://docs.google.com/spreadsheets/d/1kvPoupSzsSFBNSztMzl04xMoSC3Kcx3CrjVf4yBmESU/edit#gid=178908679)
+-  Another dataset that is worth exploring is this one (https://docs.google.com/spreadsheets/d/1kvPoupSzsSFBNSztMzl04xMoSC3Kcx3CrjVf4yBmESU/edit#gid=178908679)
 
 
-By the combination of the two I obtained the following phenotypes worth study:
+By the combination of the two I obtained the following phenotypes worth studying:
 
 - Bread intake (field 1438 of UKBB):
     - Cole et al., Nat Comm 2020 (GCST90*981)
@@ -24,14 +24,14 @@ By the combination of the two I obtained the following phenotypes worth study:
 
 ## To do
 
-- check if there are the bi-allelic intensities and see if it is possible to estimate the CNV from these --> apparently we have access also to them and they are:
+- check if there are bi-allelic intensities and see if it is possible to estimate the CNV from these --> apparently, we have access also to them and they are:
     - genotype copy number variant allele B (code 22437)
     - log ration (22431)
     - intensities (22430) 
 
-(speak with Davide, Peter and Erik on what is the best to use, for now I downloaded them in ```/processing_data/shared_datasets/ukbiobank/copy_number```)
+(speak with Davide, Peter and Erik on what is the best to use, for now, I downloaded them in ```/processing_data/shared_datasets/ukbiobank/copy_number```)
 
-- reduce the analysis to the SNPs that are proxy for the copy of AMY copies table taken from Usher et al., 2015 
+- reduce the analysis to the SNPs that are proxies for the copy of AMY copies table taken from Usher et al., 2015 
 
 | Gene  | SNP        | Minor allele freq. | Change in copy number/minor allele-GPC | Change in copy number/minor allele-GoT2D | r2-GPC | r2-GoT2D | pval-GPC | pval-GoT2D |
 | :---- | :--------- | :----------------- | :------------------------------------- | :--------------------------------------- | :----- | :------- | :------- | :--------- |
@@ -56,12 +56,12 @@ By the combination of the two I obtained the following phenotypes worth study:
     - Fasting Glucose ajusted for BMI (Downie et al.,2021 Diabetologia - http://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics/GCST90094001-GCST90095000/GCST90094959/)
     - Gluten-free diet (Jiang L Nat Genet - http://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics/GCST90042001-GCST90043000/GCST90042610/)
 
-- adjust the p-value according the number of SNPs studied:
+- adjust the p-value according to the number of SNPs studied:
     - select the region from the plink files of UKBB
-    - R LD with plink1.9 it is a correlation matrix
+    - R LD with plink1.9 as a correlation matrix
     - PCA with R prcomp, and eigen values
     - calculate the variance 
-    - see what is the number of PC that explain at least the 95% of the variance and use that number as treshold for the p-value
+    - see what is the number of PC that explain at least 95% of the variance and use that number as threshold for the p-value
 
  ## Intensities work
 
@@ -73,7 +73,7 @@ By the combination of the two I obtained the following phenotypes worth study:
 
 - extract only the values lower and higher of a certain columns with awk (faster) -- it takes in consideration 1.5 Mb of limit in the region, which is 103998686:104406594 the command is ```awk '$2 == 1 && $3 >= 102498686  && $3 <= 105906594  {print $0}' HumanOmni2.5-4v1_B-b38.Ilmn.strand > test.txt ``` and I extracted only the first column
 
-However talkig to Davide made me realise that better to use the intensities per region, but of which allele?
+However talking to Davide made me realize that better to use the intensities per region, but of which allele?
 
 - downloaded also the intensities per region https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/working/20120703_CNV_omni25_intensities/ 
 
@@ -127,15 +127,17 @@ and cat this to each file
 
 I work on R to detect the correlation
 
+Link to gdoc presentation in the making https://docs.google.com/presentation/d/1ieZyp_74-VBhB-zRYrV8xFd5dwJZUc-CIZ9v4xdR-kc/edit#slide=id.g206d7303d96_0_15
+
 ## working in progress
 
-- extend the analyses at single-base level:
-    - understand the normalisation and maybe start from raw data 
+- extend the analyses at the single-base level:
+understand the normalization and maybe start from raw data 
 
 - apply the same approach
 
-- extend this to UKBB (check how many SNPs are there in these regions and for how many individuals - divide them for ancestry? I am doing this in a separated project)
+- extend this to UKBB (check how many SNPs are there in these regions and for how many individuals - divide them for ancestry? I am doing this in a separate project)
 
-- check if there is correlation between these intensities and phenotypes? 
+- check if there is a correlation between these intensities and phenotypes. 
 
 - merge the regions together (maybe?)
