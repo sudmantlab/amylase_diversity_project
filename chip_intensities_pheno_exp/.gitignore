@@ -1,0 +1,6 @@
+*.tsv
+*.bgz
+data/
+data_set/
+.R*
+*.Rproj

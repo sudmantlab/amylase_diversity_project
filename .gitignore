@@ -6,3 +6,4 @@ pangenome/exploratory_copy_number/resources/*
 !.gitignore
 !*/.gitignore
 
+.Rproj.user
