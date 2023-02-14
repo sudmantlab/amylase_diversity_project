@@ -42,6 +42,12 @@ A repo for code and methods related to analyses as well as for a manuscript
     - Peter
         - 89 or 90 haplotyupes 
         - how does tree change w/ different bunldes
+    
+    - Nicolas
+        - presented
+
+    - Alma
+        - beautiful pics
 
     - Andrea has verkko done
         - will try to extract amylase to look at it
