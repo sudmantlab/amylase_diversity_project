@@ -1,0 +1,339 @@
+---
+  title: "Untitled"
+output: html_document
+date: '2022-07-21'
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+library(tidyr)
+```
+
+
+```{r}
+volcano <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/volcano.csv")
+volcano %>% 
+  select(primary_volcano_type, longitude, 
+         latitude, population_within_100_km) %>%
+  head()
+```
+
+```{r}
+human_data <- read.csv("C:/Users/almah/Downloads/METADATAsubset_4099.tsv",sep="\t")
+human_data
+
+gmm_output <- read.csv("C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",sep="\t")
+gmm_output[c("dataset", "samp_name","site","region")] <- str_split_fixed(gmm_output$sample, '[.]',4)
+gmm_output
+
+unique(gmm_output$label)
+
+gmm_output_calls = gmm_output %>% 
+                   #filter(label == 'AMY2A') %>%
+                   group_by(samp_name,label) %>%
+                   mutate(max_r = max(r)) %>%
+                   ungroup() %>%
+                   filter(r == max_r)
+
+gmm_output_calls
+
+```
+
+
+
+```{r}
+
+```
+
+```{r}
+merged_table = merge(human_data,gmm_output_calls,by.x="s",by.y="samp_name",all.x=TRUE,all.y=TRUE)
+merged_table
+tail(merged_table)
+write.table(merged_table,file='C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/1KG_HGDP_GMM_output_plus_metadata_all.tsv',sep='\t',row.names=F)
+
+merged_table_nona <- merged_table[!is.na(merged_table$cp),]
+merged_table_nona
+
+write.table(merged_table_nona,file='C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/1KG_HGDP_GMM_output_plus_metadata_justgmm.tsv',sep='\t',row.names=F)
+
+
+
+#human_data %>% 
+#  select(s, longitude, 
+#         latitude, population_within_100_km) %>%
+#  head()
+```
+```{r}
+
+world <- map_data("world")
+world
+```
+
+
+```{r}
+merged_table_nona = merged_table_nona %>%
+                   group_by(project_meta.subpop_description,label) %>%
+                   mutate(average_cp = mean(cp)) %>%
+                   ungroup()
+
+merged_table_nona
+
+```
+
+
+```{r}
+
+#min(merged_table_nona$gmm_genotype)
+#max(merged_table_nona$gmm_genotype)
+#sapply(merged_table_nona[gmm_genotype],max)
+
+table_copy <-merged_table_nona
+
+table_copy
+
+```
+
+```{r}
+
+joana_table <- table_copy %>%
+                   select(project_meta.subpop_description,region,hgdp_tgp_meta.Latitude,hgdp_tgp_meta.Longitude,label,average_cp) %>%
+                   #select(hgdp_tgp_meta.Latitude) %>%
+                   #select(hgdp_tgp_meta.Longitude) %>%
+                   #select(project_meta.subpop_description) %>%
+                   #select(average_cp) %>%
+                   #select(region)
+                   distinct(.keep_all = TRUE)
+
+joana_table <- joana_table[!is.na(joana_table$hgdp_tgp_meta.Longitude),]
+
+
+joana_table
+
+
+write.table(joana_table,file='C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
+#write.table(merged_table_nona,file='1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
+
+#write.table(joana_table,file='C:/Users/almah/OneDrive/Documents/1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
+#write.table(joana_table,file="1KG_HGDP_Global_Populations_AvgAMYs.tsv",sep='\t',row.names=F)
+
+```
+
+
+```{r,fig.width=12,fig.height=5}
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = merged_table_nona,size=3,
+    aes(hgdp_tgp_meta.Longitude, hgdp_tgp_meta.Latitude, 
+        color = average_cp)) +
+  scale_colour_viridis_c(option='inferno') +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() +
+  #theme(legend.position = "none")+
+  #labs(title="1KG and HGDP Population Distribution",color='Populations')
+  labs(title="1KG and HGDP GMM Genotype AMY1 Copy Number",color='AMY1 Copy Number')
+  #legend(hgdp_tgp_meta.Population)
+#project_meta.subpop_description
+#hgdp_tgp_meta.Population
+pdf('testing_R.pdf')
+
+```
+
+```{r,fig.width=16,fig.height=5}
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = merged_table_nona,size=3,
+    aes(hgdp_tgp_meta.Longitude, hgdp_tgp_meta.Latitude, 
+        color = project_meta.subpop_description)) +
+  #scale_colour_viridis_c(option = "H") +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() +
+  #theme(legend.position = "none")+
+  labs(title="1KG and HGDP Population Distribution",color='Populations')
+  #labs(title="1KG GMM Genotype AMY1 Copy Number",color='AMY1 Copy Number')
+  #legend(hgdp_tgp_meta.Population)
+#project_meta.subpop_description
+#hgdp_tgp_meta.Population
+
+```
+
+
+
+```{r,fig.width=12,fig.height=5}
+
+spread = 12
+
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = merged_table_nona,size=1,position=position_jitter(width=5,height=5),
+    aes(hgdp_tgp_meta.Longitude, hgdp_tgp_meta.Latitude, 
+        color = cp)) +
+  scale_colour_viridis_c(option = "H") +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() +
+  #theme(legend.position = "none")+
+  #labs(title="1KG Population Distribution",color='GMM Genotype')
+  labs(title="1KG GMM Genotype AMY1 Copy Number",color='AMY1 Copy Number')
+  #legend(hgdp_tgp_meta.Population)
+#project_meta.subpop_description
+#hgdp_tgp_meta.Population
+
+```
+
+
+```{r,fig.width=12,fig.height=5}
+
+spread = 11
+
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = merged_table_nona,size=1,position=position_jitter(width=5),
+    aes(hgdp_tgp_meta.Longitude, (hgdp_tgp_meta.Latitude-spread) + (spread*((gmm_genotype-min(merged_table_nona$gmm_genotype))/(max(merged_table_nona$gmm_genotype)-min(merged_table_nona$gmm_genotype)))), 
+        color = gmm_genotype)) +
+  scale_colour_viridis_c(option = "H") +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() +
+  #theme(legend.position = "none")+
+  #labs(title="1KG Population Distribution",color='GMM Genotype')
+  labs(title="1KG GMM Genotype AMY1 Copy Number",color='AMY1 Copy Number')
+  #legend(hgdp_tgp_meta.Population)
+#project_meta.subpop_description
+#hgdp_tgp_meta.Population
+
+```
+
+
+```{r,fig.width=12,fig.height=5}
+
+spread = 9
+
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_violin(
+    data = merged_table_nona,
+    aes(hgdp_tgp_meta.Longitude, hgdp_tgp_meta.Latitude, 
+        color = gmm_genotype)) +
+  scale_colour_viridis_c(option = "H") +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() 
+  #theme(legend.position = "none")+
+  #labs(title="1KG Population Distribution",color='GMM Genotype')
+  #labs(title="1KG GMM Genotype AMY1 Copy Number",color='AMY1 Copy Number')
+  #legend(hgdp_tgp_meta.Population)
+#project_meta.subpop_description
+#hgdp_tgp_meta.Population
+
+```
+
+```{r,fig.width=12,fig.height=5}
+
+spread = 9
+
+ggplot(merged_table_nona,main='1KG AMY1 Copy Number') + 
+  geom_violin(aes(color = cp)) +
+  scale_colour_viridis_c(option = "H") +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  #theme_void() 
+  #theme(legend.position = "none")+
+  #labs(title="1KG Population Distribution",color='GMM Genotype')
+  #labs(title="1KG GMM Genotype AMY1 Copy Number",color='AMY1 Copy Number')
+  #legend(hgdp_tgp_meta.Population)
+#project_meta.subpop_description
+#hgdp_tgp_meta.Population
+  
+```
+
+
+```{r,fig.width=10,fig.height=4}  
+
+#ggplot(NULL) +
+#  geom_line(data = merged_table_nona, aes(y=gmm_genotype,group=project_meta.subpop_description,color=gmm_genotype)) + 
+#  labs(title = "1KG AMY1 GMM Copy Number", x = "Population", y = "Copy Number")
+#  #facet_grid(popGrouping ~ .) +  
+
+#project_meta.subpop_description
+
+ggplot2(data = merged_table_nona, aes(x=hgdp_tgp_meta.Genetic.region,y=cp,fill=hgdp_tgp_meta.Genetic.region)) + 
+  geom_violin() +
+  #geom_jitter(height = 0, width = 0.1) +
+  #stat_summary(fun.y = "mean") +
+  stat_summary(fun = "mean", geom = "point", shape = 8, size = 3, color = "midnightblue") +
+  stat_summary(fun = "median", geom = "point", shape = 2, size = 3, color = "red") +
+  theme(axis.text.x = element_text(angle = 45,vjust = -0.01)) +
+  labs(title = "1KG and HGDP AMY1 GMM Copy Number", x = "Population", y = "Copy Number", fill='Population')
+
+pdf('1KG_HGDP_Violin_Continents.pdf',width=15,height=7)
+```
+
+
+
+
+ggplot(gene_groups_nodups_amy1A, aes(x = avg_CN), main='AMY1A in Modern Humans') + 
+  geom_histogram(aes(fill=popGrouping),bins = 800) + 
+  labs(title = "AMY1A in Modern Humans", x = "Average Copy Number", y = "# Individuals")
+
+
+```{r}
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = volcano,
+    aes(longitude, latitude, 
+        color = primary_volcano_type,
+        size=population_within_100_km),
+    alpha = 0.5
+  ) +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() +
+  theme(legend.position = "none")+
+  labs(title="Volcano Locations")
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
