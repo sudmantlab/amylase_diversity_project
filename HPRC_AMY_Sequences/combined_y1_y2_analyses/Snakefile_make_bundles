@@ -1,0 +1,78 @@
+#!vim set syntax=python
+import pandas as pd
+import pdb
+
+configfile: "config.json"
+
+rule all:
+    input:
+        "output/pgrtk/AMY_48_56_4_1000.pmapg.csv"
+
+rule make_bundle_colors:
+    input:
+        "output/pgrtk/AMY_{w}_{k}_{r}_{blc}.pmapg.gfa"
+    output: 
+        "output/pgrtk/AMY_{w}_{k}_{r}_{blc}.pmapg.csv"
+    run:
+        outrows = []
+        with open(input[0]) as f:
+            for l in f.readlines():
+                info = l.split("\t")
+                name = info[1]
+                if info[0] == "S":
+                    b = int(info[5].split(":")[2])
+                    print(b)
+                    print(info)
+                    color = "#00FFFF"
+                    if b<len(config['bundle_colors']):
+                        color=config['bundle_colors'][b]
+                    outrows.append({"Name":name,
+                                    "Color":color,
+                                    "Bundle_ID":b})
+        t = pd.DataFrame(outrows)
+        t.to_csv(output[0], sep=",", index=False)
+
+rule bundle:
+    input:
+        "output/selected_indivs_AMY_region_bundlebuild.fa.gz",
+        "output/selected_indivs_AMY_region_bundledecomp.fa.gz"
+    output:
+        "output/pgrtk/AMY_{w}_{k}_{r}_{blc}.pmapg.gfa"
+    run:
+        cmd=("/Users/petersudmant/Documents/science/programs/pgr-tk/target/release/pgr-pbundle-decomp "
+              #"-w 48 -k 56 -r 4 "
+              "-w {w} -k {k} -r {r} "
+              #"--min-span 28 --min-cov 20 "
+              "--min-span 28 --min-cov 0 "
+              "--min-branch-size 8 "
+              "--bundle-length-cutoff {blc} "
+              "--bundle-merge-distance 10000 "
+              "-d {fa_decomp} "
+              "{fa_build} "
+              "output/pgrtk/AMY_{w}_{k}_{r}_{blc}."
+              "".format(fa_build=input[0],
+                        fa_decomp=input[1],
+                        w=wildcards.w,
+                        k=wildcards.k,
+                        r=wildcards.r,
+                        blc=wildcards.blc))
+        shell(cmd)
+
+rule extract:
+    input:
+        "input/combined_input/AMY1A_region_seq.fa.gz"
+    output:
+        "output/selected_indivs_AMY_region_bundledecomp.fa.gz",
+        "output/selected_indivs_AMY_region_bundlebuild.fa.gz"
+    run:
+        cmd = "samtools faidx {fn} {samples} | bgzip -c > {fn_out}"
+        cmd = cmd.format(fn=input[0],                
+                         samples=" ".join(config['samples']),
+                         fn_out = output[0])
+        shell(cmd)
+        cmd = "samtools faidx {fn} {samples} | bgzip -c > {fn_out}"
+        bundle_build_samples = set(config['samples']).difference(set(config['bundle_build_exclude'])) 
+        cmd = cmd.format(fn=input[0],                
+                         samples=" ".join(bundle_build_samples),
+                         fn_out = output[1])
+        shell(cmd)

@@ -1,12 +1,5 @@
 {
-    "bundle_colors":["#CCCCCC", 
-                     "#666666", 
-                     "#D53E4F", 
-                     "#FC8D59", 
-                     "#FEE08B", 
-                     "#E6F598", 
-                     "#99D594", 
-                     "#3288BD"], 
+    "bundle_colors":["#CCCCCC", "#666666", "#D53E4F", "#FC8D59", "#FEE08B", "#99D594", "#E6F598", "#3288BD", "#FFFFBF"],
     "excluded_hifiasm":[
         "HG02809.hifiasm_filt_pat.fa:h1tg000007l_103415673_103822536_0" ,
         "HG01099.hifiasm_filt_pat.fa:h1tg000003l_56136922_56638856_1" ,
@@ -52,7 +45,13 @@
         "HG01358#2#JAGYZA010000086.1_556_316498_0" ,
         "HG01928#1#JAGYVQ010000195.1_211_358290_0" 
     ],
+    "bundle_build_exclude":[
+        "ANDREA_VERKKO_HG00673#haplotype1#0000019:16627360-17129375",
+        "ANDREA_VERKKO_HG00673#haplotype2#0001165:24014011-24421797"
+    ],
     "samples":[
+        "ANDREA_VERKKO_HG00673#haplotype1#0000019:16627360-17129375",
+        "ANDREA_VERKKO_HG00673#haplotype2#0001165:24014011-24421797",
         "HG02080#1#JAHEOW010000048.1_16689583_17097287_0" ,
         "HG00621#2#JAHBCC010000031.1_16669999_17077865_0" ,
         "HG00621#1#JAHBCD010000034.1_2122997_2624098_1" ,
