@@ -1,7 +1,7 @@
 ---
-  title: "Untitled"
+  title: "Human_World_Map_HGDP_1kG"
 output: html_document
-date: '2022-07-21'
+date: '2023-02-15'
 ---
   
 ```{r setup, include=FALSE}
@@ -16,6 +16,7 @@ library(ggplot2)
 library(stringr)
 library(dplyr)
 library(tidyr)
+library(sf)
 ```
 
 
@@ -28,10 +29,10 @@ volcano %>%
 ```
 
 ```{r}
-human_data <- read.csv("C:/Users/almah/Downloads/METADATAsubset_4099.tsv",sep="\t")
+human_data <- read.csv("Modern_Human_Metadata.tsv",sep="\t")
 human_data
 
-gmm_output <- read.csv("C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",sep="\t")
+gmm_output <- read.csv("./output/genotypes.likelihoods.tsv",sep="\t")
 gmm_output[c("dataset", "samp_name","site","region")] <- str_split_fixed(gmm_output$sample, '[.]',4)
 gmm_output
 
@@ -58,12 +59,12 @@ gmm_output_calls
 merged_table = merge(human_data,gmm_output_calls,by.x="s",by.y="samp_name",all.x=TRUE,all.y=TRUE)
 merged_table
 tail(merged_table)
-write.table(merged_table,file='C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/1KG_HGDP_GMM_output_plus_metadata_all.tsv',sep='\t',row.names=F)
+write.table(merged_table,file='1KG_HGDP_GMM_output_plus_metadata_all.tsv',sep='\t',row.names=F)
 
 merged_table_nona <- merged_table[!is.na(merged_table$cp),]
 merged_table_nona
 
-write.table(merged_table_nona,file='C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/1KG_HGDP_GMM_output_plus_metadata_justgmm.tsv',sep='\t',row.names=F)
+write.table(merged_table_nona,file='1KG_HGDP_GMM_output_plus_metadata_justgmm.tsv',sep='\t',row.names=F)
 
 
 
@@ -98,45 +99,24 @@ merged_table_nona
 
 table_copy <-merged_table_nona
 
-table_copy
+table_copy<- table_copy[!is.na(table_copy$hgdp_tgp_meta.Latitude),]
 
+table_copy
 ```
 
 ```{r}
 
-joana_table <- table_copy %>%
-                   select(project_meta.subpop_description,region,hgdp_tgp_meta.Latitude,hgdp_tgp_meta.Longitude,label,average_cp) %>%
-                   #select(hgdp_tgp_meta.Latitude) %>%
-                   #select(hgdp_tgp_meta.Longitude) %>%
-                   #select(project_meta.subpop_description) %>%
-                   #select(average_cp) %>%
-                   #select(region)
-                   distinct(.keep_all = TRUE)
-
-joana_table <- joana_table[!is.na(joana_table$hgdp_tgp_meta.Longitude),]
-
-
-joana_table
-
-
-write.table(joana_table,file='C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
-#write.table(merged_table_nona,file='1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
-
-#write.table(joana_table,file='C:/Users/almah/OneDrive/Documents/1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
-#write.table(joana_table,file="1KG_HGDP_Global_Populations_AvgAMYs.tsv",sep='\t',row.names=F)
 
 ```
 
 
 ```{r,fig.width=12,fig.height=5}
 ggplot() +
-  geom_map(
-    data = world, map = world,
-    aes(long, lat, map_id = region),
-    color = "white", fill = "lightgray", size = 0.1
+  geom_sf(
+    data = world, color = "white", fill = "lightgray", size = 0.1
   ) +
   geom_point(
-    data = merged_table_nona,size=3,
+    data = table_copy,size=3,
     aes(hgdp_tgp_meta.Longitude, hgdp_tgp_meta.Latitude, 
         color = average_cp)) +
   scale_colour_viridis_c(option='inferno') +
@@ -148,9 +128,35 @@ ggplot() +
   #legend(hgdp_tgp_meta.Population)
 #project_meta.subpop_description
 #hgdp_tgp_meta.Population
-pdf('testing_R.pdf')
+#pdf('testing_R.pdf')
 
 ```
+```{r,fig.width=12,fig.height=5}
+ggplot() +
+  geom_sf(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = table_copy,size=3,
+    aes(hgdp_tgp_meta.Longitude, hgdp_tgp_meta.Latitude, 
+        color = average_cp)) +
+  scale_colour_viridis_c(option='inferno') +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() +
+  #theme(legend.position = "none")+
+  #labs(title="1KG and HGDP Population Distribution",color='Populations')
+  labs(title="1KG and HGDP GMM Genotype AMY1 Copy Number",color='AMY1 Copy Number')
+  #legend(hgdp_tgp_meta.Population)
+#project_meta.subpop_description
+#hgdp_tgp_meta.Population
+#pdf('testing_R.pdf')
+
+```
+
+
+
 
 ```{r,fig.width=16,fig.height=5}
 ggplot() +
@@ -331,6 +337,26 @@ ggplot() +
 
 ```{r}
 
+joana_table <- table_copy %>%
+                   select(project_meta.subpop_description,region,hgdp_tgp_meta.Latitude,hgdp_tgp_meta.Longitude,label,average_cp) %>%
+                   #select(hgdp_tgp_meta.Latitude) %>%
+                   #select(hgdp_tgp_meta.Longitude) %>%
+                   #select(project_meta.subpop_description) %>%
+                   #select(average_cp) %>%
+                   #select(region)
+                   distinct(.keep_all = TRUE)
+
+joana_table <- joana_table[!is.na(joana_table$hgdp_tgp_meta.Longitude),]
+
+
+joana_table
+
+
+write.table(joana_table,file='C:/Users/almah/OneDrive/Documents/GreatApe_CNV/Amylase/amylase_diversity_project/read_depth_genotyping/genotyping/1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
+#write.table(merged_table_nona,file='1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
+
+#write.table(joana_table,file='C:/Users/almah/OneDrive/Documents/1KG_HGDP_Global_Populations_AvgAMYs.tsv',sep='\t',row.names=F)
+#write.table(joana_table,file="1KG_HGDP_Global_Populations_AvgAMYs.tsv",sep='\t',row.names=F)
 
 
 ```
