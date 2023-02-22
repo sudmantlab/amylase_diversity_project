@@ -108,6 +108,23 @@ dev.off()
 
 
 ```
+```{r}
+
+g=ggplot(t %>% filter(name%in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(dataset!="StoneAgeAncient") %>% filter(name == "AMY2B"))
+g=g+geom_point(aes(x=gt,reorder(p1,gt),color=p2),size=.5,alpha=.5,shape="|")+
+  stat_summary(aes(x=gt,y=reorder(p1,gt),color=p2),size=.1)+
+  theme_bw(base_size=4)+
+  facet_wrap(~name,scales = "free")+
+  scale_color_manual("",values=pnw_palette("Bay",8))+
+  theme(legend.key.size=unit(0.5,"cm"))
+  #scale_color_brewer(palette="BuGn")
+
+fn_out = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/copy_by_pop_2B.pdf"
+pdf(fn_out,width=2.5,height=4)
+print(g)
+dev.off()
+
+```
 
 ```{r}
 #t %>% filter(name%in% c("amy1_sum","AMY2A","AMY2B")) 
