@@ -93,20 +93,29 @@ paf_genes = as.data.frame(read_paf(fn_genes)) %>%
 
 g=ggplot(paf_genes)
 g+geom_histogram(aes(x=dv,fill=tname=="chr1_chm13_103304997_103901127_0"))+
-  geom_vline(xintercept=0.0025)+
+  geom_vline(xintercept=0.0028)+
   geom_vline(xintercept=0.01)+
   geom_vline(xintercept=0.02)+
   theme_bw()+
   facet_wrap(~name2)+
   theme(legend.position="None")
 
+paf_genes %>% 
+  filter(name=="2Ap") %>%
+  arrange(-dv) %>%
+  filter(dv<0.01)
+```
 
+
+```{r}
 paf_2Ap = paf_genes %>% 
           filter(name=="2A") %>%
-          filter(dv>0.0025,dv<0.01)
+        filter(dv>0.0025,dv<0.01)
+  
 
 paf_plot_genes = paf_genes %>% 
-              filter(dv<=0.0025) %>%
+              #filter(dv<=0.0025) %>%
+              filter(dv<=0.0028) %>% #modified to fix the missed one
               mutate(chrom=tname,start=tstart,end=tend)
 #paf_genes = paf_genes %>% filter(dv<=0.01)
 
@@ -256,6 +265,7 @@ t %>% group_by(bID) %>% summarize(n=n())
 colors
 unique(t$bID)
 
+t
 ```
 
 ```{r}
