@@ -126,13 +126,13 @@ ggplot() +
 ```
 
 
-```{r,fig.width=7,fig.height=3}
-ggplot() +
+```{r,fig.width=14,fig.height=6}
+g = ggplot() +
   geom_sf(
     data = world, color = "white", fill = "lightgray", size = 0.1
   ) +
   geom_point(
-    data = table_copy,size=3,
+    data = table_copy %>% filter(label == "AMY1"),size=30,
     aes(hgdp_tgp_meta.Longitude, hgdp_tgp_meta.Latitude, 
         color = average_cp)) +
   scale_colour_viridis_c(option='inferno') +
@@ -144,7 +144,10 @@ ggplot() +
   #legend(hgdp_tgp_meta.Population)
 #project_meta.subpop_description
 #hgdp_tgp_meta.Population
-
+fn_out = "./output_figures/AMY1_worldmap.pdf"
+pdf(fn_out,width=14,height=6)
+print(g)
+dev.off()
 
 
 #pdf('testing_map.pdf')

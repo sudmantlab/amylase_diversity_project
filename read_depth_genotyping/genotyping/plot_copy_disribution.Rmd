@@ -24,9 +24,16 @@ You can also embed plots, for example:
 
 ```{r}
 library(tidyverse)
-t=read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.raw.tsv",header=T,sep="\t")
+t=read.table("./output/genotypes.raw.tsv",header=T,sep="\t")
+#install.packages("devtools") 
+#devtools::install_github("jakelawlor/PNWColors") 
 library(PNWColors)
-
+library(ggplot2)
+theme_set(theme_bw())
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(Rcpp)
 
 ```
 
@@ -64,7 +71,7 @@ g=g+geom_point(aes(x=gt,reorder(p1,gt),color=p2),size=.5,alpha=.5,shape="|")+
   theme(legend.key.size=unit(0.5,"cm"))
   #scale_color_brewer(palette="BuGn")
 
-fn_out = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/copy_by_pop_1.pdf"
+fn_out = "./output_figures/copy_by_pop_1.pdf"
 pdf(fn_out,width=2.5,height=4)
 print(g)
 dev.off()
@@ -78,7 +85,7 @@ g=g+geom_point(aes(x=gt,reorder(p1,gt),color=p2),size=.5,alpha=.5,shape="|")+
   theme(legend.key.size=unit(0.5,"cm"))
   #scale_color_brewer(palette="BuGn")
 
-fn_out = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/copy_by_pop_2A.pdf"
+fn_out = "./output_figures/copy_by_pop_2A.pdf"
 pdf(fn_out,width=2.5,height=4)
 print(g)
 dev.off()
@@ -93,7 +100,7 @@ g=g+geom_point(aes(x=gt,reorder(p1,gt),color=p2),size=.5,alpha=.5,shape="|")+
   theme(legend.key.size=unit(0.5,"cm"))
   #scale_color_brewer(palette="BuGn")
 
-fn_out = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/copy_by_pop_2B.pdf"
+fn_out = "./output_figures/copy_by_pop_2B.pdf"
 pdf(fn_out,width=2.5,height=4)
 print(g)
 dev.off()
@@ -101,4 +108,50 @@ dev.off()
 
 
 ```
+
+```{r}
+#t %>% filter(name%in% c("amy1_sum","AMY2A","AMY2B")) 
+#  %>% filter(dataset!="StoneAgeAncient")
+#  %>% spread(name, gt)
+
+t %>% spread(name, gt)
+
+
+```
+
+```{r}
+g=ggplot(t %>% spread(name, gt) %>% filter(dataset!="StoneAgeAncient"))
+g=g+geom_point(aes(x=amy1_sum,y=AMY2A,color=p2),size=0.9)+
+  #stat_summary(aes(x=gt,y=reorder(p1,gt),color=p2),size=.1)+
+  #theme_bw(base_size=4)+
+  #facet_wrap(~name,scales = "free")+
+  scale_color_manual("",values=pnw_palette("Bay",8))+
+  theme(legend.key.size=unit(0.5,"cm"))+
+  ylim(-0.25,7.25)+
+  xlim(0,21)+
+  #scale_color_brewer(palette="BuGn")
+ labs(title = "AMY2A vs. AMY1 Copy Number (1KG and HGDP)", x = "AMY1 Summed Copy Number", y = "AMY2A Copy Number")
+
+fn_out = "./output_figures/AMY2A_vs_AMY1_scatterplot.pdf"
+pdf(fn_out,width=8,height=6)
+print(g)
+dev.off()
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
