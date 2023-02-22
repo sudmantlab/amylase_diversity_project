@@ -11,12 +11,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
+#install.packages(c("cowplot", "googleway", "ggplot2", "ggrepel", "ggspatial", "libwgeom", "sf", "rnaturalearth", "rnaturalearthdata","Rcpp","plotly"))
 library(tidyverse)
 library(ggplot2)
+theme_set(theme_bw())
 library(stringr)
 library(dplyr)
 library(tidyr)
+library(Rcpp)
 library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+#library(plotly)
 ```
 
 
@@ -75,8 +81,13 @@ write.table(merged_table_nona,file='1KG_HGDP_GMM_output_plus_metadata_justgmm.ts
 ```
 ```{r}
 
-world <- map_data("world")
-world
+#world <- map_data("world")
+#world
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+
+
 ```
 
 
@@ -100,17 +111,22 @@ merged_table_nona
 table_copy <-merged_table_nona
 
 table_copy<- table_copy[!is.na(table_copy$hgdp_tgp_meta.Latitude),]
+table_copy <- table_copy[!is.na(table_copy$hgdp_tgp_meta.Genetic.region),]
+table_copy <- table_copy[!is.na(table_copy$project_meta.subpop_description),]
 
 table_copy
 ```
 
 ```{r}
+test_dataset <- data.frame(x = c(1,2,3,4),y=c(1,2,3,4))
 
+ggplot() + 
+  geom_line()
 
 ```
 
 
-```{r,fig.width=12,fig.height=5}
+```{r,fig.width=7,fig.height=3}
 ggplot() +
   geom_sf(
     data = world, color = "white", fill = "lightgray", size = 0.1
@@ -128,9 +144,20 @@ ggplot() +
   #legend(hgdp_tgp_meta.Population)
 #project_meta.subpop_description
 #hgdp_tgp_meta.Population
-#pdf('testing_R.pdf')
+
+
+
+#pdf('testing_map.pdf')
 
 ```
+
+
+
+
+
+
+
+
 ```{r,fig.width=12,fig.height=5}
 ggplot() +
   geom_sf(
@@ -282,7 +309,7 @@ ggplot(merged_table_nona,main='1KG AMY1 Copy Number') +
 ```
 
 
-```{r,fig.width=10,fig.height=4}  
+```{r,fig.width=10,fig.height=6}  
 
 #ggplot(NULL) +
 #  geom_line(data = merged_table_nona, aes(y=gmm_genotype,group=project_meta.subpop_description,color=gmm_genotype)) + 
@@ -291,7 +318,10 @@ ggplot(merged_table_nona,main='1KG AMY1 Copy Number') +
 
 #project_meta.subpop_description
 
-ggplot2(data = merged_table_nona, aes(x=hgdp_tgp_meta.Genetic.region,y=cp,fill=hgdp_tgp_meta.Genetic.region)) + 
+#gene_of_interest <- 'AMY2A'
+#title <- "1KG and HGDP " + gene_of_interest + " GMM Copy Number"
+
+ggplot(data = table_copy[table_copy$label == 'AMY1',], aes(x=hgdp_tgp_meta.Genetic.region,y=cp,fill=hgdp_tgp_meta.Genetic.region)) + 
   geom_violin() +
   #geom_jitter(height = 0, width = 0.1) +
   #stat_summary(fun.y = "mean") +
@@ -300,10 +330,34 @@ ggplot2(data = merged_table_nona, aes(x=hgdp_tgp_meta.Genetic.region,y=cp,fill=h
   theme(axis.text.x = element_text(angle = 45,vjust = -0.01)) +
   labs(title = "1KG and HGDP AMY1 GMM Copy Number", x = "Population", y = "Copy Number", fill='Population')
 
-pdf('1KG_HGDP_Violin_Continents.pdf',width=15,height=7)
+#pdf('1KG_HGDP_Violin_Continents.pdf',width=15,height=7)
 ```
 
+```{r,fig.width=6,fig.height=25}  
 
+#ggplot(NULL) +
+#  geom_line(data = merged_table_nona, aes(y=gmm_genotype,group=project_meta.subpop_description,color=gmm_genotype)) + 
+#  labs(title = "1KG AMY1 GMM Copy Number", x = "Population", y = "Copy Number")
+#  #facet_grid(popGrouping ~ .) +  
+
+#project_meta.subpop_description
+
+#gene_of_interest <- 'AMY2A'
+#title <- "1KG and HGDP " + gene_of_interest + " GMM Copy Number"
+
+
+#ggplot(data = merged_table_nona[merged_table_nona$label == 'AMY1',], aes(x=project_meta.subpop_description,y=cp,fill=hgdp_tgp_meta.Genetic.region)) + 
+ggplot(data = table_copy[table_copy$label == 'AMY2B',], aes(x=reorder(project_meta.subpop_description,average_cp),y=cp,fill=hgdp_tgp_meta.Genetic.region)) + 
+  geom_violin(width=5) +
+  #geom_jitter(height = 0, width = 0.1) +
+  #stat_summary(fun.y = "mean") +
+  stat_summary(fun = "mean", geom = "point", shape = 8, size = 3, color = "midnightblue") +
+  stat_summary(fun = "median", geom = "point", shape = 2, size = 3, color = "red") +
+  #theme(axis.text.x = element_text(angle = 45,vjust = -0.01)) +
+  labs(title = "1KG and HGDP AMY2B GMM Copy Number", x = "Population", y = "Copy Number", fill='Population') +
+  coord_flip()
+#pdf('1KG_HGDP_Violin_Continents.pdf',width=15,height=7)
+```
 
 
 ggplot(gene_groups_nodups_amy1A, aes(x = avg_CN), main='AMY1A in Modern Humans') + 
