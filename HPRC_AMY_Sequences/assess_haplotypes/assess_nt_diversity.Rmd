@@ -16,13 +16,34 @@ library(treeio)
 library(tidyverse)
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output"
 
-
 #####THIS JUST is a path distance from ERik versus my bundling
 t= read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/OG_graphs/AMY1A_region_seq.fa.gz.4a49d6f.68f91e8.fd809ae.smooth.final.og.hap.dist",sep="\t",header=T,comment="") %>%
       mutate(path.a=str_replace(path.a,"chr1_hg","chr1#hg")) %>%
       mutate(path.a=str_replace(path.a,"chr1_ch","chr1#ch")) %>%
       mutate(path.b=str_replace(path.b,"chr1_hg","chr1#hg")) %>%
       mutate(path.b=str_replace(path.b,"chr1_ch","chr1#ch"))
+
+t_bundle0 = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/OG_graphs/AMY1A_region_principal_bundles.0.hap.dist.gz",sep="\t",header=T,comment="") %>%
+      separate(path.a,c("path.a","seg.a"),sep=":") %>%
+      separate(path.b,c("path.b","seg.b"),sep=":") %>%
+      mutate(path.a=str_replace(path.a,"chr1_hg","chr1#hg")) %>%
+      mutate(path.a=str_replace(path.a,"chr1_ch","chr1#ch")) %>%
+      mutate(path.b=str_replace(path.b,"chr1_hg","chr1#hg")) %>%
+      mutate(path.b=str_replace(path.b,"chr1_ch","chr1#ch"))
+
+t_bundle1 = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/AMY_graphs/OG_graphs/AMY1A_region_principal_bundles.1.hap.dist.gz",sep="\t",header=T,comment="") %>%
+      separate(path.a,c("path.a","seg.a"),sep=":") %>%
+      separate(path.b,c("path.b","seg.b"),sep=":") %>%
+      mutate(path.a=str_replace(path.a,"chr1_hg","chr1#hg")) %>%
+      mutate(path.a=str_replace(path.a,"chr1_ch","chr1#ch")) %>%
+      mutate(path.b=str_replace(path.b,"chr1_hg","chr1#hg")) %>%
+      mutate(path.b=str_replace(path.b,"chr1_ch","chr1#ch"))
+
+fn = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output/haplotype_struc_dists.tsv"
+fn_hap_structs = paste(outdir,"/haplotype_all_structures.tsv",sep="")
+t_hap_structs = read.table(fn_hap_structs,sep="\t",header=TRUE,comment="") %>%   
+                    group_by(hap_struc_d) %>%
+                    mutate(n=n())
 
 a_structs = t_hap_structs %>% transmute(path.a=contig, hap_struc_a = hap_struc_d)
 b_structs = t_hap_structs %>% transmute(path.b=contig, hap_struc_b = hap_struc_d)
@@ -41,6 +62,36 @@ g+geom_boxplot(aes(color=comparison,x=1-jaccard))+
   theme_bw()+
   scale_color_viridis_d()
 
+t_comp_bundle0 = t_bundle0 %>% 
+  inner_join(a_structs,by = "path.a") %>%
+  inner_join(b_structs,by = "path.b") %>%
+  #filter(bundle==1) %>%
+  mutate(comparison = ifelse(hap_struc_a==hap_struc_b,"within","between")) %>%
+  mutate(bundle=0) %>%
+  filter(path.b.length>90000,path.a.length>90000)
+
+t_comp_bundle1 = t_bundle1 %>% 
+  inner_join(a_structs,by = "path.a") %>%
+  inner_join(b_structs,by = "path.b") %>%
+  #filter(bundle==1) %>%
+  mutate(comparison = ifelse(hap_struc_a==hap_struc_b,"within","between")) %>%
+  mutate(bundle=1)
+
+t_comp_bundles = rbind(t_comp_bundle1,t_comp_bundle0)
+
+g=ggplot(t_comp_bundles)
+g+geom_violin(aes(y=comparison, color=comparison,x=1-jaccard))+
+  #geom_point(aes(y=comparison, color=comparison,x=1-jaccard),position=position_jitter(height=1,width=0))+
+  #geom_point(aes(color=comparison,x=1-jaccard))+
+  #geom_text(aes(color=comparison,x=1-jaccard,y=comparison,label=path.a))+
+  theme_bw()+
+  scale_color_viridis_d()+
+  facet_wrap(~bundle,scales = "free")
+
+t_comp_bundles %>% filter((1-jaccard)>0.8)
+
+g=ggplot(t_comp_bundles)
+g+geom_histogram(aes(x=path.b.length))
 
 ```
 
@@ -68,8 +119,49 @@ ggtree(phylo_seq) %<+% (a_structs %>% dplyr::select(path.a,hap_struc_d)) +
 dev.off()  
 #t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists.tsv",sep=""),header=T,sep="\t")
 
+```
+
+```{r}
+library(ape)
+dmat_b0 = t_bundle0 %>% 
+  mutate(jd=1-jaccard) %>%
+  dplyr::select(path.a,path.b,jd) %>%
+  spread(path.a,jd) %>%
+  column_to_rownames(var="path.b") %>% 
+  as.matrix
+
+dmat_b1 = t_bundle1 %>% 
+  mutate(jd=1-jaccard) %>%
+  dplyr::select(path.a,path.b,jd) %>%
+  spread(path.a,jd) %>%
+  column_to_rownames(var="path.b") %>% 
+  as.matrix
+
+c_b0=hclust(as.dist(dmat_b0),method="average")
+c_b1=hclust(as.dist(dmat_b1),method="average")
+#phylo = hclust2phylog(c)
+#phylo = as.dendrogram(c)
+phylo_seq_b0 = as.phylo(c_b0)
+phylo_seq_b1 = as.phylo(c_b1)
+
+fn_out = paste(outdir,"/haplotype_nt_clusters.pdf",sep="")
+#pdf(fn_out,width=18,height=8)
+ggtree(phylo_seq_b0)
+ggtree(phylo_seq_b1)
+#dev.off()  
+
+assoc = cbind(phylo_seq_b1$tip.label, phylo_seq_b1$tip.label)
+cophyloplot(phylo_seq_b0, 
+            phylo_seq_b1,
+            assoc = assoc,
+            length.line = 1, space = 2, gap = 3,
+            show.tip.label = FALSE)
+
+# plot
+#cophyloplot(tree1, tree2, assoc = association, length.line = 4, space = 28, gap = 3)
 
 ```
+
 ```{r}
 t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists_all.tsv",sep=""),header=T,sep="\t",comment="")
 

@@ -20,7 +20,7 @@ t_wnd_cvg = rbind(t_wnd_cvg_dist,t_wnd_cvg_prox)
 
 ```
 ```{r}
-t_cvg %>% dplyr::select(sample) %>% unique() %>% tail()
+t_wnd_cvg %>% dplyr::select(sample) %>% unique() %>% tail()
 ```
 ```{r}
 #calculate coverage stats for QC and to transform to copy later

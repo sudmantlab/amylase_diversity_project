@@ -11,12 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 # Code to output "raw" read depth based genotypes using the raw depth and the normalization factor
 
 ```{r}
-library(ggcorrplot)
+#library(ggcorrplot)
 library(tidyverse)
 library(PNWColors)
 exclude = c("1KG.HG00403.CHS.EA", "1KG.HG00662.CHS.EA", "1KG.HG01773.IBS.WEA", "1KG.HG01857.KHV.EA", 
             "1KG.NA18644.CHB.EA", "1KG.NA18916.YRI.AFR", "1KG.NA18985.JPT.EA", "1KG.NA19159.YRI.AFR",
             "1KG.NA19201.YRI.AFR", "1KG.NA19204.YRI.AFR", "1KG.NA20892.GIH.SA") 
+
+exclude = c(exclude,"HGDP.HGDP00351.Burusho.SA",
+                    "1KG_trio.HG00405.CHS.EA",
+                    "1KG_trio.HG00664.CHS.EA")
 
 ancient_qc = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/info/ancients_passed_QC.tsv", header=T,sep="\t")
 
@@ -29,38 +33,36 @@ stats = read.table(fn,header=T,sep="\t") %>%
         dplyr::select(-c(y,z)) %>%
         filter((group!="StoneAgeAncient")|ID %in% ancient_qc$sample)
   #separate(name,into = c("source","ID","pop","region"),sep="\\.")
-
-
 #samples w/ median 0
 
 t_wnd_raw = data.table::fread("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/input/combined/amylase_1000_200.1000.200.tsv.gz",header=F,sep="\t",col.names = c("contig","start","end","cvg","sample")) %>%
   inner_join(stats,on="sample") %>%
   mutate(cp = 2*cvg/cvg_mu) %>%
   #mutate(cp = 2*cvg/cvg_med) %>%
-  separate(sample,c("source","sample_id",'p1','p2'),remove=FALSE) %>%
+  separate(sample,c("source","sample_id",'p1','p2'),remove=FALSE,sep="\\.") %>%
   filter(start>0)
 
-sds = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/data/superdups_headered.txt",header=T,sep="\t") %>%
-  filter(chrom=="chr1") %>%
-  filter(chromEnd<103820315,chromStart>103499858) %>%
-  mutate(start_1 = chromStart, 
-         end_1 = chromEnd,
-         start_2 = otherStart,
-         end_2 = otherEnd) %>% 
-  dplyr::select(start_1,end_1,start_2,end_2,strand,fracMatch) %>%
-  group_by(fracMatch,strand) %>%
-  summarize(start_1 = first(start_1),
-            start_2 = first(start_2),
-            end_1 = first(end_1),
-            end_2 = first(end_2))%>%
-  ungroup() %>%
-  #filter(fracMatch>0.93) %>%
-  mutate(ix = row_number()) %>%
-  arrange(fracMatch)
+# sds = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/data/superdups_headered.txt",header=T,sep="\t") %>%
+#   filter(chrom=="chr1") %>%
+#   filter(chromEnd<103820315,chromStart>103499858) %>%
+#   mutate(start_1 = chromStart, 
+#          end_1 = chromEnd,
+#          start_2 = otherStart,
+#          end_2 = otherEnd) %>% 
+#   dplyr::select(start_1,end_1,start_2,end_2,strand,fracMatch) %>%
+#   group_by(fracMatch,strand) %>%
+#   summarize(start_1 = first(start_1),
+#             start_2 = first(start_2),
+#             end_1 = first(end_1),
+#             end_2 = first(end_2))%>%
+#   ungroup() %>%
+#   #filter(fracMatch>0.93) %>%
+#   mutate(ix = row_number()) %>%
+#   arrange(fracMatch)
 
-usher_blocks = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/data/amylase_gene_indices_hg38.tsv",header=T) %>%
-  filter(Type!="hg38_Gene") %>%
-  mutate(ix=row_number())
+# usher_blocks = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/data/amylase_gene_indices_hg38.tsv",header=T) %>%
+#   filter(Type!="hg38_Gene") %>%
+#   mutate(ix=row_number())
 # fn_info="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/info/sample_info.tsv"
 # sample_info = read.table(fn_info,sep="\t",header=T) %>% 
 #   mutate(sample_id = sample) %>%
@@ -74,6 +76,17 @@ usher_blocks = read.table("/Users/petersudmant/Documents/science/sudmantlab/proj
 
 
 #usher_blocks
+t_wnd_raw %>% 
+  dplyr::select(source) %>% 
+  group_by(source) %>%
+  summarize(n=n()/1244)
+
+stats %>% 
+  dplyr::select(group)%>%
+  group_by(group) %>%
+  summarize(n=n())
+
+t_wnd_raw %>% filter(p2=="Europe")
 
 ```
 
@@ -85,26 +98,31 @@ ancient_colors = pnw_palette("Sunset2",7)[1:4]
 
 colors = c(ancient_colors,modern_colors)
 
-genes = data.frame(names=c("RNPC3", "AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
-                   start=c(103525691,103571100,103617427,103655760,103687415,103749898),
-                   end=c(103553343,103579530,103625780,103664554,103696210,103758692))
 
-genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","prox"),
-                             start=c(103564100,103612500,103635500,103698415,103729898,103762000),
-                             end=  c(103588530,103617000,103655000,103716210,103743692,103795000))
-  
-#these work quite well, and it turns out they are INSIDE the usher ones
-genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","prox"),
-                             start=c(103564100,103612500,103639500,103700415,103732500,103762000),
-                             end=  c(103588530,103617000,103655000,103715210,103746000,103795000))
+genes = data.frame(names=c("RNPC3", "AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","AMY2Ap"),
+                   start=c(103525691,103571100,103617427,103655760,103687415,103749898,103713720),
+                   end=c(103553343,103579530,103625780,103664554,103696210,103758692,  103719905))
+
+# genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","prox"),
+#                              start=c(103564100,103612500,103635500,103698415,103729898,103762000),
+#                              end=  c(103588530,103617000,103655000,103716210,103743692,103795000))
+#   
+# #these work quite well, and it turns out they are INSIDE the usher ones
+# genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","prox"),
+#                              start=c(103564100,103612500,103639500,103700415,103732500,103762000),
+#                              end=  c(103588530,103617000,103655000,103715210,103746000,103795000))
 
 #Usher coords for Amy 1
-genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C"),
-                             start=c(103564100,103612500,103638544,103684142,103732686),
-                             end=  c(103588530,103617000,103667876,103712474,103762027))
 
+genotype_blocks = data.frame(name=c("AMY2B", "AMY2A","AMY1A","AMY1B","AMY1C","AMY2Ap"),
+                             start=c(103564100,103612500,103638544,103684142,103732686,103713720),
+                             end=  c(103588530,103617000,103667876,103712474,103762027,103730686))
 
-  
+control_blocks = data.frame(name=c("left_ctrl","right_ctrl"),
+                            start = c(103550201,      103765027),
+                            end =   c(103550201+10000,103762027+25000))
+
+genotype_blocks =rbind(genotype_blocks,control_blocks)
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures"
 fn_out = paste(outdir,"/amylase_distribution.pdf",sep="")
 pdf(fn_out,width=8,height=8)
@@ -168,6 +186,22 @@ write.table(t_gt,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 
 length(unique(t_gt$sample))
 ```
+```{r}
+#find bad samples
+#g=ggplot(t_gt %>% filter(name %in% c("left_ctrl","right_ctrl")))# %>% filter(!grepl("StoneAgeAncient",dataset)))
+g=ggplot(t_gt %>% filter(name %in% c("left_ctrl","right_ctrl")) %>% filter(!grepl("StoneAgeAncient",dataset)))
+g+geom_histogram(aes(x=gt,fill=p2))+
+  facet_wrap(~name)+
+  ylim(c(0,100))
+
+t_gt %>% filter(name=="left_ctrl", gt>4)
+t_gt %>% filter(name=="right_ctrl", gt<1)
+
+#HGDP.HGDP00351.Burusho.SA	
+#1KG_trio.HG00405.CHS.EA	
+#1KG_trio.HG00664.CHS.EA	
+```
+
 ```{r}
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures"
