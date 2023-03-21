@@ -1,0 +1,34 @@
+{
+    "samples":[
+            "HG00673.amy_locus.renamed.fa",
+            "HG00735.amy_locus.renamed.fa",
+            "HG01106.amy_locus.renamed.fa",
+            "HG01175.amy_locus.renamed.fa",
+            "HG01361.amy_locus.renamed.fa",
+            "HG02148.amy_locus.renamed.fa",
+            "HG02257.amy_locus.renamed.fa",
+            "HG02572.amy_locus.renamed.fa"
+    ],
+    "revcomp_haplotypes":[
+       "HG00673#haplotype2#0001165:24014011-24421797.fa",
+       "HG02148#haplotype2#0002863:16304803-16712699.fa",
+       "HG01175#haplotype1#0000070:46006269-46414083.fa",
+       "HG00735#haplotype2#0000777:145114464-145522332.fa",
+       "HG00735#haplotype1#0000024:104913989-105227662.fa"
+    ],
+    "non_revcomp_haplotypes":[
+       "HG00673#haplotype1#0000019:16627360-17129375.fa",
+       "HG01106#haplotype1#0000048:16666181-17262214.fa",
+       "HG01106#haplotype2#0000932:16673968-17175925.fa",
+       "HG01175#haplotype2#0000768:43143589-43739745.fa",
+       "HG01361#haplotype1#0000023:101593539-102001341.fa",
+       "HG01361#haplotype2#0001322:101872897-102186552.fa",
+       "HG02148#haplotype1#0000039:338-232714.fa",
+       "HG02257#haplotype1#0000051:41457158-42053197.fa",
+       "HG02257#haplotype2#0001152:102843493-103251377.fa",
+       "HG02572#haplotype1#0000067:51550960-51887240.fa",
+       "HG02572#haplotype2#0001465:50729721-51014902.fa"
+    ]
+}
+
+
