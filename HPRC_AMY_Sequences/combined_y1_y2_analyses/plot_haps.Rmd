@@ -596,7 +596,23 @@ t_clustered = inner_join(t_graph_clusters,t,by="contig")
 cluster_rep_indivs = t_clustered %>% 
                       dplyr::select(contig,cluster) %>%
                       group_by(cluster) %>%
-                      filter(row_number()==0)
+                      filter(row_number()==1)
+
+# missing 1,5 7
+#HG04228 #1
+#HG03710 HG03710.hifiasm_filt_pat.fa:h1tg000035l_103311655_103704662_0 #
+#HG01928#1#JAGYVQ010000195.1_211_358290_0 7
+
+t %>% filter(grepl("HG03710",sample_id))
+```
+
+```
+t_clustered = inner_join(t_graph_clusters,t,by="contig")
+
+cluster_rep_indivs = t_clustered %>% 
+                      dplyr::select(contig,cluster) %>%
+                      group_by(cluster) %>%
+                      filter(row_number()==1)
 
 g=ggplot(t_clustered)
 g+geom_gene_arrow(aes(xmin=rel_start2,

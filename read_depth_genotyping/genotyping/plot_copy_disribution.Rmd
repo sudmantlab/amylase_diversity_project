@@ -104,11 +104,20 @@ t_sum = t_plot %>%
           filter(label=="AMY1")
           
 
+df_vline = data.frame(x=c(min((t_sum %>% filter(super_pop!="archaic"))$mu),
+                          max((t_sum %>% filter(super_pop!="archaic"))$mu)),
+                      super_pop = c('modern','modern'))
+
+df_vline$super_pop = factor(df_vline$super_pop, levels = c("modern","archaic"))
+
+
+max(t_sum$mu)
 g=ggplot(t_plot %>% filter(label == "AMY1"))
 g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   geom_errorbarh(aes(xmin=mu-serr,xmax=mu+serr,y=reorder(plabel,mu)),size=.05,height=0,data=t_sum)+
   geom_point(aes(x=mu,y=reorder(plabel,mu)),shape=18,data=t_sum,size=.5)+
   geom_point(aes(x=mu,y=reorder(plabel,mu),color=p2),shape=18,data=t_sum,size=.05)+
+  geom_vline(aes(xintercept=x),data=df_vline,linetype='85',size=.1,alpha=.75)+
   #stat_summary(aes(x=gt,y=reorder(p1,gt),color=p2),size=.1)+
   theme_bw(base_size=4)+
   scale_color_manual("",values=colors)+
@@ -123,7 +132,7 @@ g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   #scale_color_brewer(palette="BuGn")
 
 fn_out = "./output_figures/genotype_by_pop_1.pdf"
-pdf(fn_out,width=1.5,height=4)
+pdf(fn_out,width=1.5,height=3.5)
 print(g)
 dev.off()
 
@@ -132,6 +141,13 @@ t_sum = t_plot %>%
           dplyr::select(p1,plabel,p2,label,mu,serr,super_pop) %>%
           unique() %>%
           filter(label=="AMY2A")
+
+df_vline = data.frame(x=c(min((t_sum %>% filter(super_pop!="archaic"))$mu),
+                          max((t_sum %>% filter(super_pop!="archaic"))$mu)),
+                      super_pop = c('modern','modern'))
+
+df_vline$super_pop = factor(df_vline$super_pop, levels = c("modern","archaic"))
+
           
 
 g=ggplot(t_plot %>% filter(label == "AMY2A"))
@@ -139,6 +155,7 @@ g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   geom_errorbarh(aes(xmin=mu-serr,xmax=mu+serr,y=reorder(plabel,mu)),size=.05,height=0,data=t_sum)+
   geom_point(aes(x=mu,y=reorder(plabel,mu)),shape=18,data=t_sum,size=.5)+
   geom_point(aes(x=mu,y=reorder(plabel,mu),color=p2),shape=18,data=t_sum,size=.05)+
+  geom_vline(aes(xintercept=x),data=df_vline,linetype='85',size=.1,alpha=.75)+
   #stat_summary(aes(x=gt,y=reorder(p1,gt),color=p2),size=.1)+
   theme_bw(base_size=4)+
   scale_color_manual("",values=colors)+
@@ -153,7 +170,7 @@ g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   #scale_color_brewer(palette="BuGn")
 
 fn_out = "./output_figures/genotype_by_pop_2A.pdf"
-pdf(fn_out,width=1,height=4)
+pdf(fn_out,width=1.5,height=3.5)
 print(g)
 dev.off()
 
@@ -163,6 +180,12 @@ t_sum = t_plot %>%
           dplyr::select(p1,plabel,p2,label,mu,serr,super_pop) %>%
           unique() %>%
           filter(label=="AMY2B")
+
+df_vline = data.frame(x=c(min((t_sum %>% filter(super_pop!="archaic"))$mu),
+                          max((t_sum %>% filter(super_pop!="archaic"))$mu)),
+                      super_pop = c('modern','modern'))
+
+df_vline$super_pop = factor(df_vline$super_pop, levels = c("modern","archaic"))
           
 
 g=ggplot(t_plot %>% filter(label == "AMY2B") )
@@ -170,6 +193,7 @@ g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   geom_errorbarh(aes(xmin=mu-serr,xmax=mu+serr,y=reorder(plabel,mu)),size=.05,height=0,data=t_sum)+
   geom_point(aes(x=mu,y=reorder(plabel,mu)),shape=18,data=t_sum,size=.5)+
   geom_point(aes(x=mu,y=reorder(plabel,mu),color=p2),shape=18,data=t_sum,size=.05)+
+  geom_vline(aes(xintercept=x),data=df_vline,linetype='85',size=.1,alpha=.75)+
   #stat_summary(aes(x=gt,y=reorder(p1,gt),color=p2),size=.1)+
   theme_bw(base_size=4)+
   scale_color_manual("",values=colors)+
@@ -184,7 +208,7 @@ g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   #scale_color_brewer(palette="BuGn")
 
 fn_out = "./output_figures/genotype_by_pop_2B.pdf"
-pdf(fn_out,width=1,height=4)
+pdf(fn_out,width=1.25,height=3.5)
 print(g)
 dev.off()
 
@@ -523,7 +547,7 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
           panel.background = element_blank())+
     theme(axis.line = element_line(colour = "black"),
           #panel.grid.major = element_blank(),
-          #panel.grid.minor = element_blank(),
+          panel.grid.minor = element_blank(),
           #panel.border = element_blank(),
           panel.background = element_rect(fill='white'),
           plot.background=element_rect(fill='transparent', color=NA))
@@ -542,7 +566,7 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
   
   
   g=ggplot(t_gt_renamed_age %>% filter(label == curr_gene))
-  g=g+geom_point(aes(x=-age,y=cp,color=p2),alpha=.5,position=position_jitter(width=0,height=.1),size=.5)+
+  g=g+geom_point(aes(x=-age,y=cp,color=p2),alpha=.5,position=pos ition_jitter(width=0,height=.2),size=.5)+
     geom_plot(data = data.tb, aes(x, y, label = plot)) +
     geom_smooth(aes(x=-age,y=cp),alpha=.5,color="red",size=.5)+
     scale_color_manual("",values=colors)+

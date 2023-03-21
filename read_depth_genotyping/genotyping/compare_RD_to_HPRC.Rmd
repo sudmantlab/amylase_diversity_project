@@ -1,0 +1,393 @@
+---
+title: "Untitled"
+output: html_document
+date: "2022-12-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/HPRC_comparison"
+
+t_copy_likelihoods = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",header=T,sep="\t")
+
+t_HPRC_copies = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output/gene_copy_counts_per_indiv.tsv", header=T,sep="\t")
+
+
+
+
+t_usher_table_s2 = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/Usher_et_al/Table_S2.txt",header=T,sep="\t")
+
+
+```
+```{r}
+
+samples = unique(t_HPRC_copies$sample)
+
+t_max_likelihood = t_copy_likelihoods %>% 
+  group_by(sample,label) %>%
+  filter(r==max(r)) %>%
+  separate(sample,c("source","sample",'p1','p2'),sep="\\.") %>%
+  dplyr::select(sample,X,cp,label) %>%
+  mutate(ID=sample)
+
+t_max_likelihood_HPRC = t_copy_likelihoods %>% 
+  group_by(sample,label) %>%
+  filter(r==max(r)) %>%
+  separate(sample,c("source","sample",'p1','p2'),sep="\\.") %>%
+  filter(sample %in% samples) %>%
+  dplyr::select(sample,cp,label,X)
+
+# g=ggplot(t_max_likelihood_HPRC) 
+# g+geom_histogram(aes(x=X),binwidth = 0.1)+
+#   facet_wrap(~label)
+```
+
+```{r, fig.width=5/3,fig.height=2/3}
+t_max_likelihood
+USHER_AMY1 = t_usher_table_s2 %>% 
+                    mutate(ddPCR_cp =   AMY1.Copy.Number.ddPCR,
+                           ddPCR_qual = AMY1.Quality.Filter,
+                           label="AMY1") %>%
+                    dplyr::select(ID,label,ddPCR_cp,ddPCR_qual)
+
+USHER_AMY2A = t_usher_table_s2 %>% 
+                    mutate(ddPCR_cp =   AMY2A.Copy.Number.ddPCR,
+                           ddPCR_qual = AMY2A.Quality.Filter,
+                           label="AMY2A") %>%
+                    dplyr::select(ID,label,ddPCR_cp,ddPCR_qual)
+
+USHER_AMY2B = t_usher_table_s2 %>% 
+                    mutate(ddPCR_cp =   AMY2B.Copy.Number.ddPCR,
+                           ddPCR_qual = AMY2B.Quality.Filter,
+                           label="AMY2B") %>%
+                    dplyr::select(ID,label,ddPCR_cp,ddPCR_qual)
+
+t_USHER_ddPCR = rbind(USHER_AMY1,
+                      USHER_AMY2A,
+                      USHER_AMY2B) %>%
+                filter(ddPCR_qual=="PASS") %>%
+                filter(!is.na(ddPCR_cp))
+  
+t_comp = inner_join(t_max_likelihood,
+                    t_USHER_ddPCR, 
+                    by=c("ID","label"))
+
+g=ggplot(t_comp)
+g=g+geom_abline(slope=1,intercept=0)+
+  geom_point(aes(x=cp,y=ddPCR_cp,color=label),alpha=.5,size=.5)+
+  theme_bw()+
+  facet_wrap(~label,scales="free")+
+  scale_color_brewer(palette="Set1")+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(1,20))+
+  scale_y_continuous(breaks=seq(1,18))+
+  theme(strip.background = element_blank())
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/HPRC_comparison"
+
+fn_out = paste(outdir,"/ddPCR_vs_readdepth.pdf",sep="")
+pdf(fn_out,width=5,height=2)
+print(g)
+dev.off()  
+print(g)
+
+t_comp %>% arrange(-cp)
+
+t_comp %>% group_by(label) %>% summarize(n=n())
+```
+
+```{r}
+#combine 2A and 2Ap
+t_HPRC_long_read_est = t_HPRC_copies %>% 
+  mutate(label = case_when(name=="1" ~ "AMY1",
+                           name=="2A" ~ "AMY2A",
+                           name=="2Ap" ~ "AMY2Ap",
+                           name=="2B" ~ "AMY2B")) %>%
+  group_by(sample,label) %>%
+  summarize(assembly_copy = sum(total_copy)) %>%
+  filter(label!="AMY2Ap")
+
+```
+```{r, fig.width=5/3,fig.height=2/3}
+
+
+#t_HPRC_long_read_est
+#t_max_likelihood_HPRC
+
+t_merge = inner_join(t_HPRC_long_read_est,t_max_likelihood_HPRC,by=c("sample","label"))
+
+
+
+g=ggplot(t_merge)
+g=g+geom_abline(slope=1,intercept=0)+
+  geom_point(aes(y=assembly_copy,
+                 x=cp,
+                 color=label,
+                 fill=label),
+             position=position_jitter(width=.25,
+                                      height=.25),
+             alpha=.5,
+             shape=21)+
+  theme_bw()+
+  #facet_wrap(~label,scales="free")+
+  scale_color_brewer(palette="Set1")+
+  scale_fill_brewer(palette="Set1")+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,16,2),lim=c(0,15))+
+  scale_y_continuous(breaks=seq(0,16,2),lim=c(0,15))+
+  theme(strip.background = element_blank())+
+  theme(panel.grid.minor  = element_blank())
+# 
+# g2=ggplot(t_merge %>% 
+#            group_by(label,assembly_copy,cp) %>%
+#            summarize(n=n()))
+# g2=g2+geom_abline(slope=1,intercept=0)+
+#   geom_point(aes(y=assembly_copy,
+#                  x=cp,
+#                  color=label,
+#                  size=n),
+#              position=position_jitter(width=.25,
+#                                       height=.25),
+#              alpha=.5,
+#              shape=21)+
+#   theme_bw()+
+#   #facet_wrap(~label,scales="free")+
+#   scale_color_brewer(palette="Set1")+
+#   theme(legend.position="None")+
+#   scale_x_continuous(breaks=seq(0,16,2),lim=c(0,15))+
+#   scale_y_continuous(breaks=seq(0,16,2),lim=c(0,15))+
+#   theme(strip.background = element_blank())+
+#   theme(panel.grid.minor  = element_blank())
+# 
+# g2
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/HPRC_comparison"
+
+fn_out = paste(outdir,"/HPRC_vs_readdepth.pdf",sep="")
+pdf(fn_out,width=2.5,height=2.5)
+print(g)
+dev.off()  
+
+fn_out = paste(outdir,"/HPRC_vs_readdepth_facet.pdf",sep="")
+pdf(fn_out,width=4.5,height=2)
+print(g+facet_wrap(~label))
+dev.off() 
+
+fn_out = paste(outdir,"/HPRC_vs_readdepth_legend.pdf",sep="")
+pdf(fn_out,width=2.5,height=2.5)
+print(g+theme(legend.position='right'))
+dev.off()  
+
+print(g)
+
+errors = t_merge %>% 
+  ungroup() %>%
+  mutate(match=assembly_copy==cp) %>%
+  filter(match==FALSE) %>%
+  arrange(sample)
+  #group_by(label, match) %>%
+  #summarize(n=n())
+  
+t_merge %>% 
+  ungroup() %>%
+  mutate(match=assembly_copy==cp) %>%
+  group_by(label, match) %>%
+  summarize(n=n())
+  
+error_samples = unique(errors$sample)
+error_samples
+#bad_samples = c("HG00673", "HG00735", "HG01106", "HG01175", "HG01361", "HG01952", "HG02148", "HG02257", "HG02572")
+#really bad = HG01175, HG02257, HG01106, HG01952
+
+
+
+errors
+1-(13/(3*29))
+
+(300e-9)/6.4e-12 
+#50,000 cells... 
+```
+```{r}
+t_HPRC_y1y2copies = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_Y2_haplotypes/output/gene_copy_counts_per_indiv.tsv", header=T,sep="\t") %>%
+  mutate(yr = ifelse(grepl("hifiasm|verkko",sample),"Y2","Y1")) %>%
+  separate(sample,c("sample","tech"),sep="\\.") %>%
+  mutate(tech=ifelse(yr=="Y1","Y1_hifiasm",paste("Y2_",tech,sep=""))) %>%
+  mutate(label = case_when(name=="1" ~ "AMY1",
+                           name=="2A" ~ "AMY2A",
+                           name=="2Ap" ~ "AMY2Ap",
+                           name=="2B" ~ "AMY2B")) %>%
+  group_by(sample,tech,yr,label) %>%
+  summarize(assembly_copy = sum(total_copy)) %>%
+  filter(label!="AMY2Ap")
+
+
+t_HPRC_y1y2copies %>% 
+  dplyr::select(sample,tech,yr) %>%
+  unique() %>%
+  group_by(tech) %>%
+  summarize(n=n())
+
+```
+```{r}
+
+
+samples_y1y2 = unique(t_HPRC_y1y2copies$sample)
+
+t_max_likelihood_HPRC_y1y2 = t_copy_likelihoods %>% 
+  group_by(sample,label) %>%
+  filter(r==max(r)) %>%
+  separate(sample,c("source","sample",'p1','p2'),sep="\\.") %>%
+  filter(sample %in% samples_y1y2) %>%
+  dplyr::select(sample,cp,label,X)
+
+t_merge = inner_join(t_HPRC_y1y2copies,t_max_likelihood_HPRC_y1y2,by=c("sample","label"))
+
+
+g=ggplot(t_merge)
+g=g+geom_abline(slope=1,intercept=0)+
+  geom_point(aes(y=assembly_copy,
+                 x=cp,
+                 color=label,
+                 fill=label),
+             position=position_jitter(width=.25,
+                                      height=.25),
+             alpha=.5,
+             shape=21)+
+  theme_bw()+
+  #facet_wrap(~label,scales="free")+
+  scale_color_brewer(palette="Set1")+
+  scale_fill_brewer(palette="Set1")+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,16,2),lim=c(0,15))+
+  scale_y_continuous(breaks=seq(0,16,2),lim=c(0,15))+
+  theme(strip.background = element_blank())+
+  theme(panel.grid.minor  = element_blank())
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/HPRC_comparison"
+
+fn_out = paste(outdir,"/HPRC_y1y2_vs_readdepth.pdf",sep="")
+pdf(fn_out,width=4.5,height=2)
+print(g+facet_wrap(~tech))
+dev.off()  
+
+fn_out = paste(outdir,"/HPRC_vs_readdepth_facet.pdf",sep="")
+#pdf(fn_out,width=4.5,height=2)
+print(g+facet_wrap(~label))
+#dev.off() 
+
+fn_out = paste(outdir,"/HPRC_vs_readdepth_legend.pdf",sep="")
+#pdf(fn_out,width=2.5,height=2.5)
+print(g+theme(legend.position='right'))
+#dev.off()  
+
+print(g)
+
+errors = t_merge %>% 
+  ungroup() %>%
+  mutate(match=assembly_copy==cp) %>%
+  filter(match==FALSE) %>%
+  arrange(sample,tech)
+  #group_by(label, match) %>%
+  #summarize(n=n())
+  
+t_merge %>% 
+  ungroup() %>%
+  mutate(match=assembly_copy==cp) %>%
+  group_by(label, match) %>%
+  summarize(n=n())
+  
+error_samples = unique(errors$sample)
+error_samples
+#bad_samples = c("HG00673", "HG00735", "HG01106", "HG01175", "HG01361", "HG01952", "HG02148", "HG02257", "HG02572")
+#really_bad = HG01175, HG02257, HG01106, HG01952
+
+
+
+```
+```{r}
+
+#analysis of final "picked" genomes
+
+
+t_HPRC_copies_Y1Y2_merged_analysis = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/gene_copy_counts_per_indiv.tsv", header=T,sep="\t") %>%
+  #mutate(yr = ifelse(grepl("hifiasm|verkko",sample),"Y2","Y1")) %>%
+  separate(sample,c("sample","tech"),sep="\\.") %>%
+  #mutate(tech=ifelse(yr=="Y1","Y1_hifiasm",paste("Y2_",tech,sep=""))) %>%
+  mutate(label = case_when(name=="1" ~ "AMY1",
+                           name=="2A" ~ "AMY2A",
+                           name=="2Ap" ~ "AMY2Ap",
+                           name=="2B" ~ "AMY2B")) %>%
+  group_by(sample,label) %>%
+  summarize(assembly_copy = sum(total_copy)) %>%
+  filter(label!="AMY2Ap") %>%
+  mutate(sample=ifelse(grepl("AV_HG",sample),str_replace(sample,"AV_",""),sample))
+
+
+n = t_HPRC_copies_Y1Y2_merged_analysis %>% 
+  dplyr::select(sample) %>%
+  unique() %>%
+  summarize(n=n()) %>%
+  summarize(n=n())
+
+
+
+```
+```{r}
+
+samples_y1y2_merged = unique(t_HPRC_copies_Y1Y2_merged_analysis$sample)
+
+t_max_likelihood_HPRC_y1y2_merged = t_copy_likelihoods %>% 
+  group_by(sample,label) %>%
+  filter(r==max(r)) %>%
+  separate(sample,c("source","sample",'p1','p2'),sep="\\.") %>%
+  filter(sample %in% samples_y1y2_merged) %>%
+  dplyr::select(sample,cp,label,X)
+
+t_merge = inner_join(t_HPRC_copies_Y1Y2_merged_analysis,t_max_likelihood_HPRC_y1y2_merged,by=c("sample","label"))
+
+label = paste("n=",n$n," (",2*n$n,")",sep="")
+df_lab = data.frame(label=label,x=12,y=2)
+
+g=ggplot(t_merge)
+g=g+geom_abline(slope=1,intercept=0,alpha=0.75)+
+  geom_point(aes(y=assembly_copy,
+                 x=cp,
+                 color=label,
+                 fill=label),
+             position=position_jitter(width=.25,
+                                      height=.25),
+             alpha=.5,
+             shape=21)+
+  geom_text(aes(x=x,y=y,label=label),data=df_lab)+
+  theme_bw()+
+  #facet_wrap(~label,scales="free")+
+  scale_color_brewer(palette="Set1")+
+  scale_fill_brewer(palette="Set1")+
+  theme(legend.position="None")+
+  scale_x_continuous("read depth copy number", breaks=seq(0,16,2),lim=c(0,15))+
+  scale_y_continuous("assembly copy number", breaks=seq(0,16,2),lim=c(0,15))+
+  theme(strip.background = element_blank())+
+  theme(panel.grid.minor  = element_blank())
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/HPRC_comparison"
+
+fn_out = paste(outdir,"/HPRC_y1y2_vs_MERGED_readdepth.pdf",sep="")
+pdf(fn_out,width=2.25,height=2)
+#print(g+geom_text(aes(x=cp,y=assembly_copy,label=sample)))
+print(g)
+dev.off()  
+
+
+```
+```{r}
+3e9/1000
+
+(4000*3e6*32)/8/1024/1024/1024
+
+
+```
+

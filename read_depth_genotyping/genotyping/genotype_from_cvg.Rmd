@@ -127,22 +127,13 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 fn_out = paste(outdir,"/amylase_distribution.pdf",sep="")
 pdf(fn_out,width=8,height=8)
 
-
-#g=ggplot(t_wnd_raw %>% filter(sample %in% stats$sample[1:100]))
 g=ggplot(t_wnd_raw)
 g+geom_line(aes(x=start,y=cp,group=sample,color=p2),size=.1,alpha=.5)+
-  #geom_segment(aes(x=end_1,xend=end_2,y=-1-ix*.5,yend=-1-ix*.5),size=.1,data=sds)+
-  #geom_segment(aes(x=start_1,xend=end_1,y=-1-ix*.5,yend=-1-ix*.5,color=fracMatch),size=1,data=sds)+
-  #geom_segment(aes(x=start_2,xend=end_2,y=-1-ix*.5,yend=-1-ix*.5,color=fracMatch),size=1,data=sds)+
-  #geom_segment(aes(x=Start,xend=End,y=-1-ix*.5,yend=-1-ix*.5),color="green",size=.5,data=usher_blocks)+
-  #geom_text(aes(x=Start,y=-1-ix*.5,label=Name),color="darkgreen",size=1.5,data=usher_blocks)+
   theme_bw()+
   facet_wrap(~p2,ncol=1,strip.position = "right")+
   scale_y_continuous(lim=c(0,7),breaks=seq(0,10,1))+
   theme(legend.position="None")+
   theme(strip.background = element_blank())+
-  #scale_color_gradient2(low="grey",mid="yellow",high="orange")+
-  #scale_color_gradient(low="grey",high="orange")+
   scale_color_manual(values=colors)+
   geom_segment(aes(x=start,xend=end,y=0.5,yend=0.5),size=0.5,data=genes)+
   geom_segment(aes(x=start,xend=end,y=0,yend=0),size=0.5,data=genotype_blocks,color='blue')+
@@ -180,9 +171,16 @@ t_gt = do.call(rbind, t_gt) %>%
         separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE)
   #inner_join(t_stats,on="sample") 
 
+#### MODIFY THE SGDP AND HGDP BY A CONSTANT FACTOR SO THEY FIT INTEGERS
+
+t_gt_adj = t_gt %>% mutate(gt=ifelse(dataset=="SGDP",gt*1.08,gt)) %>%
+         mutate(gt=ifelse(dataset=="HGDP",gt*0.97,gt))
+
+
+
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
 fn_out = paste(outdir,"/genotypes.raw.tsv",sep="")
-write.table(t_gt,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+write.table(t_gt_adj,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 
 length(unique(t_gt$sample))
 ```
@@ -208,7 +206,10 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 
 fn_out = paste(outdir,"/genotypes_amy1_sum.pdf",sep="")
 pdf(fn_out,width=3,height=2)
-g=ggplot(t_gt %>% filter(name == "amy1_sum"))
+g=ggplot(t_gt %>% 
+           filter(name == "amy1_sum") %>% 
+           mutate(gt=ifelse(dataset=="SGDP",gt*1.08,gt)) %>%
+           mutate(gt=ifelse(dataset=="HGDP",gt*0.97,gt)))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
   theme_bw(base_size=8)+
   facet_wrap(~dataset,scales="free_y",ncol=1)+

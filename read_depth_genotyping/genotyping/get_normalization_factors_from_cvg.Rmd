@@ -56,7 +56,7 @@ write.table(summary_inf,fn_out,sep="\t",row.names = FALSE)
 # u=50556.50
 # d=24816.00
 # 3*u+d
-summary_inf %>% filter(grepl("Archaic",sample))
+summary_inf %>% filter(grepl("SGDP",sample))
 ```
 
 

@@ -3,6 +3,7 @@
 
 #
 #cat ../output/selected_indivs_AMY_region.fa.gz | gzip -d >AMY1A_region_seq.fa
+#cat ../output/selected_indivs_AMY_region_bundledecomp.fa.gz | gzip -d >AMY1A_region_seq.fa
 #/Users/petersudmant/Documents/science/sudmantlab/code/fastatools/target/debug/fastatools  split AMY1A_region_seq.fa ./split_fastas
 
 # minimap2 -x splice:hq -uf ./split_fastas/chr1_hg19_103998686_104406594_0.fa ./amylase_seqs/Homo_sapiens_ENST00000361355_8_sequence.fa
@@ -13,13 +14,20 @@ rule all:
     input:
         "output/gene_alns.paf"
 
+rule get_amy_seqs:
+    output:
+        "AMY1A_region_seq.fa"
+    run:
+        cmd = "gzip -d -c ../output/selected_indivs_AMY_region_bundledecomp.fa.gz >{fout}".format(fout=output[0])
+        shell(cmd)
+        print("HI")
 
 rule split_fa:
+    input:
+        "AMY1A_region_seq.fa"
     output:
         "split_fastas/idx.txt"
     run:
-        cmd="cat ../output/selected_indivs_AMY_region.fa.gz | gzip -d >AMY1A_region_seq.fa"
-        shell(cmd)
         cmd="/Users/petersudmant/Documents/science/sudmantlab/code/fastatools/target/debug/fastatools  split AMY1A_region_seq.fa ./split_fastas"
         shell(cmd)
 
