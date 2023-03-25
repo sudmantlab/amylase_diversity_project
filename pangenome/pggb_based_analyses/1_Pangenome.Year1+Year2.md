@@ -30,5 +30,7 @@ Build a pangenome graph:
 mkdir -p $DIR_BASE/amylase_diversity_project/graphs
 cd $DIR_BASE/amylase_diversity_project/graphs
 
-sbatch -p workers -c 48 --wrap "$PGGB -i $DIR_BASE/amylase_diversity_project/HPRC_AMY_Sequences/Y2_TMP/AMY1A_region_seq_Y1_Y2_TEST.fa.gz -o $DIR_BASE/amylase_diversity_project/graphs/amy_Y1_y2.p80.s5k.k419.n121 -p 80 -s 5000 -k 419 -n 121 -t 48 -D /scratch"
+samtools faidx $DIR_BASE/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/input/AMY1A_region_seq.fa.gz
+
+sbatch -p workers -c 48 --wrap "$PGGB -i $DIR_BASE/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/input/AMY1A_region_seq.fa.gz -o $DIR_BASE/amylase_diversity_project/graphs/amy_Y1_y2.p80.s5k.k419.n121 -p 80 -s 5000 -k 419 -n 121 -t 48 -D /scratch"
 ```

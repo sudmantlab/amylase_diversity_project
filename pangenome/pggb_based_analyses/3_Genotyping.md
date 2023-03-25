@@ -33,3 +33,7 @@ cat $DIR_BASE/pangenome/pggb_based_analyses/data/1kg_samples_todo.txt | while re
         12
 done
 ```
+
+```shell
+< HG03486/genotype.tsv datamash transpose --no-strict | sort -n -k 2 | grep -v N/A$ | tr -d '"' | strswap -i /dev/stdin -s $DIR_BASE/pangenome/pggb_based_analyses/data/hap.swaps | column -t | less -S
+```

@@ -1,0 +1,88 @@
+#!vim syntax=python
+import itertools
+
+
+
+configfile: "configs/allsamples_config.json"
+
+
+def get_h5_inputs(wildcards):
+    inputs = []
+    for sample in config["sample_paths"].keys():
+        inputs.append("read_depth_h5/{s}_1000_500.h5".format(s=sample)) 
+    return inputs
+
+def get_inputs(wildcards):
+    
+    p1s = []
+    p2s = []
+    
+    for sample in config["sample_paths"].keys():
+        source, id, p1, p2 = sample.split(".")
+        p1s.append(p1)
+        p2s.append(p2)
+    
+    p1s = set(p1s)
+    p2s = set(p2s)
+
+    inputs = []
+    for subset in itertools.combinations(p1s,2):
+        inputs.append("vst_tables/{pop1}_{pop2}.tsv".format(pop1=subset[0],
+                                                            pop2=subset[1]))
+    return inputs
+
+rule all:
+    input:
+        get_inputs
+
+
+def get_inputs_for_pop(pop):
+    inputs = []
+    for sample, f in config["sample_paths"].items():
+        source, id, p1, p2 = sample.split(".")
+        if p1==pop:
+            inputs.append("read_depth_h5/{s}_1000_500.h5".format(s=sample))
+
+    return inputs
+
+def get_vst_inputs(wildcards):
+
+    i1 = get_inputs_for_pop(wildcards.pop1)
+    i2 = get_inputs_for_pop(wildcards.pop2)
+    
+    return i1+i2
+
+rule get_vst:
+    input:
+        get_h5_inputs
+        #get_vst_inputs
+
+    output:
+        "vst_tables/{pop1}_{pop2}.tsv"
+    run:
+        i1 = get_inputs_for_pop(wildcards.pop1)
+        i2 = get_inputs_for_pop(wildcards.pop2)
+        cmd = ("python make_h5_vst_tables.py calc_vst "
+               "--pop1_h5s {pop1_h5} "
+               "--pop2_h5s {pop2_h5} "
+               "--fn_out {fn_out} "
+               "".format(pop1_h5 = " ".join(i1),
+                         pop2_h5 = " ".join(i2),
+                        fn_out = output[0]))
+        shell(cmd)
+
+
+rule make_h5:
+    output:
+        "read_depth_h5/{sample}_{w}_{s}.h5" 
+    run:
+        fn_d4 = config["sample_paths"][wildcards.sample]
+        cmd = ("python make_h5_vst_tables.py create "
+               "--d4_file {fn_d4} "
+               "--h5_out {fn_h5} "
+               "-w {w} "
+               "-s {s} ".format(fn_d4  = fn_d4,
+                                fn_h5 = output[0],
+                                w=wildcards.w,
+                                s=wildcards.s))
+        shell(cmd)

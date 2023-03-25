@@ -7,3 +7,9 @@ pangenome/exploratory_copy_number/resources/*
 !*/.gitignore
 
 .Rproj.user
+HPRC_AMY_Sequences/bundle_tree/fasta
+HPRC_AMY_Sequences/bundle_tree/iqtree
+HPRC_AMY_Sequences/bundle_tree/iqtree_old
+HPRC_AMY_Sequences/bundle_tree/kalign
+HPRC_AMY_Sequences/bundle_tree/logs
+HPRC_AMY_Sequences/bundle_tree/muscle

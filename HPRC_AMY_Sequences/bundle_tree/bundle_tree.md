@@ -14,33 +14,92 @@ library(pegas)
 
 ``` r
 hap_struc_table <- read_tsv("../combined_y1_y2_analyses/output/haplotype_all_structures.tsv") 
+gene_count <- read_tsv("../combined_y1_y2_analyses/output/gene_locations_on_haplotypes.tsv") %>%
+  ## this is a temporary fix
+  filter(hap_struc_d != "0.0-3.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-2.1-5.0-2.0-1.0" | name != "2Ap") %>%
+  count(contig, name, hap_struc_d) %>%
+  pivot_wider(names_from = name, values_from = n, names_prefix = "AMY", values_fill = 0)  %>%
+  ## also part of the temporary fix
+  mutate(AMY2Ap=ifelse(hap_struc_d == "0.0-3.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-2.1-5.0-2.0-1.0", 1, AMY2Ap)) %>%
+  mutate(amy_copy_number = str_c(AMY1, AMY2A, AMY2Ap, AMY2B, sep = "-")) %>%
+  dplyr::select(-contig) %>%
+  group_by_all() %>% 
+  tally() %>%
+  ungroup()
+gene_count %>%
+  group_by(hap_struc_d) %>%
+  filter(n()>1)
+```
 
+    ## # A tibble: 0 × 7
+    ## # Groups:   hap_struc_d [0]
+    ## # … with 7 variables: hap_struc_d <chr>, AMY1 <int>, AMY2A <int>, AMY2Ap <dbl>,
+    ## #   AMY2B <int>, amy_copy_number <chr>, n <int>
+
+``` r
 structure_tree <- read.newick("../combined_y1_y2_analyses/output/haplotype_structures_tree.nwk")
-
 structure_tree_grouped <- structure_tree %>%
   as_tibble() %>%
-  left_join(count(hap_struc_table, hap_struc_d), by=c("label"="hap_struc_d")) %>%
-  groupClade(c(43, 40, 55, 59, 36, 32)) %>%
+  left_join(gene_count, by=c("label"="hap_struc_d")) %>%
+  groupClade(c(38, 36, 50, 54, 32, 55)) %>%
   mutate(group = as.character(group))
 hap_group_table <- structure_tree_grouped %>% 
   dplyr::select(label, group) %>% 
   filter(!is.na(label))
-group_color <- RColorBrewer::brewer.pal(6, "Set1")
+group_color <- RColorBrewer::brewer.pal(6, "Set2")
+amy_color <- MetBrewer::met.brewer("Klimt", 4, "discrete")
 structure_ggtree <-  structure_tree_grouped %>%
   as.treedata() %>%
   ggtree(aes(color=group), linewidth=1) +
-  scale_color_manual(values = c("black",group_color)) +
+  scale_color_manual(values = c("black",group_color), guide="none") +
   geom_tiplab(align=TRUE, mapping = aes(label=label), size=3, offset = 0.03, color="black") +
   geom_tippoint(aes(size=n, fill=group), shape=21, color="black") +
-  scale_fill_manual(values = group_color) +
-  #geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2) +
+  scale_fill_manual(values = group_color, guide="none") +
+  geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2) +
   xlim_tree(1.2)
 structure_ggtree
 ```
 
 ![](bundle_tree_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
-## Extract all AMY genes from the fasta file
+``` r
+structure_ggtree <-  structure_tree_grouped %>%
+  as.treedata() %>%
+  ggtree(aes(color=group), linewidth=1) +
+  scale_color_manual(values = c("black",group_color), guide="none") +
+  geom_tiplab(align=TRUE, mapping = aes(label=amy_copy_number), size=3, offset = 0.04, color="black") +
+  geom_tippoint(aes(size=n, fill=group), shape=21, color="black") +
+  scale_fill_manual(values = group_color, guide="none") +
+  #geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2) +
+  xlim_tree(0.33)
+#nice example where this came from: https://www.janknappe.com/blog/r-irish-elections-gender/
+histo_dots <- gene_count %>%
+  dplyr::select(1:5) %>%
+  pivot_longer(2:5, values_to = "n", names_to = "name") %>%
+  uncount(n) %>%
+  arrange(hap_struc_d, name) %>%
+  group_by(hap_struc_d) %>%
+  mutate(index=row_number()) %>%
+  ungroup()
+histo_dots_plot <- histo_dots %>%
+  ggplot(aes(x=index, y=hap_struc_d, fill=name, shape=name)) +
+  geom_point(size=3) +
+  scale_shape_manual(values = 22:25) +
+  scale_fill_manual(values = amy_color) +
+  ggnewscale::new_scale_fill() +
+  theme_void() +
+  theme(axis.text.y = element_blank())
+structure_tree_with_gene_count <- histo_dots_plot %>% aplot::insert_left(structure_ggtree, width=1.1)
+structure_tree_with_gene_count
+```
+
+![](bundle_tree_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+ggsave("figures/structure_tree_with_gene_count.pdf", structure_tree_with_gene_count, width = 5.5, height = 6, units = "in")
+```
+
+## Extract all bundle sequences from the fasta file
 
 ``` r
 bundle_loc <- read_tsv("../combined_y1_y2_analyses/output/pgrtk/AMY_48_56_4_1000.bed", col_names = c("chrom", "start", "end", "tmp"), skip=1) %>%
@@ -53,17 +112,17 @@ bundle_loc <- read_tsv("../combined_y1_y2_analyses/output/pgrtk/AMY_48_56_4_1000
 
 bundle_loc %>%
   ggplot()+
-  geom_histogram(aes(x=length/1000, fill=length <= mean_length - 3* sd_length)) +
-  facet_wrap(~name, scales = "free") +
+  geom_histogram(aes(x=length/1000, fill=length <= mean_length / 2)) +
+  facet_wrap(~name, scales = "free", nrow = 2) +
   cowplot::theme_cowplot() +
   theme(legend.position = 'none')
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 bundle_loc_filtered <-  bundle_loc %>%
-  filter(length > mean_length - 3* sd_length) 
+  filter(length > mean_length / 2) 
 
 bundle_loc_filtered %>%
   count(chrom, name) %>%
@@ -72,18 +131,17 @@ bundle_loc_filtered %>%
   rename(bundle_name = name)
 ```
 
-    ## # A tibble: 9 × 8
+    ## # A tibble: 8 × 8
     ##   bundle_name   `1`   `2`   `3`   `4`   `5`   `7`   `9`
     ##   <chr>       <int> <int> <int> <int> <int> <int> <int>
-    ## 1 0              89    NA    NA    NA    NA    NA    NA
-    ## 2 1              88    NA    NA    NA    NA    NA    NA
-    ## 3 2              13     6    46     7    14     2     1
-    ## 4 3              80     5     2    NA    NA    NA    NA
-    ## 5 4              16    42    24     1     5     1    NA
-    ## 6 5              15    47    24     2     1    NA    NA
-    ## 7 6              18    47    21     1     1    NA    NA
-    ## 8 7              75     9     2    NA    NA    NA    NA
-    ## 9 8              19    48    20     1     1    NA    NA
+    ## 1 0              91    NA    NA    NA    NA    NA    NA
+    ## 2 1              91    NA    NA    NA    NA    NA    NA
+    ## 3 2              13     6    47     7    15     2     1
+    ## 4 3              84     5     2    NA    NA    NA    NA
+    ## 5 4              16    43    25     1     5     1    NA
+    ## 6 5              15    48    25     2     1    NA    NA
+    ## 7 6              19    48    22     1     1    NA    NA
+    ## 8 7              75    12     2    NA    NA    NA    NA
 
 ``` r
 bundle_loc_filtered %>%
@@ -92,18 +150,17 @@ bundle_loc_filtered %>%
   rename(bundle_name = name)
 ```
 
-    ## # A tibble: 9 × 3
+    ## # A tibble: 8 × 3
     ##   bundle_name     n mean_length
     ##   <chr>       <int>       <dbl>
-    ## 1 0              89     115358.
-    ## 2 1              88     102749.
-    ## 3 2             284      32021.
-    ## 4 3              96      22833.
-    ## 5 4             208      14630.
-    ## 6 5             194      12460.
-    ## 7 6             184       2039 
-    ## 8 7              99       1770.
-    ## 9 8             184       1311.
+    ## 1 0              91     115359.
+    ## 2 1              91     102742.
+    ## 3 2             292      32012.
+    ## 4 3             100      22824.
+    ## 5 4             213      14621.
+    ## 6 5             199      12464.
+    ## 7 6             190       3291.
+    ## 8 7             105       1761.
 
 ``` r
 bundle_loc_filtered %>%
@@ -123,7 +180,10 @@ a reference
 ``` bash
 cd /global/scratch/users/nicolas931010/amylase_diversity_project/HPRC_AMY_Sequences/bundle_tree
 rm fasta/*
-SEQ=../amy_tree/AMY1A_region_seq.fa
+rm kalign/*
+rm iqtree/*
+#gunzip -c ../combined_y1_y2_analyses/input/combined_input/AMY1A_region_seq.fa.gz > AMY1A_region_seq.fa
+SEQ=AMY1A_region_seq.fa
 BUNDLE_LOC=bundle_locations_on_haplotypes_filtered.tsv
 NLINE=`wc -l $BUNDLE_LOC | cut -f 1 -d ' '`
 for I in `seq 2 $NLINE`; do
@@ -145,14 +205,14 @@ fi
 done
 ```
 
-## Multiple sequence alignment and tree construction (kalign3)
+## Multiple sequence alignment and tree construction (with kalign3 and iqtree)
 
 ``` bash
 ## Set up kalign and iqtree
 conda activate base
 mamba create -c bioconda -n kalign3 kalign3 iqtree
 ## Run kalign and iqtree
-for BUNDLE in {0..8}; do
+for BUNDLE in {0..7}; do
 echo '#!/bin/bash
 source ~/.bashrc
 conda activate kalign3
@@ -205,6 +265,7 @@ combine_tree_data <- function(x) {
     left_join(bundle_info, by="label") %>%
     left_join(hap_struc_table, by = c("chrom" = "contig")) %>%
     left_join(hap_group_table, by=c("hap_struc_d" = "label")) %>%
+    left_join(gene_count) %>%
     as.treedata() 
 }
 plot_tree <- function(x, type, title){
@@ -244,7 +305,7 @@ Show figures
 </summary>
 
 ``` r
-for (i in 0:8){
+for (i in 0:7){
   dna <- read_fasta(str_c("kalign/bundle",i, ".afa"))
   #spider::checkDNA(dna) %>%
   #  as.vector() %>%
@@ -256,7 +317,7 @@ for (i in 0:8){
 }
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-4.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-5.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-6.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-7.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-8.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-8-9.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-9-5.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-9-6.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-9-7.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-9-8.png)<!-- -->
 
 </details>
 
@@ -265,6 +326,7 @@ for (i in 0:8){
 Bundle 0 as an example
 
 ``` r
+## with haplotype names
 bundle0_tree <- str_c("iqtree/bundle", 0, ".treefile") %>%
   read.tree() %>%
   combine_tree_data() %>%
@@ -274,7 +336,43 @@ bundle0_tree +
   xlim_tree(0.001)
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+## with amy copy numbers
+bundle0_histo_dots <- bundle_info %>%
+  filter(name=="0") %>%
+  left_join(hap_struc_table, by=c("chrom"="contig")) %>%
+  dplyr::select(label, hap_struc_d) %>%
+  left_join(histo_dots, by = "hap_struc_d")
+```
+
+    ## Warning in left_join(., histo_dots, by = "hap_struc_d"): Each row in `x` is expected to match at most 1 row in `y`.
+    ## ℹ Row 1 of `x` matches multiple rows.
+    ## ℹ If multiple matches are expected, set `multiple = "all"` to silence this
+    ##   warning.
+
+``` r
+bundle0_histo_dots_plot <- bundle0_histo_dots %>%
+  ggplot(aes(x=index, y=label, fill=name, shape=name)) +
+  geom_point(size=3) +
+  scale_shape_manual(values = 22:25) +
+  scale_fill_manual(values = amy_color) +
+  ggnewscale::new_scale_fill() +
+  theme_void() +
+  theme(axis.text.y = element_blank())
+bundle0_tree_with_gene_count <- bundle0_histo_dots_plot %>%
+  aplot::insert_left(bundle0_tree +
+                       geom_tiplab(mapping = aes(label=amy_copy_number), align = TRUE, size = 3, hjust = -0.3, offset = 0.00002) +
+                       xlim_tree(0.00055), width = 2.5)
+bundle0_tree_with_gene_count
+```
+
+![](bundle_tree_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+
+``` r
+ggsave("figures/bundle0_tree_with_gene_count.pdf", bundle0_tree_with_gene_count, height = 12, width = 10, units = "in")
+```
 
 ``` r
 dna <- read_fasta(str_c("kalign/bundle",0, ".afa"))
@@ -285,7 +383,7 @@ common_snp <- updateLabel(common_snp, labels(common_snp), labels(common_snp) %>%
 msaplot(bundle0_tree, common_snp, offset=0.0001, width=3, window = NULL, color = c("red", "yellow", "green", "blue"), bg_line=FALSE, height=1)
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 #### Circular
 
@@ -304,7 +402,7 @@ for (i in 0:5){
 }
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-11-3.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-11-4.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-11-5.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-11-6.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-3.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-4.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-5.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-6.png)<!-- -->
 
 </details>
 
@@ -326,7 +424,7 @@ for (i in 0:5){
 }
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-3.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-4.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-5.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-12-6.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-13-3.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-13-4.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-13-5.png)<!-- -->![](bundle_tree_files/figure-gfm/unnamed-chunk-13-6.png)<!-- -->
 
 </details>
 
@@ -343,72 +441,89 @@ p2 <- str_c("kalign/bundle", 0, ".afa") %>%
   nj_tree() %>%
   combine_tree_data() %>%
   ggtree()
-opposing_trees(p1 %>% ggtree::rotate(160) %>% ggtree::rotate(161), p2 %>% ggtree::rotate(91) %>% ggtree::rotate(92), label)
+opposing_trees(p1 %>% ggtree::rotate(149) %>% ggtree::rotate(150), p2 %>% ggtree::rotate(93) %>% ggtree::rotate(95) %>% ggtree::rotate(154) %>% ggtree::rotate(155) %>% ggtree::rotate(141) %>% ggtree::rotate(94) %>% ggtree::rotate(95), label)
 ```
 
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
     ## ℹ Please use `linewidth` instead.
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
-#### Trees in sliding windows in bundle 1
+#### Trees with first vs. second half of bundle 0
 
 ``` r
-bundle1_window1 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(00001:20000) %>%
+bundle0_window1 <- str_c("kalign/bundle", 0, ".afa") %>%
+  read_fasta(00001:57842) %>%
   nj_tree() %>%
   combine_tree_data() %>%
-  plot_tree("rectangular", str_c("bundle", 1, "(1:20000)")) +
+  plot_tree("rectangular", str_c("The first vs. second half of bundle 0")) +
   geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
-bundle1_window2 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(20001:40000) %>%
-  nj_tree() %>%
-  combine_tree_data() %>%
-  ggtree()
-bundle1_window3 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(40001:60000) %>%
-  nj_tree() %>%
-  combine_tree_data() %>%
-  ggtree()
-bundle1_window5 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(80001:100000) %>%
+bundle0_window2 <- str_c("kalign/bundle", 0, ".afa") %>%
+  read_fasta(57843:115684) %>%
   nj_tree() %>%
   combine_tree_data() %>%
   ggtree()+
   geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
-
-opposing_trees(bundle1_window1 %>% ggtree::rotate(128), bundle1_window2 %>% ggtree::rotate(91) %>% ggtree::rotate(107), label)
+bundle0_opposing_trees <- opposing_trees(bundle0_window1 , bundle0_window2 %>% ggtree::rotate(92) %>% ggtree::rotate(93) %>% ggtree::rotate(129) %>% ggtree::rotate(163), label)
+bundle0_opposing_trees
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
-opposing_trees(bundle1_window1, bundle1_window5 %>% ggtree::rotate(89), label)
+ggsave("figures/bundle0_opposing_trees.pdf", bundle0_opposing_trees, width = 8, height = 8, unit="in")
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+#### Trees with first vs. second half of bundle 1
+
+``` r
+bundle1_window1 <- str_c("kalign/bundle", 1, ".afa") %>%
+  read_fasta(00001:51722) %>%
+  nj_tree() %>%
+  combine_tree_data() %>%
+  plot_tree("rectangular", str_c("The first vs. second half of bundle 1")) +
+  geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
+bundle1_window2 <- str_c("kalign/bundle", 1, ".afa") %>%
+  read_fasta(51723:103444) %>%
+  nj_tree() %>%
+  combine_tree_data() %>%
+  ggtree()+
+  geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
+bundle1_opposing_trees <- opposing_trees(bundle1_window1 %>% ggtree::rotate(151), bundle1_window2 %>% ggtree::rotate(92) %>% ggtree::rotate(143), label)
+bundle1_opposing_trees
+```
+
+![](bundle_tree_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
+ggsave("figures/bundle1_opposing_trees.pdf", bundle1_opposing_trees, width = 8, height = 8, unit="in")
+```
 
 #### Bundle 0 vs. 1
 
 ``` r
-p1 <- str_c("kalign/bundle", 0, ".afa") %>%
-  read_fasta(60001:100000) %>%
+bundle0_window2 <- str_c("kalign/bundle", 0, ".afa") %>%
+  read_fasta(57843:115684) %>%
   nj_tree() %>%
   combine_tree_data() %>%
-  plot_tree("rectangular", str_c("bundle", 0, "(60001:80000)")) +
+  plot_tree("rectangular", str_c("Second half of bundle 0 vs. First half of bundle 1")) +
   geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
-p2 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(00001:40000) %>%
+bundle1_window1 <- str_c("kalign/bundle", 1, ".afa") %>%
+  read_fasta(00001:51722) %>%
   nj_tree() %>%
   combine_tree_data() %>%
   ggtree() 
-
-opposing_trees(p1 %>% ggtree::rotate(91) %>% ggtree::rotate(100) %>% ggtree::rotate(126), 
-               p2 %>% ggtree::rotate(90) %>% ggtree::rotate(91) %>% ggtree::rotate(92) %>% ggtree::rotate(154), 
+bundle0_vs_bundle1_opposing_trees <- opposing_trees(bundle0_window2 %>% ggtree::rotate(142) %>% ggtree::rotate(151), 
+               bundle1_window1 %>% ggtree::rotate(113) %>% ggtree::rotate(158), 
                chrom)
+bundle0_vs_bundle1_opposing_trees
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+``` r
+ggsave("figures/bundle0_vs_bundle1_opposing_trees.pdf", bundle0_vs_bundle1_opposing_trees, width = 8, height = 8, unit="in")
+```
 
 #### Trees in sliding windows in bundle 2
 
@@ -424,10 +539,10 @@ bundle2_window2 <- str_c("kalign/bundle", 2, ".afa") %>%
   nj_tree() %>%
   combine_tree_data() %>%
   ggtree()
-opposing_trees(bundle2_window1 %>% ggtree::rotate(307), bundle2_window2 %>% ggtree::rotate(285) %>% ggtree::rotate(369), label)
+opposing_trees(bundle2_window1, bundle2_window2, label)
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ## Diversity
 
@@ -458,13 +573,79 @@ for(i in as.character(0:5)){
     mutate(bundle=i)
   nuc_div_table <- bind_rows(nuc_div_table, nuc_div_table_tmp)
 }
-nuc_div_table  %>%
-  ggplot(aes(x=pos, y=nuc_div)) +
+pi_in_windows <- nuc_div_table %>%
+  ggplot(aes(x=pos/1000, y=nuc_div)) +
   geom_line() +
   geom_point() +
-  facet_wrap(~bundle, scales = "free_x")
+  facet_wrap(~bundle, scales = "free_x") +
+  cowplot::theme_cowplot() +
+  labs(x="position in kb", y="nucleotide diversity")+
+  theme(panel.border = element_rect(color="black", size=1))
+```
+
+    ## Warning: The `size` argument of `element_rect()` is deprecated as of ggplot2 3.4.0.
+    ## ℹ Please use the `linewidth` argument instead.
+
+``` r
+pi_in_windows
 ```
 
     ## Warning: Removed 3 rows containing missing values (`geom_point()`).
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+ggsave("../bundle_tree/figures/pi_in_windows.pdf", pi_in_windows, height = 6, width = 8, units = "in")
+```
+
+    ## Warning: Removed 3 rows containing missing values (`geom_point()`).
+
+Note `pairwise.deletion` makes a difference in some cases. Need to think
+more about it.
+
+``` r
+contig_group_table <- hap_struc_table %>%
+  left_join(hap_group_table, by=c("hap_struc_d"="label"))
+pairwise_distance=NULL
+for (i in 0:5){
+  pairwise_distance_tmp <- str_c("kalign/bundle", i, ".afa") %>%
+    read_fasta() %>%
+    dist.dna(model = "raw", pairwise.deletion = TRUE) %>%
+    broom::tidy() %>%
+    mutate(bundle = str_c("bundle", i),
+           ind1=str_extract(item1, "^.*?(?=[#\\.])"),
+           ind2=str_extract(item2, "^.*?(?=[#\\.])"),
+           contig1=str_extract(item1, ".*(?=\\.[^.]*$)"),
+           contig2=str_extract(item2, ".*(?=\\.[^.]*$)")) %>%
+    left_join(contig_group_table, by = c("contig1"="contig")) %>%
+    left_join(contig_group_table, by = c("contig2"="contig"), suffix = c("1", "2")) %>%
+    mutate(type = case_when(contig1==contig2 ~ "same contig",
+                            hap_struc_d1==hap_struc_d2 ~ "same structure",
+                            group1==group2 ~ "same group", 
+                            TRUE ~ "others"))
+  pairwise_distance <- bind_rows(pairwise_distance, pairwise_distance_tmp)
+}
+set.seed(42)
+pairwise_distance_plot <- pairwise_distance %>%
+  mutate(group=ifelse(group1=="6" | group2=="6", "comparisons involving group 6", "comparisons not involving group 6")) %>%
+  bind_rows(pairwise_distance %>% mutate(group="all")) %>%
+  filter(! bundle %in% c("bundle4", "bundle5")) %>%
+  mutate(type=fct_relevel(type, c("same contig", "same structure", "same group", "others"))) %>%
+  ggplot(aes(x=fct_rev(type), y=distance)) +
+  geom_boxplot(outlier.alpha = 0) +
+  #geom_jitter(size = 0.2, width = 0.1) +
+  scattermore::geom_scattermore(pointsize = 1, position=position_jitter(height=0, width = 0.2)) +
+  labs(y="pairwise distance") +
+  coord_flip() +
+  facet_grid(bundle~group, scales = "free_x") +
+  cowplot::theme_cowplot() +
+  theme(panel.border = element_rect(color="black", size=1),
+        axis.title.y = element_blank())
+pairwise_distance_plot
+```
+
+![](bundle_tree_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+``` r
+ggsave("figures/pairwise_distance_plot.pdf", pairwise_distance_plot, width = 12, height = 8, units = "in")
+```

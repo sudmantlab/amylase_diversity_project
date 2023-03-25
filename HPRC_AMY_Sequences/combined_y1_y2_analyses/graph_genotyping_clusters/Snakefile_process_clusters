@@ -1,0 +1,25 @@
+
+import pandas as pd
+
+
+
+
+rule all:
+    input:
+        "output/clusters_processed.tsv"
+
+
+rule process_clusters:
+    input:
+        "input/cluster.tsv"
+    output:
+        "output/clusters_processed.tsv"
+    run:
+        rows = [] 
+        for i, l in enumerate(open(input[0]).readlines()):
+            for indiv in l.rstrip().split(","):
+                #print(indiv, i)
+                rows.append({"sample": indiv,
+                             "cluster": i})
+        t = pd.DataFrame(rows)
+        t.to_csv(output[0], sep="\t", index=False)
