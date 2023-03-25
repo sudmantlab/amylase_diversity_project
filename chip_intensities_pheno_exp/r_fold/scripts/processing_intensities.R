@@ -30,7 +30,6 @@ names(lst_tab) <- gsub(".int.head.tsv", "", files_region)
 # sanity check 
 lst_tab_no0rows = lst_tab[unlist(lapply(lst_tab, function(X) nrow(X)!=0))]
 
-
 # test to design the function
 t = lst_tab_no0rows$AMY1A
 
