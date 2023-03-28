@@ -17,7 +17,7 @@ write.table(file = "data/region_AMY_hg38.bed", x= geno_blk[,c("chr","start","end
 geno_blk$chr = "chr1"
 write.table(file = "data/region_AMY_hg38.bed", x= geno_blk[,c("chr","start","end")], quote = F, col.names = F, row.names = F)
 
-# import the converted table table
+# import the converted table 
 reg_hg37 = read.table("data/hglft_genome_2d609_2875e0.bed", header = F)
 
 write.table(file = "data/region_AMY_hg38name.bed", x= geno_blk, quote = F, col.names = F, row.names = F)

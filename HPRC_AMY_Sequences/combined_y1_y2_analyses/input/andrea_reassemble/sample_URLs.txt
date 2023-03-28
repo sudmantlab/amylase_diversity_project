@@ -1,0 +1,8 @@
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG00673.amy_locus.renamed.fa
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG00735.amy_locus.renamed.fa
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG01106.amy_locus.renamed.fa
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG01175.amy_locus.renamed.fa
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG01361.amy_locus.renamed.fa
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG02148.amy_locus.renamed.fa
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG02257.amy_locus.renamed.fa
+http://hypervolu.me/~guarracino/amylase_diversity_project/HG02572.amy_locus.renamed.fa

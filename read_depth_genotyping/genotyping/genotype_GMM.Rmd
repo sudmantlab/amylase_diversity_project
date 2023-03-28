@@ -16,26 +16,40 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 fn_gts = paste(outdir,"/genotypes.raw.tsv",sep="")
 t_gt = read.table(fn_gts, sep="\t",header=T)
 
-g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C"))))
+g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C","AMY2Ap"))))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
   facet_grid(name~dataset,scales="free")+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
 
-to_gt_train_AMY2A = t_gt %>% filter(name=="AMY2A")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-to_gt_train_AMY2B = t_gt %>% filter(name=="AMY2B")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-to_gt_train_AMY1 =  t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-to_gt_train_AMY2Ap =  t_gt %>% filter(name=="AMY2Ap") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+# to_gt_train_AMY2A = t_gt %>% filter(name=="AMY2A")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+# to_gt_train_AMY2B = t_gt %>% filter(name=="AMY2B")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+# to_gt_train_AMY1 =  t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+# to_gt_train_AMY2Ap =  t_gt %>% filter(name=="AMY2Ap") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
+
+#%>% filter(!grepl("1KG",sample))
+to_gt_AMY2A = t_gt %>% filter(name=="AMY2A")  %>% dplyr::select(sample,gt)
+to_gt_AMY2B = t_gt %>% filter(name=="AMY2B")  %>% dplyr::select(sample,gt)
+to_gt_AMY1 =  t_gt %>% filter(name=="amy1_sum")  %>% dplyr::select(sample,gt)
 
 
+######ARCHAIC FIX
+#Archaics consistently have a slight excess of coverage over the AMY1 copies, 
+#potentially due to gene conversion, resulting in consistent "copy 3" estimates
+#this code is to correct for this
+arch_AMY1_adj = 2-(to_gt_AMY1 %>% filter(grepl("Neand|Denis",sample)) %>% summarize(mu = mean(gt)))$mu
+to_gt_AMY1=to_gt_AMY1 %>% mutate(gt = ifelse(grepl("Neand|Denis",sample),gt+arch_AMY1_adj,gt))
 
 
-g=ggplot(t_gt %>% 
-        filter(name %in% c("AMY2A","AMY2Ap")) %>%
-        dplyr::select(sample,dataset,gt,name) %>%
-        pivot_wider(names_from=name,values_from=gt))
-g+geom_point(aes(x=AMY2A,y=AMY2Ap))+
-  theme_bw(base_size=8)
+#to_gt_AMY2B %>% filter(grepl("Neander",sample))
+
+
+# g=ggplot(t_gt %>% 
+#         filter(name %in% c("AMY2A","AMY2Ap")) %>%
+#         dplyr::select(sample,dataset,gt,name) %>%
+#         pivot_wider(names_from=name,values_from=gt))
+# g+geom_point(aes(x=AMY2A,y=AMY2Ap))+
+#   theme_bw(base_size=8)
 
 
 #t_HPRC_indivs = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/map_gene_locations/HPRC_indivs",header=FALSE,col.names=c("ID"))
@@ -80,6 +94,12 @@ M_step = function(df_resps,k,mu,offset,iter){
           summarize(den=sum(r))
   sigma = sqrt(num$num/denom$den)
 
+  mu_total_num = df_resps %>% 
+    ungroup() %>%
+    inner_join(data.frame(mu=mu+offset) %>% mutate(i=row_number()),on=i) %>%
+    summarize(num=sum(r*X))
+  
+    
   updated_mu_num = df_resps %>% 
     group_by(i) %>%
     inner_join(data.frame(mu=mu+offset) %>% mutate(i=row_number()),on=i) %>%
@@ -91,7 +111,10 @@ M_step = function(df_resps,k,mu,offset,iter){
     summarize(denom=sum(r)) 
 
   updated_mu = updated_mu_num$num/updated_mu_denom$denom
-  
+  delta_mu = mu-updated_mu
+  offset = mean(delta_mu)
+  #offset=0
+  #set offset = 0 here if you like
     
   return(list("sigma"=sigma,
               "pi"=pi,
@@ -158,7 +181,7 @@ genotype = function(to_gt, iters, label){
   }
   dists = do.call(rbind, dists)
   
-  final_resps = gt_likelihood_table(t_gt,k,mu,offset,sigma, pi, label)
+  final_resps = gt_likelihood_table(to_gt,k,mu,offset,sigma, pi, label)
   
   #final_resps = E_step(X,k,mu,offset,sigma,pi,-1)
 
@@ -178,55 +201,114 @@ genotype = function(to_gt, iters, label){
               "final_resps"=final_resps))
 }
 
+```
 
-AMY1_gt_trained = genotype(to_gt_train_AMY1, 20, "AMY1")
-AMY2B_gt_trained = genotype(to_gt_train_AMY2B, 20, "AMY2B")
-AMY2A_gt_trained = genotype(to_gt_train_AMY2A, 20, "AMY2A")
-AMY2Ap_gt_trained = genotype(to_gt_train_AMY2Ap, 20, "AMY2Ap")
 
+```{r}
+#Original TRAIN on 1kg, but use on others
+#undebug(M_step)
+#genotype(to_gt_train_AMY1, 20, "AMY1")
+
+AMY1_gt = genotype(to_gt_AMY1, 20, "AMY1")
+AMY2B_gt = genotype(to_gt_AMY2B, 20, "AMY2B")
+AMY2A_gt = genotype(to_gt_AMY2A, 20, "AMY2A")
+
+
+#MY2Ap_gt_trained = genotype(to_gt_train_AMY2Ap, 20, "AMY2Ap")
                              
-gtl_AMY1 = gt_likelihood_table(t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt), 
-                               AMY1_gt_trained$k,
-                               AMY1_gt_trained$mu,
-                               AMY1_gt_trained$offset,
-                               AMY1_gt_trained$sigma, 
-                               AMY1_gt_trained$pi, 
-                               "AMY1")
+# gtl_AMY1 = gt_likelihood_table(t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt), 
+#                                AMY1_gt_trained$k,
+#                                AMY1_gt_trained$mu,
+#                                AMY1_gt_trained$offset,
+#                                AMY1_gt_trained$sigma, 
+#                                AMY1_gt_trained$pi, 
+#                                "AMY1")
+# 
+# gtl_AMY2A = gt_likelihood_table(t_gt %>% filter(name=="AMY2A") %>% dplyr::select(sample,gt), 
+#                                AMY2A_gt_trained$k,
+#                                AMY2A_gt_trained$mu,
+#                                AMY2A_gt_trained$offset,
+#                                AMY2A_gt_trained$sigma, 
+#                                AMY2A_gt_trained$pi, 
+#                                "AMY2A")
+# 
+# gtl_AMY2B = gt_likelihood_table(t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt), 
+#                                AMY2B_gt_trained$k,
+#                                AMY2B_gt_trained$mu,
+#                                AMY2B_gt_trained$offset,
+#                                AMY2B_gt_trained$sigma, 
+#                                AMY2B_gt_trained$pi, 
+#                                "AMY2B")
+# 
+# gtl_AMY2Ap = gt_likelihood_table(t_gt %>% filter(name=="AMY2Ap") %>% dplyr::select(sample,gt), 
+#                                AMY2Ap_gt_trained$k,
+#                                AMY2Ap_gt_trained$mu,
+#                                AMY2Ap_gt_trained$offset,
+#                                AMY2Ap_gt_trained$sigma, 
+#                                AMY2Ap_gt_trained$pi, 
+#                                "AMY2Ap")
 
-gtl_AMY2A = gt_likelihood_table(t_gt %>% filter(name=="AMY2A") %>% dplyr::select(sample,gt), 
-                               AMY2A_gt_trained$k,
-                               AMY2A_gt_trained$mu,
-                               AMY2A_gt_trained$offset,
-                               AMY2A_gt_trained$sigma, 
-                               AMY2A_gt_trained$pi, 
-                               "AMY2A")
-
-gtl_AMY2B = gt_likelihood_table(t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt), 
-                               AMY2B_gt_trained$k,
-                               AMY2B_gt_trained$mu,
-                               AMY2B_gt_trained$offset,
-                               AMY2B_gt_trained$sigma, 
-                               AMY2B_gt_trained$pi, 
-                               "AMY2B")
-
-gtl_AMY2Ap = gt_likelihood_table(t_gt %>% filter(name=="AMY2Ap") %>% dplyr::select(sample,gt), 
-                               AMY2Ap_gt_trained$k,
-                               AMY2Ap_gt_trained$mu,
-                               AMY2Ap_gt_trained$offset,
-                               AMY2Ap_gt_trained$sigma, 
-                               AMY2Ap_gt_trained$pi, 
-                               "AMY2Ap")
 
 
-
-all_gts = rbind(gtl_AMY1,
-                gtl_AMY2A,
-                gtl_AMY2B,
-                gtl_AMY2Ap)
+all_gts = rbind(AMY1_gt$final_resps,
+                AMY2B_gt$final_resps,
+                AMY2A_gt$final_resps)
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
 fn_gts = paste(outdir,"/genotypes.likelihoods.tsv",sep="")
 write.table(all_gts, fn_gts, sep="\t",row.names = FALSE, quote = FALSE)
+
+
+
+gtl_AMY2B = gt_likelihood_table(t_gt %>% filter(name=="AMY2B") %>% dplyr::select(sample,gt),
+                               AMY2B_gt$k,
+                               AMY2B_gt$mu,
+                               AMY2B_gt$offset,
+                               AMY2B_gt$sigma,
+                               AMY2B_gt$pi,
+                               "AMY2B")
+
+AMY1_gt$final_resps %>% filter(grepl("Neander",sample)) 
+
+```
+```{r}
+
+AMY1_gt[["offset"]]
+AMY2A_gt[["offset"]]
+AMY2B_gt[["offset"]]
+
+adj = 200
+g=ggplot(AMY1_gt$dists %>% filter(iter==20))+
+  geom_histogram(aes(x=gt),binwidth = 0.1,data=to_gt_AMY1)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,20,2))
+
+print(g)
+
+g=ggplot(AMY2A_gt$dists %>% filter(iter==20))+
+  geom_histogram(aes(x=gt),binwidth = 0.1,data=to_gt_AMY2A)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,20,2))
+
+print(g)
+
+g=ggplot(AMY2B_gt$dists %>% filter(iter==20))+
+  geom_histogram(aes(x=gt),binwidth = 0.1,data=to_gt_AMY2B)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,20,2))
+
+print(g)
+
+
 
 
 ```
@@ -310,6 +392,61 @@ final_resps = to_gt %>%
 # ggplot(get_dists(k,mx_copy,mu,sigma,pi))+
 #   geom_line(aes(x=x,y=y,color=factor(i)))+theme_bw()
 # 
+```
+
+```{r}
+
+### EXPERIMENTING WITH GENOTYPING and plotting
+ 
+AMY1_ALL = t_gt %>% filter(name=="amy1_sum")
+
+AMY1_1kg_gt = genotype(AMY1_1kg, 20, "AMY1")
+AMY1_HGDP_gt = genotype(AMY1_HGDP, 20, "AMY1")
+AMY1_ALL_gt = genotype(AMY1_ALL, 20, "AMY1")
+
+
+AMY1_1kg_gt[["offset"]]
+AMY1_HGDP_gt[["offset"]]
+AMY1_ALL_gt[["offset"]]
+
+adj = 250
+g=ggplot(AMY1_1kg_gt$dists %>% filter(iter==20))+
+  geom_histogram(aes(x=gt),binwidth = 0.1,data=AMY1_1kg)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,20,2))
+
+print(g)
+
+adj = 120
+g=ggplot(AMY1_HGDP_gt$dists %>% filter(iter==20))+
+  geom_histogram(aes(x=gt),binwidth = 0.05,data=AMY1_HGDP)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,20,2))
+
+print(g)
+
+adj = 120
+g=ggplot(AMY1_ALL_gt$dists %>% filter(iter==20))+
+  geom_histogram(aes(x=gt),binwidth = 0.05,data=AMY1_ALL)+
+  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  theme_bw()+
+  facet_wrap(~iter)+
+  theme(legend.position="None")+
+  scale_x_continuous(breaks=seq(0,20,2))
+
+print(g)
+
+AMY1_ALL_gt$final_resps %>% 
+  group_by(sample) %>%
+  filter(r==max(r)) %>%
+  filter(grepl("Neander",sample))
+
 ```
 
 ```{r}

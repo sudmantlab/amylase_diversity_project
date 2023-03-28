@@ -129,15 +129,86 @@ I work on R to detect the correlation
 
 Link to gdoc presentation in the making https://docs.google.com/presentation/d/1ieZyp_74-VBhB-zRYrV8xFd5dwJZUc-CIZ9v4xdR-kc/edit#slide=id.g206d7303d96_0_15
 
+
+### working with the intensities at the single base level 
+
+1. select the base between the range of chromosome 1 
+
+``` 
+awk '$2 == 1 && $3 >= 102498686 && $3 <= 105906594 {print $0}' /project/alfredo/reference_data/1000G/genotype_chips/grch38_lifted1kgp/script/HumanOmni2.5-4v1_B-b38.Ilmn.strand | awk '{print $1}' > AMY_SNPs_Omni25.tsv 
+```
+
+2. sed in order to grep only the beginning of the line
+```
+awk '{print "^"$1"-"}' AMY_SNPs_Omni25.tsv > AMY_SNPs_Omni25_frmt.tsv
+```
+
+3. grep them 
+```
+grep -f AMY_SNPs_Omni25_frmt.tsv /project/alfredo/reference_data/1000G/genotype_chips/20110117_bi_omni_intensities/Omni25_norm_intensity_20110117.txt > Omni25_norm_intensity_20110117_onlyAMY.txt
+```
+
+4. give them the position and the chr in Grch38 with the vlookup but before do a sanity check to remove A and B
+
+```
+awk '{print $1,$0}' Omni25_norm_intensity_20110117_onlyAMY.txt | awk '{gsub(/-A|-B/, "", $1); print $0}' > Omni25_norm_intensity_20110117_onlyAMY_noAB.txt
+
+awk 'NR==FNR{a[$1]=$2"\t"$3; next} {print a[$1],$0}' /project/alfredo/reference_data/1000G/genotype_chips/grch38_lifted1kgp/script/HumanOmni2.5-4v1_B-b38.Source.strand Omni25_norm_intensity_20110117_onlyAMY_noAB.txt > Omni25_norm_intensity_20110117_onlyAMY_noAB_Grch38.txt
+
+head -n 1 /project/alfredo/reference_data/1000G/genotype_chips/20110117_bi_omni_intensities/Omni25_norm_intensity_20110117.txt | awk '{print "chr","pos_Grch38","snp_id",$0}' > header_Omni_AMY_Grch38
+
+cat header_Omni_AMY_Grch38 Omni25_norm_intensity_20110117_onlyAMY_noAB_Grch38.txt > Omni25_norm_intensity_20110117_onlyAMY_noAB_Grch38_head.txt 
+```
+
+the Grch37 conversion for this it is at `/project/alfredo/reference_data/1000G/genotype_chips/grch38_lifted1kgp/script/HumanOmni2.5-4v1_B-b37.Ilmn.strand`
+
+open in R and modify this table in R
+
+
+5. I re-downloaded a more recent file with intensities, since the one that I had downloaded did not contain all the probes that were indicated in the summary the we had downloaded
+
+## take the ukbb intensities 
+
+I have seen from the RAP under the section bulk that there are many files that can be used in [here](https://biobank.ndph.ox.ac.uk/ukb/label.cgi?id=100315)
+
+downaload these huge files using the script in `/processing_data/shared_datasets/ukbiobank/copy_number/script/download_chr1_log2ratio.sh`
+
+using the wrap 
+
+```
+sbatch  --partition cpuq --time 48:00:00 --cpus-per-task=1 --mem=8G -o /processing_data/shared_datasets/ukbiobank/copy_number/script/dwnlog2ratio.log --wrap "cd /processing_data/shared_datasets/ukbiobank/copy_number/script; bash download_chr1_log2ratio.sh"
+```
+
+```
+sbatch  --partition cpuq --time 48:00:00 --cpus-per-task=1 --mem=8G -o /processing_data/shared_datasets/ukbiobank/copy_number/script/dwnloggenint.log --wrap "cd /processing_data/shared_datasets/ukbiobank/copy_number/script; bash download_chr1_genotint.sh"
+```
+the intensities are in Grch37, at this point I am selecting only the rows in the bim that are at the left and at the right of the region of interest. 
+
+File that I have look in are in `chip_intensities_pheno_exp/r_fold/data/amy_reg_hg37.tsv`
+
+the lowest value is `104092823` the highest value is `104329649` I am subsetting this in the bim 
+
+I have done this for both and at the end we extracted only 15 SNPs
+
+```
+
+awk '$4>104092823 && $4<104329649 {print NR-1}' ukb_snp_chr1_v2.bim > AMYrown_ukbbchip_grch37.tsv
+```
+
+
+I plot them using R 
+
+
+
+
+
+
+
 ## working in progress
-
-- extend the analyses at the single-base level:
-understand the normalization and maybe start from raw data 
-
-- apply the same approach
 
 - extend this to UKBB (check how many SNPs are there in these regions and for how many individuals - divide them for ancestry? I am doing this in a separate project)
 
 - check if there is a correlation between these intensities and phenotypes. 
 
 - merge the regions together (maybe?)
+

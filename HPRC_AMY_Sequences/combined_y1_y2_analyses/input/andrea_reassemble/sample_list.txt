@@ -1,0 +1,8 @@
+HG00673.amy_locus.renamed.fa
+HG00735.amy_locus.renamed.fa
+HG01106.amy_locus.renamed.fa
+HG01175.amy_locus.renamed.fa
+HG01361.amy_locus.renamed.fa
+HG02148.amy_locus.renamed.fa
+HG02257.amy_locus.renamed.fa
+HG02572.amy_locus.renamed.fa
