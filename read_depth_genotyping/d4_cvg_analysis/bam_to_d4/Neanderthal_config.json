@@ -1,0 +1,9 @@
+{
+    "hg38_bam_dir":"/global/scratch/p2p3/sudmantlab/human_diversity/ancient_genomes/neanderthals",
+    "hg38_bams": [
+        "Altai",
+        "Chagyrskaya",
+        "Denisova",
+        "Vindija"
+    ]
+}

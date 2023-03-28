@@ -8,8 +8,7 @@ def get_inputs(wildcards):
     inputs = [] 
     for p in config['sample_paths']:
         s = p.split("/")[-1].replace(".cram","") 
-        inputs.append("d4_files/HGDP/q20/{sample}.d4".format(sample=s))
-        inputs.append("d4_files/HGDP/q0/{sample}.d4".format(sample=s))
+        inputs.append("d4_files/SGDP/q0/{sample}.d4".format(sample=s))
                                                                  
     return inputs
 

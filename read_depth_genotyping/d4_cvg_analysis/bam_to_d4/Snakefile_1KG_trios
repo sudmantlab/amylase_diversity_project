@@ -17,7 +17,7 @@ def get_inputs(wildcards):
                                                run_id=run_id,
                                                pop=pop)
                                                  
-        inputs.append("d4_files/1KG_trios/{fn}".format(fn=fn))
+        inputs.append("d4_files/1KG_trios/q0/{fn}".format(fn=fn))
     return inputs
 
 rule all:
@@ -27,13 +27,13 @@ rule all:
 
 rule make_d4:
     output:
-        "d4_files/1KG_trios/{name}.{run_id}.{pop}.d4"
+        "d4_files/1KG_trios/q0/{name}.{run_id}.{pop}.d4"
     run:
         d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
         path = "{path}/{run_id}/{name}.final.cram".format(path=config['path'],
                                                           run_id=wildcards.run_id,
                                                           name=wildcards.name)
-        cmd = "{d4} create -r {fai_path} -z -q20 {path} {output}"
+        cmd = "{d4} create -r {fai_path} -z -q0 {path} {output}"
         cmd = cmd.format(d4=d4_tools,
                          path=path,
                          fai_path=config["fn_fai"],
