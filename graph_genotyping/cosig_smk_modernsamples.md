@@ -1,6 +1,5 @@
 ## A few step that we have done to run the smk genotyper of davide on modern samples. 
 
-
 - install micromamba 
 
 - install an env using micromamba and python=3.10 and snakemake 
@@ -12,10 +11,56 @@ micromamba create -c conda-forge -c bioconda -p /global/home/users/alessandrorav
 
 - listed all the cram samples using 
 
+HGDP
+
 ```
-mkdir cram cram_seq_HGDP
+mkdir cram_seq_HGDP
 
 ln -s /global/scratch/p2p3/pl1_sudmant/human_diversity/HGDP/*/*/alignment/*.cram
+```
+
+SGDP
+
+```
+mkdir bam_seq_SGDP
+
+cd bam_seq_SGDP
+
+ln -s  /global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams/LP600*/LP*.bam* .
+```
+
+modify with `.bam` the extract `.smk` and the cosigt_prepare.sh together with `bai` instead that `.crai`
+
+```
+./cosigt_prepare.sh ../../../bam_seq_SGDP/ ../../../ref_fasta/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz ../../../graph_ref/AMY1A_region_seq.fa.gz.45f3937.68f91e8.f72a9ab.smooth.final.gfa chr1:103456064-103863972 resources/extra/bad_samples.txt
+
+```
+
+in processing this file it happened that the `LP6005441-DNA_H08.bam` does not have the bai file.
+
+I am removing it and then re-running the pipeline
+
+1000G 
+
+```
+mkdir cram_seq_1000G
+
+cd cram_seq_1000G
+
+ln -s /global/scratch/p2p3/pl1_sudmant/human_diversity/1KG30X/data/ERR32*/*cram* .
+```
+
+started the run as before but the `HG03708` is corrupted as `[E::cram_read_container] Container header CRC32 failure`
+
+
+
+
+Ancient genome 
+
+```
+
+
+
 ```
 
 - ref fasta copy and zip with bgzip
@@ -47,6 +92,71 @@ this allow to read any cram there.
 - run the `cosig_run.sh`
 
 ## need to run it for all the other samples
+
+done but the 1kgp have some issue, some may be corrupted
+
+I checked the md5 hashes also for the rel 
+
+```
+ ls *.cram | xargs -P 20 -I{} sh -c 'md5sum {} >> par_xarg_file_md5hash'
+```
+
+then I compare them with the values in index file 
+
+```
+awk -F'\t' 'FNR==NR{a[$10".final.cram"]=$2;next} {print $0, a[$2]}' md5sum_peter.tsv FS=' '  par_xarg_file_md5hash > md5comp.tsv
+```
+
+select only the file with different md5 hashes
+
+```
+awk '{if($1 != $3) print}' md5comp.tsv > md5comp_notmatch.tsv
+
+awk '{if($1 == $3) print $2}' md5comp.tsv > md5comp_MATCH.tsv
+```
+
+```
+awk '{print $2}' ../md5comp_notmatch.tsv > ../md5comp_notmatch_onlyfile.tsv
+```
+
+```
+ln -s /global/scratch/p2p3/pl1_sudmant/human_diversity/1KG30X/data/ERR32*/*cram* .
+
+while read line; do rm $line*; done <../md5comp_notmatch_onlyfile.tsv
+```
+
+run again the pipeline
+
+some crai have some corrupted crai, so I recomputed them 
+
+```
+rm *.crai
+
+ls *cram | xargs -P 10 -I{} samtools index {} -M -o {}.crai
+```
+
+## re-download of 1KGP in folder 
+
+select all the field in the file of peter
+```
+ awk -F'\t' 'FNR==NR{a[$10".final.cram"]=$0;next} {print $0, a[$2]}' md5sum_peter.tsv FS=' '  par_xarg_file_md5hash > test.tsv
+```
+
+grab the one not matching
+
+```
+awk '{if($1 != $4) print}' test.tsv > test_notmatch.tsv
+```
+
+select only the column with the ftp 
+
+```
+awk '{print $3}' test_notmatch.tsv | sed -e '/^$/d' > ftp_not_matching.tsv
+```
+
+redownload them with ftp
+
+
 
 ## implemente for the ancient samples
 

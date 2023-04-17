@@ -193,6 +193,20 @@ I have done this for both and at the end we extracted only 15 SNPs
 ```
 
 awk '$4>104092823 && $4<104329649 {print NR-1}' ukb_snp_chr1_v2.bim > AMYrown_ukbbchip_grch37.tsv
+
+# for the large region
+
+awk '$4>103000000 && $4<105000000 {print NR-1}' ukb_snp_chr1_v2.bim > AMYrown_ukbbchip_grch37_large.tsv
+```
+
+
+top the lowest (for the large region - 29111) and highest value (for the large region - 29415) of this table and then select it on the big file 
+
+```
+awk 'NR>=29268 && NR<=29282' ukb22431_c1_b0_v2.txt > amy_intlog2ratio.txt
+
+awk 'NR>=29111 && NR<=29415' ukb22431_c1_b0_v2.txt > amy_intlog2ratio.txt
+
 ```
 
 
