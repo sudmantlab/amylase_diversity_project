@@ -11,7 +11,7 @@
 - Number of individuals with different md5sum: `31`
 
 ## Actions Taken
--The corrupted files were re-downloaded and checked.
+- The corrupted files were re-downloaded and checked.
 - The files are now stored in this folder: `/global/scratch/p2p3/pl1_sudmant/alessandroraveane/re_dwn_1kgp/`
 - The files were re-indexed.
 
