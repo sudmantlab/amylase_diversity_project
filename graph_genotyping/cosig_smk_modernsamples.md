@@ -156,6 +156,11 @@ awk '{print $3}' test_notmatch.tsv | sed -e '/^$/d' > ftp_not_matching.tsv
 
 redownload them with ftp
 
+```
+awk -F' ' 'NR==FNR{a[$1];next}FNR==1{FS="\t"}($10 in a){print $0}' md5comp_notmatch.tsv md5sum_peter.tsv
+
+```
+
 
 
 ## implemente for the ancient samples
