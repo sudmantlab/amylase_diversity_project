@@ -1,0 +1,52 @@
+# vim: syntax=python tabstop=4 expandtab
+# coding: utf-8
+
+
+import pysam
+import os
+import tempfile
+import pandas as pd
+import pdb
+
+log_path = config['log_path']
+bam_path = config['bam_path']
+input_bam_path = config['bam_path']
+output_d4_path = config['d4_path']
+
+def get_d4s(wildcards):
+    inputs = set()
+    input_samples = config['samples'].keys()
+    for sample in input_samples:
+        inputs.add("{output_d4_path}/{sample}.d4".format(output_d4_path=output_d4_path,sample=sample))
+    return inputs
+
+rule all:
+    input:
+        get_d4s
+    """
+    params:
+        slurm_opts=lambda wildcards: "--time 72:00:00 "
+                                     "-A co_genomicdata "
+                                     "-J rule_all "
+                                     "-o {log_path}/rule_all_%j.logs "
+                                     "-p savio,savio2,savio3,savio_bigmem,savio2_bigmem,savio3_bigmem"
+                                     .format(log_path=log_path)
+    """
+
+rule make_d4:
+    input:
+        lambda wildcards: "{input_bam_path}/{sample}.bam".format(input_bam_path=input_bam_path,sample=wildcards.sample)
+    output:
+        "{output_d4_path}/{mapq}/{sample}.d4"
+    """
+    params:
+        slurm_opts=lambda wildcards: "--time 72:00:00 "
+                                     "-A co_genomicdata "
+                                     "-J merge_{sample} "
+                                     "-o {log_path}/merge_{sample}_%j.logs "
+                                     "-p savio,savio2,savio3,savio_bigmem,savio2_bigmem,savio3_bigmem"
+                                     .format(log_path=log_path,sample=wildcards.sample)
+    """
+    run:
+        d4_tools = "/global/scratch/users/psudmant/software/d4-format/target/release/d4tools"
+        shell("{d4} create -F ~256 -z -q0 {bam_path} {output_d4}".format(d4=d4_tools,bam_path=input,output_d4=output))
