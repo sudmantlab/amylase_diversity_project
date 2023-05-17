@@ -206,10 +206,12 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 
 fn_out = paste(outdir,"/genotypes_amy1_sum.pdf",sep="")
 pdf(fn_out,width=3,height=2)
+# g=ggplot(t_gt %>% 
+#            filter(name == "amy1_sum") %>% 
+#            mutate(gt=ifelse(dataset=="SGDP",gt*1.08,gt)) %>%
+#            mutate(gt=ifelse(dataset=="HGDP",gt*0.97,gt)))
 g=ggplot(t_gt %>% 
-           filter(name == "amy1_sum") %>% 
-           mutate(gt=ifelse(dataset=="SGDP",gt*1.08,gt)) %>%
-           mutate(gt=ifelse(dataset=="HGDP",gt*0.97,gt)))
+           filter(name == "amy1_sum"))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
   theme_bw(base_size=8)+
   facet_wrap(~dataset,scales="free_y",ncol=1)+
