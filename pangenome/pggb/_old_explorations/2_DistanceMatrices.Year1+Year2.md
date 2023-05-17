@@ -8,8 +8,8 @@ ODGI=/home/guarracino/tools/odgi/bin/odgi-f483f9ed5a514a531fbd64833d49cd931ea599
 Get contig coordinates in each bundle:
 
 ```shell
-mkdir -p $DIR_BASE/amylase_diversity_project/pangenome/pggb_based_analyses/bundle_tree
-cd $DIR_BASE/amylase_diversity_project/pangenome/pggb_based_analyses/bundle_tree
+mkdir -p $DIR_BASE/amylase_diversity_project/pangenome/pggb/bundle_tree
+cd $DIR_BASE/amylase_diversity_project/pangenome/pggb/bundle_tree
 
 NUM=$(cut -f 4 $DIR_BASE/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/pgrtk/AMY_48_56_4_1000.bed | cut -f 1 -d ':' | sort | uniq | grep '#' -v | wc -l)
 NUM=$((NUM-1))
