@@ -21,12 +21,8 @@ library(pegas)
 ```{r eval=TRUE, fig.height=6, fig.width=10}
 hap_struc_table <- read_tsv("../combined_y1_y2_analyses/output/haplotype_all_structures.tsv") 
 gene_count <- read_tsv("../combined_y1_y2_analyses/output/gene_locations_on_haplotypes.tsv") %>%
-  ## this is a temporary fix
-  filter(hap_struc_d != "0.0-3.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-2.1-5.0-2.0-1.0" | name != "2Ap") %>%
   count(contig, name, hap_struc_d) %>%
   pivot_wider(names_from = name, values_from = n, names_prefix = "AMY", values_fill = 0)  %>%
-  ## also part of the temporary fix
-  mutate(AMY2Ap=ifelse(hap_struc_d == "0.0-3.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-7.0-5.0-2.0-6.0-4.0-2.1-5.0-2.0-1.0", 1, AMY2Ap)) %>%
   mutate(amy_copy_number = str_c(AMY1, AMY2A, AMY2Ap, AMY2B, sep = "-")) %>%
   dplyr::select(-contig) %>%
   group_by_all() %>% 
@@ -39,7 +35,7 @@ structure_tree <- read.newick("../combined_y1_y2_analyses/output/haplotype_struc
 structure_tree_grouped <- structure_tree %>%
   as_tibble() %>%
   left_join(gene_count, by=c("label"="hap_struc_d")) %>%
-  groupClade(c(38, 36, 50, 54, 32, 55)) %>%
+  groupClade(c(33, 37, 39, 42, 48, 51)) %>%
   mutate(group = as.character(group))
 hap_group_table <- structure_tree_grouped %>% 
   dplyr::select(label, group) %>% 
@@ -59,15 +55,16 @@ structure_ggtree
 ```
 
 ```{r eval=TRUE, fig.height=6, fig.width=5, units = "in"}
-structure_ggtree <-  structure_tree_grouped %>%
+structure_ggtree_tmp <-  structure_tree_grouped %>%
   as.treedata() %>%
   ggtree(aes(color=group), linewidth=1) +
   scale_color_manual(values = c("black",group_color), guide="none") +
-  geom_tiplab(align=TRUE, mapping = aes(label=amy_copy_number), size=3, offset = 0.04, color="black") +
   geom_tippoint(aes(size=n, fill=group), shape=21, color="black") +
   scale_fill_manual(values = group_color, guide="none") +
   #geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2) +
   xlim_tree(0.33)
+structure_ggtree <- structure_ggtree_tmp +
+  geom_tiplab(align=TRUE, mapping = aes(label=amy_copy_number), size=3, offset = 0.04, color="black")
 #nice example where this came from: https://www.janknappe.com/blog/r-irish-elections-gender/
 histo_dots <- gene_count %>%
   dplyr::select(1:5) %>%
@@ -88,6 +85,9 @@ histo_dots_plot <- histo_dots %>%
 structure_tree_with_gene_count <- histo_dots_plot %>% aplot::insert_left(structure_ggtree, width=1.1)
 structure_tree_with_gene_count
 ggsave("figures/structure_tree_with_gene_count.pdf", structure_tree_with_gene_count, width = 5.5, height = 6, units = "in")
+structure_ggtree_legend <- structure_ggtree_tmp +
+  theme(legend.position=c(0.1, 0.93))
+ggsave("figures/structure_tree_legend.pdf", structure_ggtree_legend, width = 2, height = 6, units = "in")
 ```
 
 ## Extract all bundle sequences from the fasta file
@@ -161,37 +161,84 @@ fi
 done
 ```
 
+## Extract Neanderthal and Denisovan sequences as outgroups
+
+```{bash eval=FALSE}
+mkdir /global/scratch/users/nicolas931010/amylase_diversity_project/HPRC_AMY_Sequences/bundle_tree/outgroup
+cd /global/scratch/users/nicolas931010/amylase_diversity_project/HPRC_AMY_Sequences/bundle_tree/outgroup
+# mamba create -c conda-forge -c bioconda -n samtools samtools=1.17
+conda activate samtools
+rm outgroup_bundle?.fa
+for SAMPLE in Altai Chagyrskaya Denisova Vindija; do
+BAM=/global/scratch/p2p3/pl1_sudmant/human_diversity/ancient_genomes/neanderthals/${SAMPLE}/hg38/mapped.sorted.bam
+echo '>'${SAMPLE} >> outgroup_bundle0.fa
+samtools consensus -f fasta -r chr1:103456163-103571526 --min-MQ 20 --min-BQ 20 --line-len 1000000 \
+${BAM} | tail -n 1 >>  outgroup_bundle0.fa
+echo '>'${SAMPLE} >> outgroup_bundle1.fa
+samtools consensus -f fasta -r chr1:103760698-103863980 --min-MQ 20 --min-BQ 20 --line-len 1000000 \
+${BAM} | tail -n 1 >>  outgroup_bundle1.fa
+done
+cd ../fasta
+cp bundle0.fa bundle0_with_outgroup.fa
+cat ../outgroup/outgroup_bundle0.fa >> bundle0_with_outgroup.fa
+cp bundle1.fa bundle1_with_outgroup.fa
+cat ../outgroup/outgroup_bundle1.fa >> bundle1_with_outgroup.fag
+```
 
 ## Multiple sequence alignment and tree construction (with kalign3 and iqtree)
 
 ```{bash eval=FALSE}
+cd /global/scratch/users/nicolas931010/amylase_diversity_project/HPRC_AMY_Sequences/bundle_tree
 ## Set up kalign and iqtree
-conda activate base
-mamba create -c bioconda -n kalign3 kalign3 iqtree
+# mamba create -c bioconda -n kalign3 kalign3 iqtree
+# mamba create -c bioconda -c conda-forge -n iqtree iqtree=2.2.2.3
 ## Run kalign and iqtree
-for BUNDLE in {0..7}; do
+for BUNDLE in 0 1; do
 echo '#!/bin/bash
 source ~/.bashrc
 conda activate kalign3
-cat fasta/bundle'${BUNDLE}'.fa | kalign -o kalign/bundle'${BUNDLE}'.afa &> kalign/bundle'${BUNDLE}'.log
-iqtree -s kalign/bundle'${BUNDLE}'.afa --prefix iqtree/bundle'${BUNDLE}' -nt 10' | \
+cat fasta/bundle'${BUNDLE}'_with_outgroup.fa | kalign -o kalign/bundle'${BUNDLE}'_with_outgroup.afa &> kalign/bundle'${BUNDLE}'_with_outgroup.log' | \
 sbatch \
 --time=4320 \
 --nodes=1 \
 --cpus-per-task=10 \
 --account=co_genomicdata \
---partition=savio3_htc \
+--partition=savio4_htc \
+--qos=savio_lowprio \
+--output=logs/kalign/bundle${BUNDLE}-%j.log
+done
+
+## extract the part of bundle 1 that is upstream of the recombination hotspot as bundle 1a
+# mamba create -c bioconda -c conda-forge -n seqkit seqkit
+conda activate seqkit
+seqkit subseq -r 1:66000 kalign/bundle1_with_outgroup.afa > kalign/bundle1a_with_outgroup.afa
+conda deactivate
+
+for BUNDLE in 0 1a; do
+echo '#!/bin/bash
+source ~/.bashrc
+conda activate iqtree
+iqtree -s kalign/bundle'${BUNDLE}'_with_outgroup.afa --prefix iqtree/bundle'${BUNDLE}'_with_outgroup -nt 10
+iqtree -s kalign/bundle'${BUNDLE}'_with_outgroup.afa -te iqtree/bundle'${BUNDLE}'_with_outgroup.treefile --prefix iqtree/bundle'${BUNDLE}'_with_outgroup -nt 10 --date outgroup/bundle'${BUNDLE}'_date.txt --date-root -650000 -o "Altai,Chagyrskaya,Denisova,Vindija" --date-options "-l 0 -u 1" -undo' | \
+sbatch \
+--time=4320 \
+--nodes=1 \
+--cpus-per-task=10 \
+--account=co_genomicdata \
+--partition=savio4_htc \
 --qos=savio_lowprio \
 --output=logs/kalign/bundle${BUNDLE}-%j.log
 done
 
 #cat fasta/bundle'${BUNDLE}'.fa | kalign --type dna --nthreads 20 -f fasta > kalign/bundle'${BUNDLE}'.afa
+#iqtree -te iqtree/bundle1a_with_outgroup.treefile --prefix iqtree/bundle1a_with_outgroup -nt 4 --date-root -650000 -o "Altai,Chagyrskaya,Denisova,Vindija" -s kalign/bundle1a_with_outgroup.afa --date outgroup/bundle1a_date.txt -undo --date-options "-l 0 -u 1" 
 
+#--date-outlier 3
 ```
 
 ## Tree visualization
 
-```{r}
+```{r eval=TRUE}
 bundle_count_by_contig <- bundle_loc %>%
   group_by(chrom, name) %>%
   summarise(copy_number=n()) %>%
@@ -262,8 +309,8 @@ opposing_trees <- function(p1, p2, join_line_by){
   <summary>Show figures</summary>
 
 ```{r fig.height=8, fig.width=15}
-for (i in 0:7){
-  dna <- read_fasta(str_c("kalign/bundle",i, ".afa"))
+for (i in 0:1){
+  dna <- read_fasta(str_c("kalign/bundle",i, "_with_outgroup.afa"))
   #spider::checkDNA(dna) %>%
   #  as.vector() %>%
   #  hist()
@@ -276,25 +323,73 @@ for (i in 0:7){
 
 </details>
 
+#### Ancestral state reconstruction
+
+```{r fig.width=6, fig.height=6}
+for (bundle in c("0", "1a")){
+  bundle_treedata <-str_c("iqtree/bundle", bundle, "_with_outgroup.timetree.nwk") %>%
+    read.tree() %>%
+    combine_tree_data() %>%
+    mutate(AMY1=ifelse(is.na(AMY1), 1, AMY1)) %>%
+    mutate(AMY2A=ifelse(is.na(AMY2A), 1, AMY2A)) %>%
+    mutate(AMY2B=ifelse(is.na(AMY2B), 1, AMY2B))
+  for (gene in c("AMY1", "AMY2A", "AMY2B")){
+    bundle_tip_data <- bundle_treedata %>%
+      as_tibble() %>%
+      filter(!is.na(label)) %>%
+      transmute(node=node, trait=get(gene), label=label)
+    bundle_trait <- bundle_tip_data %>%
+      mutate(trait = set_names(trait, label)) %>%
+      pull(trait)
+    bundle_fit <- phytools::fastAnc(as.phylo(bundle_treedata), bundle_trait, vars = TRUE, CI = TRUE)
+    bundle_node_data <- data.frame(node = names(bundle_fit$ace), trait = bundle_fit$ace)
+    bundle_combined_data <- rbind(dplyr::select(bundle_tip_data, -label), bundle_node_data)
+    bundle_combined_data$node <- as.numeric(bundle_combined_data$node)
+    tree <- full_join(bundle_treedata, bundle_combined_data, by = 'node')
+    tree_without_outgroup <- tree %>% treeio::drop.tip(tip = c("Altai","Chagyrskaya", "Denisova", "Vindija"))
+    amy_ace_tree <- ggtree(
+      tree_without_outgroup, 
+      aes(color = trait), 
+      layout = 'circular', 
+      ladderize = TRUE, continuous = "color", size = 1.5) +
+      geom_tiplab(aes(label=trait), hjust = -1) +
+      #scale_color_viridis_c(name = "AMY2A") + 
+      scico::scale_color_scico(palette = "bilbao", name = gene, begin = 0.05, limits=c(0, NA), midpoint = NA, direction = 1) + 
+      #scale_color_gradient2(name = gene, limits=c(0, 9), midpoint = 3, low = "white", mid = "darkred", high = "darkblue")
+      #xlim(0, 0.0007) + 
+      theme(
+        legend.position = c(0.05, 0.85),
+        legend.text = element_text(size = 10),
+        legend.title = element_text(size = 15)
+      )
+    print(amy_ace_tree)
+    ggsave(str_c("figures/bundle", bundle, "_", gene, "_ace_tree.pdf"), amy_ace_tree, width = 6, height = 6)
+  }
+}
+```
+
 #### Rectangular
 
-Bundle 0 as an example
+Bundle 0
 
 ```{r fig.height=12, fig.width=10}
 ## with haplotype names
-bundle0_tree <- str_c("iqtree/bundle", 0, ".treefile") %>%
+bundle0_tree <- str_c("iqtree/bundle", 0, "_with_outgroup.timetree.nwk") %>%
   read.tree() %>%
-  combine_tree_data() %>%
+  combine_tree_data() %>% 
   plot_tree("rectangular", "bundle0")
 bundle0_tree +
-  geom_tiplab(aes(label=chrom), align = TRUE, size = 3, hjust = -0.05) +
-  xlim_tree(0.001)
+  geom_tiplab(aes(label=ifelse(is.na(chrom), label, chrom)), align = TRUE, size = 3, hjust = 0, offset = 0.00002) +
+  xlim_tree(0.0015)
 ## with amy copy numbers
 bundle0_histo_dots <- bundle_info %>%
   filter(name=="0") %>%
   left_join(hap_struc_table, by=c("chrom"="contig")) %>%
   dplyr::select(label, hap_struc_d) %>%
-  left_join(histo_dots, by = "hap_struc_d")
+  left_join(histo_dots, by = "hap_struc_d") %>%
+  bind_rows(tibble(label=rep(c("Altai", "Chagyrskaya", "Denisova", "Vindija"), each=3),
+                   name=rep(c("AMY1", "AMY2A", "AMY2B"),times=4),
+                   index=rep(1:3, times=4)))
 bundle0_histo_dots_plot <- bundle0_histo_dots %>%
   ggplot(aes(x=index, y=label, fill=name, shape=name)) +
   geom_point(size=3) +
@@ -305,10 +400,46 @@ bundle0_histo_dots_plot <- bundle0_histo_dots %>%
   theme(axis.text.y = element_blank())
 bundle0_tree_with_gene_count <- bundle0_histo_dots_plot %>%
   aplot::insert_left(bundle0_tree +
-                       geom_tiplab(mapping = aes(label=amy_copy_number), align = TRUE, size = 3, hjust = -0.3, offset = 0.00002) +
-                       xlim_tree(0.00055), width = 2.5)
+                       geom_tiplab(mapping = aes(label=ifelse(is.na(amy_copy_number), "1-1-0-1", amy_copy_number)), align = TRUE, size = 3, hjust = -0.1, offset = 0.00002) +
+                       xlim_tree(0.0007), width = 2.5)
 bundle0_tree_with_gene_count
 ggsave("figures/bundle0_tree_with_gene_count.pdf", bundle0_tree_with_gene_count, height = 12, width = 10, units = "in")
+```
+
+Bundle 1a
+
+```{r fig.height=12, fig.width=10}
+## with haplotype names
+bundle1a_tree <- str_c("iqtree/bundle", "1a", "_with_outgroup.timetree.nwk") %>%
+  read.tree() %>%
+  combine_tree_data() %>% 
+  plot_tree("rectangular", "bundle1a")
+bundle1a_tree +
+  geom_tiplab(aes(label=ifelse(is.na(chrom), label, chrom)), align = TRUE, size = 3, hjust = 0, offset = 0.00002) +
+  xlim_tree(0.0015)
+## with amy copy numbers
+bundle1a_histo_dots <- bundle_info %>%
+  filter(name=="1") %>%
+  left_join(hap_struc_table, by=c("chrom"="contig")) %>%
+  dplyr::select(label, hap_struc_d) %>%
+  left_join(histo_dots, by = "hap_struc_d") %>%
+  bind_rows(tibble(label=rep(c("Altai", "Chagyrskaya", "Denisova", "Vindija"), each=3),
+                   name=rep(c("AMY1", "AMY2A", "AMY2B"),times=4),
+                   index=rep(1:3, times=4)))
+bundle1a_histo_dots_plot <- bundle1a_histo_dots %>%
+  ggplot(aes(x=index, y=label, fill=name, shape=name)) +
+  geom_point(size=3) +
+  scale_shape_manual(values = 22:25) +
+  scale_fill_manual(values = amy_color) +
+  ggnewscale::new_scale_fill() +
+  theme_void() +
+  theme(axis.text.y = element_blank())
+bundle1a_tree_with_gene_count <- bundle1a_histo_dots_plot %>%
+  aplot::insert_left(bundle1a_tree +
+                       geom_tiplab(mapping = aes(label=ifelse(is.na(amy_copy_number), "1-1-0-1", amy_copy_number)), align = TRUE, size = 3, hjust = -0.1, offset = 0.00002) +
+                       xlim_tree(0.0008), width = 2.5)
+bundle1a_tree_with_gene_count
+ggsave("figures/bundle1a_tree_with_gene_count.pdf", bundle1a_tree_with_gene_count, height = 12, width = 10, units = "in")
 ```
 
 ```{r fig.height=8, fig.width=15}
@@ -395,18 +526,19 @@ ggsave("figures/bundle0_opposing_trees.pdf", bundle0_opposing_trees, width = 8, 
 
 ```{r fig.width=8, fig.height=8}
 bundle1_window1 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(00001:51722) %>%
+  read_fasta(00001:70018) %>%
   nj_tree() %>%
   combine_tree_data() %>%
   plot_tree("rectangular", str_c("The first vs. second half of bundle 1")) +
   geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
 bundle1_window2 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(51723:103444) %>%
+  read_fasta(70019:103444) %>%
   nj_tree() %>%
   combine_tree_data() %>%
   ggtree()+
   geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
-bundle1_opposing_trees <- opposing_trees(bundle1_window1 %>% ggtree::rotate(151), bundle1_window2 %>% ggtree::rotate(92) %>% ggtree::rotate(143), label)
+bundle1_opposing_trees <- opposing_trees(bundle1_window1 %>% ggtree::rotate(94) %>% ggtree::rotate(120) %>% ggtree::rotate(125) %>% ggtree::rotate(128), 
+                                         bundle1_window2 %>% ggtree::rotate(92) %>% ggtree::rotate(93) %>% ggtree::rotate(134), label)
 bundle1_opposing_trees
 ggsave("figures/bundle1_opposing_trees.pdf", bundle1_opposing_trees, width = 8, height = 8, unit="in")
 ```
@@ -415,21 +547,53 @@ ggsave("figures/bundle1_opposing_trees.pdf", bundle1_opposing_trees, width = 8, 
 
 ```{r fig.width=8, fig.height=8}
 bundle0_window2 <- str_c("kalign/bundle", 0, ".afa") %>%
-  read_fasta(57843:115684) %>%
+  read_fasta(00001:115684) %>%
   nj_tree() %>%
   combine_tree_data() %>%
-  plot_tree("rectangular", str_c("Second half of bundle 0 vs. First half of bundle 1")) +
-  geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
+  plot_tree("rectangular", str_c("Bundle 0 vs. First half of bundle 1")) 
 bundle1_window1 <- str_c("kalign/bundle", 1, ".afa") %>%
-  read_fasta(00001:51722) %>%
+  read_fasta(00001:70018) %>%
   nj_tree() %>%
   combine_tree_data() %>%
   ggtree() 
-bundle0_vs_bundle1_opposing_trees <- opposing_trees(bundle0_window2 %>% ggtree::rotate(142) %>% ggtree::rotate(151), 
-               bundle1_window1 %>% ggtree::rotate(113) %>% ggtree::rotate(158), 
-               chrom)
+bundle0_vs_bundle1_opposing_trees <- opposing_trees(bundle0_window2 +
+                                                      geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2) %>% 
+                                                      ggtree::rotate(92) %>% ggtree::rotate(93) %>% ggtree::rotate(129) %>% ggtree::rotate(133) %>% ggtree::rotate(155) %>% ggtree::rotate(164), 
+                                                    bundle1_window1 %>% 
+                                                      ggtree::rotate(94) %>% ggtree::rotate(120) %>% ggtree::rotate(125) %>% ggtree::rotate(128), 
+                                                    chrom)
 bundle0_vs_bundle1_opposing_trees
 ggsave("figures/bundle0_vs_bundle1_opposing_trees.pdf", bundle0_vs_bundle1_opposing_trees, width = 8, height = 8, unit="in")
+```
+
+#### Plot with 3 trees
+
+```{r fig.width=15, fig.height=8}
+p1 <- bundle0_window2 %>% ggtree::rotate(92) %>% ggtree::rotate(93) %>% ggtree::rotate(129) %>% ggtree::rotate(133) %>% ggtree::rotate(155) %>% ggtree::rotate(164)
+p2 <- bundle1_window1 %>% ggtree::rotate(94) %>% ggtree::rotate(120) %>% ggtree::rotate(125) %>% ggtree::rotate(128)
+p3 <- bundle1_window2 %>% ggtree::rotate(92) %>% ggtree::rotate(93) %>% ggtree::rotate(134)
+d1 <- p1$data
+d2 <- p2$data
+d3 <- p3$data
+## reverse x-axis and 
+## set offset to make the tree on the right-hand side of the first tree
+d2$x <- max(d2$x) - d2$x + max(d1$x) + 0.00015
+d3$x <- max(d3$x) - d3$x + max(d2$x) + 0.00015
+
+pp <- p1 + 
+  geom_tree(data=d2, layout='rectangular') +
+  geom_tree(data=d3, layout='rectangular') +
+  #geom_text2(data=d2, aes(subset=!isTip, label=node), hjust=-.3, size=2) +
+  geom_tippoint(data=d2, mapping = aes(fill=group), size=3, color="black", shape = 21) +
+  geom_tippoint(data=d3, mapping = aes(fill=group), size=3, color="black", shape = 21) 
+dd <- bind_rows(d1, d2, d3) %>% 
+  filter(!is.na(label))
+pp + 
+  geom_line(aes(x, y, group=chrom, color=group), data=dd, size = 0.3) +
+  scale_color_manual(values = group_color) +
+  scale_fill_manual(values = group_color) +
+  theme(legend.position = "none",
+        title = element_blank())
 ```
 
 #### Trees in sliding windows in bundle 2
