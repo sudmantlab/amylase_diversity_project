@@ -67,6 +67,7 @@ library(Rcpp)
   t_gt_count %>% filter(!(dataset %in% c("StoneAgeAncient","Archaic")))
   
   t_gt_count %>% filter(dataset %in% c("StoneAgeAncient"))
+  t_gt_count %>% filter(dataset %in% c("SGDP"))
   
 ```
 
@@ -81,19 +82,22 @@ t_plot = t_gt %>%
           filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
           separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
           filter(dataset!="StoneAgeAncient") %>%
-          group_by(p1,p2,label) %>%
+          group_by(p2,label) %>%
+          mutate(p2_mu = mean(cp)) %>%
+          ungroup() %>%
+          group_by(p1,p2,p2_mu,label) %>%
           mutate(n_total=n(),
                  mu = mean(cp),
                  sdev = sd(cp)) %>%
           mutate(serr = sdev/sqrt(n_total)) %>%
           mutate(plabel = paste(p1," (",n_total,")",sep="")) %>%
-          group_by(p1,plabel,cp,p2,label,n_total,mu,serr) %>%
+          group_by(p1,plabel,cp,p2,label,n_total,mu,serr,p2_mu) %>%
           summarize(n=n()) %>%
           mutate(prop=n/n_total) %>%
           mutate(super_pop = ifelse(p1 %in% c("Denisova","Neanderthal"), "archaic","modern")) %>%
-          mutate(p2 = ifelse(super_pop=="archaic","ARC",p2))
+          mutate(p2 = ifelse(super_pop=="archaic","ARC",p2)) 
 
-##NOTE THERE ARE MORE! I just filtered out a bunch!
+s##NOTE THERE ARE MORE! I just filtered out a bunch!
 
 unique(t_plot$p2)
 
@@ -170,7 +174,8 @@ p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
 
 
 df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
-                     ps = c(p_A1, p_A2A,p_A2B)) %>%
+                     ps = c(p_A1, p_A2A,p_A2B),
+                     xs = c(16,16,16)) %>%
             mutate(plabel=paste("P==",signif(ps,2)))
 
 g=ggplot(t_data_by_sub)
@@ -192,7 +197,7 @@ g=g+geom_point(aes(x=type_label,y=cp,size=prop,color=type),alpha=0.5)+
   geom_errorbar(aes(x=type_label,ymin=mu-serr,ymax=mu+serr),size=1,width=0,position=position_nudge(x=0.3),data=t_sum_stats)+
   geom_point(aes(x=type_label,y=mu),shape=18,size=2,position=position_nudge(x=0.3),data=t_sum_stats)+
   geom_point(aes(x=type_label,y=mu),color="white",shape=18,size=1,position=position_nudge(x=0.3),data=t_sum_stats)+
-  geom_text(aes(x=1,y=16,label=plabel),data=df_labs,parse=TRUE,size=3)+
+  geom_text(aes(x=1,y=xs,label=plabel),data=df_labs,parse=TRUE,size=3)+
   theme_bw(base_size=10)+
   facet_wrap(~label,ncol=1,strip.position="right")+
   scale_color_brewer(palette="Spectral")+
@@ -212,55 +217,54 @@ dev.off()
 
 
 
-
-
-t_data_by_sub_AG_breakdown = t_gt %>% 
-          filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
-          separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
-          inner_join(t_subsistence_breakdown_AG, on="p1") %>%
-          mutate(prop_ag = name) %>%
-  mutate(prop_ag_val = case_when(prop_ag == "0-5%" ~ 5,
-                                         prop_ag == "6-15%" ~ 15,
-                                         prop_ag == "16-25%" ~ 25,
-                                         prop_ag == "26-35%" ~ 35,
-                                         prop_ag == "36-45%" ~ 45,
-                                         prop_ag == "46-55%" ~ 55,
-                                         prop_ag == "56-65%" ~ 65,
-                                         prop_ag == "66-75%" ~ 75,
-                                         prop_ag == "76-85%" ~ 85,
-                                         prop_ag == "86-100%" ~ 100
-                                         )) 
-          
-
-
-t_plot_by_sub_AG_breakdown = t_data_by_sub_AG_breakdown %>%
-                ungroup() %>%
-                group_by(prop_ag,prop_ag_val,label) %>%
-                mutate(n_total=n(),
-                    mu = mean(cp),
-                    sdev = sd(cp)) %>%
-          mutate(serr = sdev/sqrt(n_total)) %>%
-          #mutate(type_label = paste(type," (",n_total,")",sep="")) %>%
-          group_by(cp,label,n_total,mu,serr,prop_ag,prop_ag_val) %>%
-          summarize(n=n()) %>%
-          mutate(prop=n/n_total)
-          
-
-t_sum_stats = t_plot_by_sub %>% 
-              ungroup() %>%
-              dplyr::select(type_label,mu,serr,type,label,simple_type) %>%
-              unique()
-unique(t_plot_by_sub_AG_breakdown$prop_ag)
-g=ggplot(t_plot_by_sub_AG_breakdown)
-g+geom_point(aes(x=prop_ag_val,y=cp,size=prop),alpha=0.5)+
-  geom_smooth(aes(x=prop_ag_val,y=cp),alpha=0.5,data=t_data_by_sub_AG_breakdown,method='lm')+
-  stat_summary(aes(x=prop_ag_val,y=cp),color='red')+
-  theme_bw(base_size=10)+
-  facet_wrap(~label,ncol=1,strip.position="right")+
-  scale_color_brewer(palette="Spectral")+
-  theme(legend.position="Non")+
-  theme(strip.background = element_blank())+
-  scale_size(range=c(2,5))
+# t_data_by_sub_AG_breakdown = t_gt %>% 
+#           filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
+#           separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
+#           inner_join(t_subsistence_breakdown_AG, on="p1") %>%
+#           mutate(prop_ag = name) %>%
+#   mutate(prop_ag_val = case_when(prop_ag == "0-5%" ~ 5,
+#                                          prop_ag == "6-15%" ~ 15,
+#                                          prop_ag == "16-25%" ~ 25,
+#                                          prop_ag == "26-35%" ~ 35,
+#                                          prop_ag == "36-45%" ~ 45,
+#                                          prop_ag == "46-55%" ~ 55,
+#                                          prop_ag == "56-65%" ~ 65,
+#                                          prop_ag == "66-75%" ~ 75,
+#                                          prop_ag == "76-85%" ~ 85,
+#                                          prop_ag == "86-100%" ~ 100
+#                                          )) 
+#           
+# 
+# 
+# t_plot_by_sub_AG_breakdown = t_data_by_sub_AG_breakdown %>%
+#                 ungroup() %>%
+#                 group_by(prop_ag,prop_ag_val,label) %>%
+#                 mutate(n_total=n(),
+#                     mu = mean(cp),
+#                     sdev = sd(cp)) %>%
+#           mutate(serr = sdev/sqrt(n_total)) %>%
+#           #mutate(type_label = paste(type," (",n_total,")",sep="")) %>%
+#           group_by(cp,label,n_total,mu,serr,prop_ag,prop_ag_val) %>%
+#           summarize(n=n()) %>%
+#           mutate(prop=n/n_total)
+#           
+# 
+# t_sum_stats = t_plot_by_sub %>% 
+#               ungroup() %>%
+#               dplyr::select(type_label,mu,serr,type,label,simple_type) %>%
+#               unique()
+# unique(t_plot_by_sub_AG_breakdown$prop_ag)
+# g=ggplot(t_plot_by_sub_AG_breakdown)
+# g+geom_point(aes(x=prop_ag_val,y=cp,size=prop),alpha=0.5)+
+#   geom_smooth(aes(x=prop_ag_val,y=cp),alpha=0.5,data=t_data_by_sub_AG_breakdown,method='lm')+
+#   stat_summary(aes(x=prop_ag_val,y=cp),color='red')+
+#   theme_bw(base_size=10)+
+#   facet_wrap(~label,ncol=1,strip.position="right")+
+#   scale_color_brewer(palette="Spectral")+
+#   theme(legend.position="Non")+
+#   theme(strip.background = element_blank())+
+#   scale_size(range=c(2,5))
+# 
 
 
 
@@ -272,11 +276,21 @@ g+geom_point(aes(x=prop_ag_val,y=cp,size=prop),alpha=0.5)+
 ```{r}
 t_plot$super_pop = factor(t_plot$super_pop, levels = c("modern","archaic"))
 
-t_sum = t_plot %>% 
+t_plot_subset = t_plot %>% 
+                  filter((n_total>=8)|(super_pop=="archaic"))
+
+
+order = (t_plot_subset %>% ungroup() %>% filter(label=="AMY1") %>% dplyr::select(p2,p2_mu) %>% arrange(-p2_mu) %>% unique())$p2
+t_plot_subset$p2 = factor(t_plot_subset$p2,levels = order)
+
+
+
+t_sum = t_plot_subset %>% 
           dplyr::select(p1,plabel,p2,label,mu,serr,super_pop) %>%
           unique() %>%
           filter(label=="AMY1")
           
+
 min_size = 0.01
 max_size = 1.5
 
@@ -286,21 +300,25 @@ df_vline = data.frame(x=c(min((t_sum %>% filter(super_pop!="archaic"))$mu),
 
 df_vline$super_pop = factor(df_vline$super_pop, levels = c("modern","archaic"))
 
+df_vline_p2mu = t_plot_subset %>% filter(label=="AMY1") %>% dplyr::select(p2,p2_mu,label) %>% unique()
+
 
 max(t_sum$mu)
-g=ggplot(t_plot %>% filter(label == "AMY1"))
+g=ggplot(t_plot_subset %>% filter(label == "AMY1"))
 g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   geom_errorbarh(aes(xmin=mu-serr,xmax=mu+serr,y=reorder(plabel,mu)),size=.05,height=0,data=t_sum)+
   geom_point(aes(x=mu,y=reorder(plabel,mu)),shape=18,data=t_sum,size=.5)+
   geom_point(aes(x=mu,y=reorder(plabel,mu),color=p2),shape=18,data=t_sum,size=.05)+
   geom_vline(aes(xintercept=x),data=df_vline,linetype='85',size=.1,alpha=.75)+
+  geom_vline(aes(xintercept=p2_mu),data=df_vline_p2mu,linetype='85',size=.3,alpha=.75,color='red')+
   #stat_summary(aes(x=gt,y=reorder(p1,gt),color=p2),size=.1)+
   theme_bw(base_size=2)+
   scale_color_manual("",values=colors)+
   theme(legend.key.size=unit(0.5,"cm"))+
   scale_size(range=c(min_size,max_size))+
   scale_x_continuous(breaks=seq(0,20,2))+
-  facet_grid(super_pop~.,space="free",scales="free_y")+
+  #facet_grid(super_pop~.,space="free",scales="free_y")+
+  facet_grid(p2~.,space="free",scales="free_y")+
   theme(strip.background = element_blank(),
         strip.text = element_text(size=1),
         legend.position="None")+
@@ -308,12 +326,13 @@ g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   #scale_color_brewer(palette="BuGn")
 
 fn_out = "./output_figures/main_figs/genotype_by_pop_1.pdf"
-pdf(fn_out,width=1.5,height=3.5)
+#pdf(fn_out,width=1.5,height=3.5)
+pdf(fn_out,width=1.5,height=2.5)
 print(g)
 dev.off()
 
 
-t_sum = t_plot %>% 
+t_sum = t_plot_subset %>% 
           dplyr::select(p1,plabel,p2,label,mu,serr,super_pop) %>%
           unique() %>%
           filter(label=="AMY2A")
@@ -326,7 +345,7 @@ df_vline$super_pop = factor(df_vline$super_pop, levels = c("modern","archaic"))
 
           
 
-g=ggplot(t_plot %>% filter(label == "AMY2A"))
+g=ggplot(t_plot_subset %>% filter(label == "AMY2A"))
 g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   geom_errorbarh(aes(xmin=mu-serr,xmax=mu+serr,y=reorder(plabel,mu)),size=.05,height=0,data=t_sum)+
   geom_point(aes(x=mu,y=reorder(plabel,mu)),shape=18,data=t_sum,size=.5)+
@@ -352,7 +371,7 @@ dev.off()
 
 
 
-t_sum = t_plot %>% 
+t_sum = t_plot_subset %>% 
           dplyr::select(p1,plabel,p2,label,mu,serr,super_pop) %>%
           unique() %>%
           filter(label=="AMY2B")
@@ -362,9 +381,8 @@ df_vline = data.frame(x=c(min((t_sum %>% filter(super_pop!="archaic"))$mu),
                       super_pop = c('modern','modern'))
 
 df_vline$super_pop = factor(df_vline$super_pop, levels = c("modern","archaic"))
-          
 
-g=ggplot(t_plot %>% filter(label == "AMY2B") )
+g=ggplot(t_plot_subset %>% filter(label == "AMY2B") )
 g=g+geom_point(aes(x=cp,y=reorder(plabel,mu),size=prop,color=p2),alpha=.5)+
   geom_errorbarh(aes(xmin=mu-serr,xmax=mu+serr,y=reorder(plabel,mu)),size=.05,height=0,data=t_sum)+
   geom_point(aes(x=mu,y=reorder(plabel,mu)),shape=18,data=t_sum,size=.5)+
@@ -742,7 +760,7 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
   
   
   g=ggplot(t_gt_renamed_age %>% filter(label == curr_gene))
-  g=g+geom_point(aes(x=-age,y=cp,color=p2),alpha=.5,position=pos ition_jitter(width=0,height=.2),size=.5)+
+  g=g+geom_point(aes(x=-age,y=cp,color=p2),alpha=.5,position=position_jitter(width=0,height=.2),size=.5)+
     geom_plot(data = data.tb, aes(x, y, label = plot)) +
     geom_smooth(aes(x=-age,y=cp),alpha=.5,color="red",size=.5)+
     scale_color_manual("",values=colors)+
