@@ -30,6 +30,7 @@ rule make_d4:
         "d4_files/1KG_trios/q0/{name}.{run_id}.{pop}.d4"
     run:
         d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
+        d4_tools = "/global/scratch/users/psudmant/software/d4-format/target/release/d4tools"
         path = "{path}/{run_id}/{name}.final.cram".format(path=config['path'],
                                                           run_id=wildcards.run_id,
                                                           name=wildcards.name)

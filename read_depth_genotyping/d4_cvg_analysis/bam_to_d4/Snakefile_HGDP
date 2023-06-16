@@ -8,7 +8,7 @@ def get_inputs(wildcards):
     inputs = [] 
     for p in config['sample_paths']:
         s = p.split("/")[-1].replace(".cram","") 
-        inputs.append("d4_files/SGDP/q0/{sample}.d4".format(sample=s))
+        inputs.append("d4_files/HGDP/q0/{sample}.d4".format(sample=s))
                                                                  
     return inputs
 
@@ -22,6 +22,7 @@ rule make_d4:
         "d4_files/HGDP/{mapq}/{sample}.d4"
     run:
         d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
+        d4_tools = "/global/scratch/users/psudmant/software/d4-format/target/release/d4tools"
         id,build,date,pop = wildcards.sample.split(".")
         path = "{path}/{pop}/{id}/alignment/{sample}.cram".format(path=config['path'],
                                                                   pop=pop,

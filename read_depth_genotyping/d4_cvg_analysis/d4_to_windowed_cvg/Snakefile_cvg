@@ -72,7 +72,8 @@ rule get_cvg:
     run:
         d4_tools = "/global/scratch/users/psudmant/software/d4-format//target/release/d4tools"
         path = config['sample_paths'][wildcards.sample]
-        locus_inf = config['loci'][wildcards.locus]
+        locus_inf = config['loci'][wildcards.locus]\
+        #print(locus_inf)
         locus_coords = "{c}:{s}-{e}".format(c=locus_inf['contig'],
                                             s=locus_inf['start'],
                                             e=locus_inf['end'])
