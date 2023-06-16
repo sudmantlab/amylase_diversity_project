@@ -60,12 +60,30 @@ pop_to_region = {"ACB":"AMR",
 
 rule all:
     input:
-        #"configs/allsamples_config.json"
+        "configs/allsamples_config.json",
         "configs/SGDPsamples.json",
         "configs/HGDPsamples.json",
         "configs/1kgsamples.json",
         "configs/1kg_trios.json",
         "configs/ancientsamples.json"
+
+rule combine:
+    input:
+        "configs/SGDPsamples.json",
+        "configs/HGDPsamples.json",
+        "configs/1kgsamples.json",
+        "configs/1kg_trios.json",
+        "configs/ancientsamples.json"
+    output:
+        "configs/allsamples_config.json"
+    run:
+        config_all = {"sample_paths":{}}
+
+        for fn in input:
+            j = json.load(open(fn,"r"))
+            config_all['sample_paths'].update(j['sample_paths'])
+
+        open(output[0],"w").write(json.dumps(config_all, indent=4, sort_keys=True))
 
 
 
@@ -167,7 +185,34 @@ rule make_1kg_config:
         open(output[0],"w").write(json.dumps(config_1kg, indent=4, sort_keys=True))
         open(output[1],"w").write(json.dumps(config_1kg_trio, indent=4, sort_keys=True))
         
-
+#rule make_hg19_AGDP:
+#    output:
+#        "configs/AGDP_hg19.json"
+#        mapq = "q0"        
+#
+#        config_ancient = {"sample_paths":{}} 
+#
+#        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+#        
+#        t_AGDP = pd.read_csv("../bam_to_d4/meta_data/AGDP.metadata.txt", header=0,sep="\t")
+#        AGDP_inf = {}
+#        for i, row in t_AGDP.iterrows():
+#            print(row['I-ID'])
+#            AGDP_inf[row['I-ID']] = {"pop":row["MAIN_CLUSTER"],
+#                                     "region":row["Country"].replace(" ", "")}
+#
+#        for sample_path in glob.glob("{path}/ReichAncients_agdp_subset_hg19/{mapq}/*".format(path=d4_path,mapq=mapq)):
+#            sample = sample_path.split("/")[-1].split(".")[0] 
+#            sample_inf = AGDP_inf[sample]
+#            pop = sample_inf["region"].replace("(","").replace(")","")
+#            region = sample_inf["popGrouping"].replace(" ","").replace("(","").replace(")","")
+#            sample_name = "StoneAgeAncient.{ID}.{E}.{R}".format(ID=sample,
+#                                                                E=pop,
+#                                                                R=region)
+#            config_ancient["sample_paths"][sample_name] = sample_path
+#            #StoneAgeAncient.NEO113.CentralEasternEurope.Hunter-GathererE
+#
+    
 
 rule make_ancient_config:
     output:
@@ -190,14 +235,23 @@ rule make_ancient_config:
             config_ancient["sample_paths"][sample_name] = sample_path
             #StoneAgeAncient.NEO113.CentralEasternEurope.Hunter-GathererE
 
+
+
+        t_excoffier = pd.read_csv("../bam_to_d4/meta_data/ExcoffierAncients.tsv", header=0,sep="\t")
+        ex_inf = {}
+        for i, row in t_excoffier.iterrows():
+            print(row['SAMPLE_ID'])
+            ex_inf[row['SAMPLE_ID']] = {"pop":row["MAIN_CLUSTER"],
+                                       "region":row["COUNTRY"]}
+
         for sample_path in glob.glob("{path}/ExcoffierAncients/{mapq}/*".format(path=d4_path,mapq=mapq)):
             sample = sample_path.split("/")[-1].split(".")[0] 
-            sample_inf = config[sample]
-            pop = sample_inf["region"].replace("(","").replace(")","")
-            region = sample_inf["popGrouping"].replace(" ","").replace("(","").replace(")","")
+            sample_inf = ex_inf[sample]
+            pop = sample_inf["pop"]
+            region = sample_inf["region"]
             #ExcoffierAncient.VLASA7-3.Serbia.Hunter-GathererE
-            sample_name = "ExcoffierAncient.{ID}.{E}.{R}".format(ID=sample,
-                                                                E=pop,
+            sample_name = "ExcoffierAncient.{ID}.{R}.{P}".format(ID=sample,
+                                                                P=pop,
                                                                 R=region)
             config_ancient["sample_paths"][sample_name] = sample_path
 
@@ -215,6 +269,9 @@ rule make_ancient_config:
                                                         E=pop,
                                                         R=region)
             config_ancient["sample_paths"][sample_name] = sample_path
+    
+
+
 
         open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
         
