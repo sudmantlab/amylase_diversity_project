@@ -44,6 +44,74 @@ def create(args):
     h5_out.close()
 
 
+def coverage(args):
+    f = pyd4.D4File(args.d4_file)
+    
+    t_inf = pd.read_csv(args.fn_stats,sep="\t", header=0)
+    corr_factor = t_inf.qmax_filt_mu[t_inf.sample==args.sample]
+
+    d4depth = f.load_to_np(args.contig)
+    w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
+    
+    locs = np.where((w_starts>=args.start)&(w_ends<=args.end))
+    w_starts = w_starts[locs]
+    w_ends = w_ends[locs]
+    windowed_mu = 2*windowed_mu[locs]/corr_factor
+    
+    t = pd.DataFrame({"contig":args.contig,
+                      "start":w_starts,
+                      "end":w_ends,
+                      "cp":windowed_mu,
+                      "sample":sample})
+
+    t.to_csv(args.fn_out,sep="\t", index=False)
+
+
+
+
+
+def stats(args):
+    #contigs = ["chr{c}".format(c=c) for c in range(23)]
+    contigs = ["chr1"]
+    #only rnus on chr 1 for now
+    contig = contigs[0]
+    f = pyd4.D4File(args.d4_file)
+    
+
+    d4depth = f.load_to_np(contig)
+    w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
+    quantiles = np.quantile(windowed_mu,q=[0,0.025,0.975,1])
+    qmax = quantiles[2]
+
+    qmax_filt_mu = np.mean(windowed_mu[windowed_mu<qmax])
+    qmax_filt_med = np.median(windowed_mu[windowed_mu<qmax])
+    qmax_filt_sd = np.sqrt(np.var(windowed_mu[windowed_mu<qmax]))
+    ##
+    b1 = (w_starts>103780000)&(w_starts<103500001)
+    b2 = (w_starts>103800000)&(w_starts<103900001)
+    x = windowed_mu[np.where(b1|b2)]
+    CTRL_region_mean = np.mean(x)
+    CTRL_region_med = np.median(x)
+    CTRL_region_sd = np.sqrt(np.var(x))
+    """ 
+    print("qmax_filt_mu:",qmax_filt_mu)
+    print("qmax_filt_med:",qmax_filt_med)
+    print("qmax_filt_sd:",qmax_filt_sd)
+    print("CTRL_region_mean:",CTRL_region_mean)
+    print("CTRL_region_med:",CTRL_region_med)
+    print("CTRL_region_sd:",CTRL_region_sd)
+    """ 
+    
+    t = pd.DataFrame([{"qmax_filt_mu":qmax_filt_mu,
+                       "qmax_filt_med":qmax_filt_med,
+                       "qmax_filt_sd":qmax_filt_sd,
+                       "CTRL_region_mean":CTRL_region_mean,
+                       "CTRL_region_med":CTRL_region_med,
+                       "CTRL_region_sd":CTRL_region_sd,
+                       "sample":args.sample}])
+    t.to_csv(args.fn_out,sep="\t", index=False)
+
+
 class h5_genome(object):
     
     def __init__(self,fn):
@@ -113,6 +181,38 @@ if __name__=="__main__":
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers() 
+    
+    #coverage
+    #parser_create = subparsers.add_parser("coverage")
+    #parser_create.add_argument("--d4_file", required=True)
+    #parser_create.add_argument("--fn_stats", required=True)
+    #parser_create.add_argument("--sample", required=True)
+    #parser_create.add_argument("--contig", required=True)
+    #parser_create.add_argument("--start", required=True)
+    #parser_create.add_argument("--end", required=True)
+    #parser_create.add_argument("--fn_out", required=True)
+    #parser_create.add_argument("-w", default=1000, type=int)
+    #parser_create.add_argument("-s", default=200, type=int)
+    #parser_create.set_defaults(func=coverage)
+
+    #genotype
+    #parser_create = subparsers.add_parser("genotype")
+    #parser_create.add_argument("--d4_file", required=True)
+    #parser_create.add_argument("--sample", required=True)
+    #parser_create.add_argument("--sample", required=True)
+    #parser_create.add_argument("--fn_out", required=True)
+    #parser_create.add_argument("-w", default=1000, type=int)
+    #parser_create.add_argument("-s", default=200, type=int)
+    #parser_create.set_defaults(func=stats)
+
+    #d4 stats
+    parser_create = subparsers.add_parser("stats")
+    parser_create.add_argument("--d4_file", required=True)
+    parser_create.add_argument("--sample", required=True)
+    parser_create.add_argument("--fn_out", required=True)
+    parser_create.add_argument("-w", default=1000, type=int)
+    parser_create.add_argument("-s", default=500, type=int)
+    parser_create.set_defaults(func=stats)
 
     #create h5
     parser_create = subparsers.add_parser("create")

@@ -1,0 +1,24 @@
+{
+    "sample_paths": {
+        "StoneAgeAncient.NEO260.NorthernEurope.Hunter-GathererW": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO260.d4",
+        "StoneAgeAncient.NEO860.NorthernEurope.Yamnaya": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO860.d4",
+        "StoneAgeAncient.NEO175.CentralEasternEurope.Yamnaya": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO175.d4",
+        "StoneAgeAncient.NEO861.NorthernEurope.Yamnaya": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO861.d4",
+        "StoneAgeAncient.NEO227.NorthernEurope.Yamnaya": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO227.d4",
+        "StoneAgeAncient.NEO228.NorthernEurope.Yamnaya": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO228.d4",
+        "StoneAgeAncient.NEO100.CentralEasternEurope.Hunter-GathererE": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO100.d4",
+        "StoneAgeAncient.NEO122.NorthernEurope.Hunter-GathererW": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO122.d4",
+        "StoneAgeAncient.NEO160.CentralEasternEurope.Hunter-GathererE": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO160.d4",
+        "StoneAgeAncient.NEO123.NorthernEurope.Hunter-GathererW": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO123.d4",
+        "StoneAgeAncient.NEO113.CentralEasternEurope.Hunter-GathererE": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO113.d4",
+        "StoneAgeAncient.NEO119.WesternEurope.EarlyFarmer": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO119.d4",
+        "StoneAgeAncient.NEO121.WesternEurope.EarlyFarmer": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO121.d4",
+        "StoneAgeAncient.NEO137.CentralEasternEurope.EarlyFarmer": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO137.d4",
+        "StoneAgeAncient.NEO140.CentralEasternEurope.EarlyFarmer": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO140.d4",
+        "StoneAgeAncient.NEO142.CentralEasternEurope.EarlyFarmer": "/global/scratch2/psudmant/projects/amylase/d4_files/StoneAgeAncients/NEO142.d4",
+        "SGDP.LP6005619-DNA_C01.Saharawi.AFR": "/global/scratch2/psudmant/projects/amylase/d4_files/SGDP/LP6005619-DNA_C01.d4",
+        "SGDP.LP6005677-DNA_A02.Kyrgyz.CAS": "/global/scratch2/psudmant/projects/amylase/d4_files/SGDP/LP6005677-DNA_A02.d4",
+        "SGDP.LP6005677-DNA_A03.Turkish.WEA": "/global/scratch2/psudmant/projects/amylase/d4_files/SGDP/LP6005677-DNA_A03.d4",
+        "SGDP.LP6005677-DNA_B01.Albanian.WEA": "/global/scratch2/psudmant/projects/amylase/d4_files/SGDP/LP6005677-DNA_B01.d4"
+    }
+}

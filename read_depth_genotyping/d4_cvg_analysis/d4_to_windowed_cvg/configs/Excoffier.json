@@ -1,0 +1,19 @@
+{
+    "sample_paths": {
+        "ExcoffierAncient.AKT16-2.Turkey.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/AKT16-2.d4",
+        "ExcoffierAncient.Asp6.Austria.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/Asp6.d4",
+        "ExcoffierAncient.BAR25-1.Turkey.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/BAR25-1.d4",
+        "ExcoffierAncient.Dil16.Germany.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/Dil16.d4",
+        "ExcoffierAncient.Ess7.Germany.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/Ess7.d4",
+        "ExcoffierAncient.Herx.Germany.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/Herx.d4",
+        "ExcoffierAncient.Klein7.Austria.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/Klein7.d4",
+        "ExcoffierAncient.LEPE48-2.Serbia.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/LEPE48-2.d4",
+        "ExcoffierAncient.LEPE52-1.Serbia.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/LEPE52-1.d4",
+        "ExcoffierAncient.Nea2.Greece.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/Nea2.d4",
+        "ExcoffierAncient.Nea3.Greece.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/Nea3.d4",
+        "ExcoffierAncient.STAR1.Serbia.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/STAR1.d4",
+        "ExcoffierAncient.VC3-2.Serbia.EarlyFarmer": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/VC3-2.d4",
+        "ExcoffierAncient.VLASA32-2.Serbia.HunterGathererE": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/VLASA32-2.d4",
+        "ExcoffierAncient.VLASA7-3.Serbia.HunterGathererE": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//ExcoffierAncients/q0/VLASA7-3.d4"
+    }
+}
