@@ -1,7 +1,8 @@
 {
 "__path":"/clusterfs/genomicdata/human_diversity/bams/1KG30X/additional_698_related/data/",
 "path":"/global/scratch/p2p3/pl1_sudmant/human_diversity/1KG30X/additional_698_related/data/",
-"fn_fai":"/global/scratch2/psudmant/tmp_download/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa.fai",
+"_fn_fai":"/global/scratch2/psudmant/tmp_download/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa.fai",
+"fn_fai":"/global/scratch/p2p3/pl1_sudmant/human_diversity/references/hg38_plus_decoy_hla/GRCh38_full_analysis_set_plus_decoy_hla.fa.fai",
 "sample_paths":[
 	"/clusterfs/genomicdata/human_diversity/bams/1KG30X/additional_698_related/data/ERR3989411/NA19249.final.cram",
 	"/clusterfs/genomicdata/human_diversity/bams/1KG30X/additional_698_related/data/ERR3988895/HG01514.final.cram",

@@ -1,0 +1,8 @@
+{
+    "sample_paths": {
+        "Archaic.Altai.Neanderthal.Europe": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//Neanderthals/q0/Altai.d4",
+        "Archaic.Chagyrskaya.Neanderthal.Europe": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//Neanderthals/q0/Chagyrskaya.d4",
+        "Archaic.Denisova.Denisova.Europe": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//Neanderthals/q0/Denisova.d4",
+        "Archaic.Vindija.Neanderthal.Europe": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//Neanderthals/q0/Vindija.d4"
+    }
+}

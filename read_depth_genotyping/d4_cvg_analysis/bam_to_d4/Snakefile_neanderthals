@@ -15,7 +15,10 @@ rule all:
     input:
         get_inputs
 
-
+###FOR THE ANCIENTS you have to do -F ~256 because all of the liitle chippy choppy alignements to mobiule elements (because short reads)
+### mess you up
+#
+#
 rule make_d4:
     output:
         "d4_files/Neanderthals/{mapq}/{sample}.d4"

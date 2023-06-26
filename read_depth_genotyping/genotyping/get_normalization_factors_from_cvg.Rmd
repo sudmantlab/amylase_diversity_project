@@ -65,7 +65,9 @@ summary_inf %>% filter(grepl("SGDP",sample))
 
 summary_inf %>% arrange(-cp_sd)
 
-select_samples = (summary_inf %>% filter(grepl("Archaic",sample)))$sample[1:10]
+#select_samples = (summary_inf %>% filter(grepl("Archaic",sample)))$sample[1:10]
+select_samples = (summary_inf %>% filter(grepl("SGDP",sample)))$sample[1:10]
+#select_samples = (summary_inf %>% filter(grepl("SGDP",sample)))$sample
 #select_samples = summary_inf %>% filter(cvg_med==0) 
 #select_samples = off_samples
 t_wnd_cvg_hist = t_wnd_cvg_subset %>% filter(sample %in% select_samples)
@@ -75,7 +77,7 @@ df_lines = data.frame(x=seq(0,6,1))
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures"
 fn_out = paste(outdir,"/control_histogram.pdf",sep="")
-pdf(fn_out,width=4,height=8)
+#pdf(fn_out,width=4,height=8)
 g=ggplot(t_wnd_cvg_hist)
 g+#geom_histogram(aes(x=2*cvg/mu),binwidth=.01)+
   geom_histogram(aes(x=cvg),binwidth=.1)+
@@ -86,8 +88,8 @@ g+#geom_histogram(aes(x=2*cvg/mu),binwidth=.01)+
   #scale_x_continuous(lim=c(0,4))+   
   theme_bw(base_size=3)+
   facet_wrap(~sample,ncol=1,scales="free")
-dev.off()
-
+#dev.off()
+print(g)
 #summary_inf_subset
 #max(t_wnd_cvg_subset$start)
 ```

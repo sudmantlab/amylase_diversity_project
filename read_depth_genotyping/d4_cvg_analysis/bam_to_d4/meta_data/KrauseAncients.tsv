@@ -1,0 +1,117 @@
+SAMPLE_ID	SAMPLE_TITLE	SEX	SITE	COUNTRY	CULTURE	MAIN_CLUSTER	POP_ID	AGE_ABS_MIN	AGE_ABS_MAX	AGE_ABS_TYPE	AGE_MIN_BP	AGE_MAX_BP	AGE_AVG_BP	DATASET	PAPER	LAT	LONG	FASTQS					
+AAT001	AA3	F	Abri des Autours	Belgium	Mesolithic	Oberkassel	AAT	9087	8550	BC	11110	10573	10841.5	KrauseAncients	PosthYuNature2023	50.2	4.89	ERR10693105,ERR10693299					
+ACR001	APP 2018 (Burial 2002)	M	Achères	France	Mesolithic	Oberkassel	ACR	7244	6995	BC	9267	9018	9142.5	KrauseAncients	PosthYuNature2023	48.96	2.07	ERR10693108,ERR10693109,ERR10693302					
+AC16	AC16	F	Arene Candide	Italy	Epigravettian	Villabruna	AC16	10801	10702	BC	12824	12725	12774.5	KrauseAncients	PosthYuNature2023	44.16	8.33	ERR10693106,ERR10693107,ERR10693300,ERR10693301					
+Bockstein	Varia I.1	F	Bockstein	Germany	Mesolithic	Oberkassel	Bockstein	6397	6339	BC	8420	8362	8391	KrauseAncients	PosthYuNature2023	48.33	10.09	ERR10693112,ERR10693113					
+Brillenhohle	OSUT 5827	M	Brillenhöhle	Germany	Magdalenian	GoyetQ2	Brillenhohle	13094	12452	BC	15117	14475	14796	KrauseAncients	PosthYuNature2023	48.24	9.46	ERR10693114,ERR10693115					
+Burkhardtshohle	Tü 33/32 420	M	Burkhardtshöhle	Germany	Magdalenian	GoyetQ2	Burkhardtshohle	13054	12138	BC	15077	14161	14619	KrauseAncients	PosthYuNature2023	48.32	9.35	ERR10693117					
+CRN001	UE 183, individual 1	M	Casa Corona	Spain	Mesolithic	Oberkassel	CRN	5951	5771	BC	7974	7794	7884	KrauseAncients	PosthYuNature2023	38.68	-0.93	ERR10693124,ERR10693306					
+CRN002	UE 182, individual 2	M	Casa Corona	Spain	Mesolithic	Oberkassel	CRN	5991	5842	BC	8014	7865	7939.5	KrauseAncients	PosthYuNature2023	38.68	-0.93	ERR10693125,ERR10693307					
+CIO001	Cioclovina1	M	Cioclovina	Romania	Unassigned	Unassigned	CIO	31270	29991	BC	33293	32014	32653.5	KrauseAncients	PosthYuNature2023	45.35	23.84	ERR10693120,ERR10693121,ERR10693122,ERR10693123					
+CRW001	Criewen 1961- Individual 2	F	Criewen	Germany	Mesolithic	Oberkassel	CRW	4816	4549	BC	6839	6572	6705.5	KrauseAncients	PosthYuNature2023	53.01	14.22	ERR10693126,ERR10693308					
+Chaudardes1	CuiryLesChaudardes1	M	Cuiry-lès-Chaudardes (Les Fontinettes)	France	Mesolithic	Oberkassel	Chaudardes1	6327	6013	BC	8350	8036	8193	KrauseAncients	PosthYuNature2023	49.24	3.46	ERR10693118,ERR10693119					
+DOG007	U 2014/12.3; A10-007_V001_M001	M	Doggerland	Netherlands	Mesolithic	Oberkassel	DOG	7503	7128	BC	9526	9151	9338.5	KrauseAncients	PosthYuNature2023	53.00	2.54	ERR10693141,ERR10693142,ERR10693321,ERR10693322					
+DOG004	U 2014/12.17; A10-007_V006_M011	M	Doggerland, Brown Bank	Netherlands	Mesolithic	Oberkassel	DOG	8199	7886	BC	10222	9909	10065.5	KrauseAncients	PosthYuNature2023	52.36	3.27	ERR10693137,ERR10693138,ERR10693318,ERR10693319					
+DOG001	A10-007_V002_M003	M	Doggerland, Eurogeul	Netherlands	Mesolithic	Oberkassel	DOG	7657	7513	BC	9680	9536	9608	KrauseAncients	PosthYuNature2023	51.98	4.07	ERR10693130,ERR10693131,ERR10693312,ERR10693313					
+DOG009	A10-007_V013_M023	M	Doggerland, Maasvlakte 2	Netherlands	Mesolithic	Oberkassel	DOG	6967	6619	BC	8990	8642	8816	KrauseAncients	PosthYuNature2023	52.01	3.53	ERR10693143,ERR10693144,ERR10693323,ERR10693324					
+DOG010	A10-007_V014_M024	F	Doggerland, Maasvlakte 2	Netherlands	Mesolithic	Oberkassel	DOG	6957	6523	BC	8980	8546	8763	KrauseAncients	PosthYuNature2023	52.01	3.53	ERR10693145,ERR10693146,ERR10693325,ERR10693326					
+DOG003	9507-04; A10-007_V005_M009	M	Doggerland, Noordhinder trenches	Netherlands	Mesolithic	Oberkassel	DOG	9040	8493	BC	11063	10516	10789.5	KrauseAncients	PosthYuNature2023	52.30	2.40	ERR10693134,ERR10693135,ERR10693136,ERR10693316,ERR10693317					
+DOG006	A10-007_V009_M017	M	Doggerland, Sand Motor	Netherlands	Mesolithic	Oberkassel	DOG	6613	6429	BC	8636	8452	8544	KrauseAncients	PosthYuNature2023	52.1	4.06	ERR10693139,ERR10693140,ERR10693320					
+DOG002	U 2014/12.4; A10-007_V003_M006	M	Doggerland, West of Brown Bank	Netherlands	Mesolithic	Oberkassel	DOG	8348	8165	BC	10371	10188	10279.5	KrauseAncients	PosthYuNature2023	52.36	3.27	ERR10693132,ERR10693133,ERR10693314,ERR10693315					
+DLV005	DV14	M	Dolní Věstonice II	Czechia	Gravettian	Vestonice	Czech_Vestonice	29123	28844	BC	31146	30867	31006.5	KrauseAncients	PosthYuNature2023	48.88	16.65	ERR10693127,ERR10693309					
+DLV006	DV15	M	Dolní Věstonice II	Czechia	Gravettian	Vestonice	Czech_Vestonice	29085	28824	BC	31108	30847	30977.5	KrauseAncients	PosthYuNature2023	48.88	16.65	ERR10693128,ERR10693310					
+DON005	Donkalnis 2	M	Donkalnis	Lithuania	Mesolithic	BalticHG	DON005	6390	6316	BC	8413	8339	8376	KrauseAncients	PosthYuNature2023	55.81	22.42	ERR10693147,ERR10693327					
+DON006	Donkalnis 3	M	Donkalnis	Lithuania	Narva	BalticHG	Lithuania_Narva	4710	4482	BC	6733	6505	6619	KrauseAncients	PosthYuNature2023	55.81	22.42	ERR10693148,ERR10693328					
+DRI001	Drigge skull	M	Drigge	Germany	Mesolithic	Oberkassel	DRI	5389	4924	BC	7412	6947	7180	KrauseAncients	PosthYuNature2023	54.29	13.16	ERR10693149,ERR10693329					
+FRM001	Loc 1-168/927-2322	F	Farman	France	Mesolithic	Oberkassel	FRM	NA	NA	NA	NA	NA	10124.5	KrauseAncients	PosthYuNature2023	48.83	2.27	ERR10693151,ERR10693331					
+FRL006	FL15	M	Fournol	France	Gravettian	Fournol	FRL	27001	26428	BC	29024	28451	28737.5	KrauseAncients	PosthYuNature2023	44.53	1.00	ERR10693150,ERR10693330					
+GOY001	Q100-8	M	Goyet	Belgium	Gravettian	Vestonice_Fournol	GOY	25655	25223	BC	27678	27246	27462	KrauseAncients	PosthYuNature2023	50.45	5.01	ERR10693166,ERR10693167,ERR10693168,ERR10693341,ERR10693342					
+GOY007	Q-1	M	Goyet	Belgium	Gravettian	Vestonice_Fournol	GOY	25989	25603	BC	28012	27626	27819	KrauseAncients	PosthYuNature2023	50.45	5.01	ERR10693169,ERR10693170,ERR10693171,ERR10693343,ERR10693344					
+GOY009	2878-18	F	Goyet	Belgium	Gravettian	Vestonice_Fournol	GOY	24337	23921	BC	26360	25944	26152	KrauseAncients	PosthYuNature2023	50.45	5.01	ERR10693172,ERR10693173,ERR10693345,ERR10693346					
+GOY014	2878-15	F	Goyet	Belgium	Gravettian	Vestonice_Fournol	GOY	26234	25680	BC	28257	27703	27980	KrauseAncients	PosthYuNature2023	50.45	5.01	ERR10693174,ERR10693175,ERR10693176,ERR10693347,ERR10693348					
+GoyetQ376-19	Q376-19	F	Goyet	Belgium	Gravettian	Vestonice_Fournol	GOY	25694	25278	BC	27717	27301	27509	KrauseAncients	PosthYuNature2023	50.45	5.01	ERR10693177,ERR10693178					
+GoyetQ376-3	Q376-3	M	Goyet	Belgium	Aurignacian	GoyetQ116-1	GoyetQ376-3	33147	32496	BC	35170	34519	34844.5	KrauseAncients	PosthYuNature2023	50.45	5.01	ERR10693179,ERR10693180,ERR10693181,ERR10693182,ERR10693183,ERR10693184					
+GoyetQ53-1	Q53-1	F	Goyet	Belgium	Gravettian	Vestonice_Fournol	GOY	26367	25750	BC	28390	27773	28081.5	KrauseAncients	PosthYuNature2023	50.45	5.01	ERR10693185,ERR10693186					
+GFW001	GF-1962-Individual 1	M	Gross Fredenwalde	Germany	Mesolithic	Oberkassel	GFW_1	5895	5659	BC	7918	7682	7800	KrauseAncients	PosthYuNature2023	53.13	13.80	ERR10693158,ERR10693334					
+GFW002.003	GF-1962-Individual 4	M	Gross Fredenwalde	Germany	Mesolithic	Oberkassel	GFW_1	5949	5759	BC	7972	7782	7877	KrauseAncients	PosthYuNature2023	53.13	13.80	ERR10693159,ERR10693160,ERR10693335					
+GFW004	GF-2014-feature 8 (baby burial)	F	Gross Fredenwalde	Germany	Mesolithic	Oberkassel	GFW_1	6403	6201	BC	8426	8224	8325	KrauseAncients	PosthYuNature2023	53.13	13.80	ERR10693161,ERR10693336					
+GFW005	GF-2014-feature 1/4 (male burial)	M	Gross Fredenwalde	Germany	Mesolithic	Oberkassel	GFW_2	5137	4923	BC	7160	6946	7053	KrauseAncients	PosthYuNature2023	53.13	13.80	ERR10693162,ERR10693337					
+GFW007	GF-1962-Individual 3	F	Gross Fredenwalde	Germany	Mesolithic	Oberkassel	GFW_1.1d.rel	6136	5911	BC	8159	7934	8046.5	KrauseAncients	PosthYuNature2023	53.13	13.80	ERR10693163,ERR10693338					
+GFW008	GF-1962-Individual 5	M	Gross Fredenwalde	Germany	Mesolithic	Oberkassel	GFW_1	6014	5844	BC	8037	7867	7952	KrauseAncients	PosthYuNature2023	53.13	13.80	ERR10693164,ERR10693339					
+GFW009	GF-1962-Individual 6	M	Gross Fredenwalde	Germany	Mesolithic	Oberkassel	GFW_1	6157	5961	BC	8180	7984	8082	KrauseAncients	PosthYuNature2023	53.13	13.80	ERR10693165,ERR10693340					
+HohleFels10_79	HF 79 IIb 876,HF 10 Ic 405	M	Hohle Fels	Germany	Magdalenian	GoyetQ2	HohleFels	13028	12283	BC	15051	14306	14678.5	KrauseAncients	PosthYuNature2023	48.22	9.45	ERR10693187,ERR10693188,ERR10693189					
+HohleFels49	HF 49 Ib1 66	M	Hohle Fels	Germany	Magdalenian	GoyetQ2	HohleFels	NA	NA	NA	NA	NA	15130.5	KrauseAncients	PosthYuNature2023	48.22	9.45	ERR10693190					
+AMI002	JA02	F	Ḥou Amieva (Llanes)	Spain	Mesolithic	Oberkassel	AMI	5233	4981	BC	7256	7004	7130	KrauseAncients	PosthYuNature2023	43.39	-4.90	ERR10693111,ERR10693304					
+AMI001	JA01	F	Ḥou Amieva (Llanes)	Spain	Mesolithic	Oberkassel	AMI001	4826	4624	BC	6849	6647	6748	KrauseAncients	PosthYuNature2023	43.39	-4.90	ERR10693110,ERR10693303					
+IGR001	9317	M	Igren' 8	Ukraine	Neolithic	UkraineHG	IGR001	5638	5484	BC	7661	7507	7584	KrauseAncients	PosthYuNature2023	48.48	35.19	ERR10693191,ERR10693349					
+KVH001	8622	M	Karavaikha	Russia	Mesolithic	Sidelkino	KVH	6393	6315	BC	8416	8338	8377	KrauseAncients	PosthYuNature2023	60.46	38.64	ERR10693195,ERR10693196,ERR10693352,ERR10693353					
+KVH002	8623	F	Karavaikha	Russia	Mesolithic	Sidelkino	KVH	6370	6185	BC	8393	8208	8300.5	KrauseAncients	PosthYuNature2023	60.46	38.64	ERR10693197,ERR10693354					
+KRZ001	KRZYZ 7	F	Krzyż	Poland	Mesolithic	Oberkassel	KRZ	8198	7883	BC	10221	9906	10063.5	KrauseAncients	PosthYuNature2023	52.87	16.00	ERR10693193,ERR10693194,ERR10693351					
+LMA001	LMR-B113-115	M	La Marche	France	Magdalenian	GoyetQ2	LMA	16200	15885	BC	18223	17908	18073	KrauseAncients	PosthYuNature2023	46.41	0.66	ERR10693206,ERR10693355					
+RIE002	Level 14	M	La Riera	Spain	Solutrean	Fournol	RIE	18988	18702	BC	21011	20725	20868	KrauseAncients	PosthYuNature2023	43.42	-4.86	ERR10693246,ERR10693247,ERR10693248,ERR10693386					
+LRO001	OSUT 7074	M	La Rochette	France	Gravettian	Fournol	LRO001	25811	25417	BC	27834	27440	27637	KrauseAncients	PosthYuNature2023	45.00	1.08	ERR10693198,ERR10693199,ERR10693200,ERR10693201,ERR10693202,ERR10693203,ERR10693204,ERR10693205					
+LPI002	PG08 J-1D α(2) #27	M	Le Piage	France	Solutrean	Fournol	LPI	21734	21170	BC	23757	23193	23475	KrauseAncients	PosthYuNature2023	44.80	1.40	ERR10693207,ERR10693208,ERR10693209,ERR10693356					
+MAF001	ZAC Alfort Str. 7	M	Maisons-Alfort	France	Mesolithic	Oberkassel	MAF	7055	6628	BC	9078	8651	8864.5	KrauseAncients	PosthYuNature2023	48.80	2.43	ERR10693210,ERR10693357					
+MPR001	MPR-1	F	Malonne Petit Ri	Belgium	Mesolithic	Oberkassel	MPR	8658	8221	BC	10681	10244	10466.5	KrauseAncients	PosthYuNature2023	50.43	4.8	ERR10693225,ERR10693369					
+MAZ001	1/1	M	Maszycka	Poland	Magdalenian	GoyetQ2	MAZ001	16563	16161	BC	18586	18184	18385	KrauseAncients	PosthYuNature2023	49.98	20.28	ERR10693211,ERR10693212,ERR10693358					
+MAZ003	1/5	M	Maszycka	Poland	Magdalenian	GoyetQ2	MAZ003	13731	13334	BC	15754	15357	15555.5	KrauseAncients	PosthYuNature2023	49.98	20.28	ERR10693213,ERR10693214,ERR10693359					
+MNN001.002	2/1 ind	F	Minino I	Russia	Mesolithic	Sidelkino	MNN_2	6574	6434	BC	8597	8457	8527	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693218,ERR10693219,ERR10693363					
+MNN003	5	M	Minino I	Russia	Mesolithic	Sidelkino	MNN_3	5593	5482	BC	7616	7505	7560.5	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693220,ERR10693364					
+MNN004	13	M	Minino I	Russia	Mesolithic	Sidelkino	MNN_3	5641	5493	BC	7664	7516	7590	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693221,ERR10693365					
+MNN005	19/1 ind	F	Minino I	Russia	Mesolithic	Sidelkino	MNN_1	8623	8358	BC	10646	10381	10513.5	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693222,ERR10693366					
+MNN006	20	F	Minino I	Russia	Mesolithic	Sidelkino	MNN_1	8724	8553	BC	10747	10576	10661.5	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693223,ERR10693367					
+MNN007	22/2 ind	F	Minino I	Russia	Mesolithic	Sidelkino	MNN_1	9066	8703	BC	11089	10726	10907.5	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693224,ERR10693368					
+MN2001	I/ 1 ind	M	Minino II	Russia	Mesolithic	Sidelkino	MNN_1	8637	8406	BC	10660	10429	10544.5	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693215,ERR10693360					
+MN2002	V	M	Minino II	Russia	Mesolithic	Sidelkino	MNN_1	8726	8553	BC	10749	10576	10662.5	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693216,ERR10693361					
+MN2003	VI/ 1 ind	M	Minino II	Russia	Mesolithic	Sidelkino	MNN_1	8631	8390	BC	10654	10413	10533.5	KrauseAncients	PosthYuNature2023	59.42	39.30	ERR10693217,ERR10693362					
+GER003	MIII M17 QM84 54	M	Mollet III (Girona)	Spain	Gravettian	Fournol	GER	25299	25053	BC	27322	27076	27199	KrauseAncients	PosthYuNature2023	42.17	2.74	ERR10693155,ERR10693156,ERR10693157,ERR10693333					
+MUR001	burial 91, skeleton 1	M	Murzihinskiy II tomb	Russia	Eneolithic	Sidelkino	MUR.1d.rel	NA	NA	NA	NA	NA	6423.5	KrauseAncients	PosthYuNature2023	55.35	50.01	ERR10693226,ERR10693370					
+MUR002	burial 94, skeleton 2	F	Murzihinskiy II tomb	Russia	Eneolithic	Sidelkino	MUR	4641	4470	BC	6664	6493	6578.5	KrauseAncients	PosthYuNature2023	55.35	50.01	ERR10693227,ERR10693371					
+MUR005	burial 102, skeleton 2	M	Murzihinskiy II tomb	Russia	Eneolithic	Sidelkino	MUR	NA	NA	NA	NA	NA	6423.5	KrauseAncients	PosthYuNature2023	55.35	50.01	ERR10693228,ERR10693372					
+MUR007	burial 104	M	Murzihinskiy II tomb	Russia	Eneolithic	Sidelkino	MUR	NA	NA	NA	NA	NA	6423.5	KrauseAncients	PosthYuNature2023	55.35	50.01	ERR10693229,ERR10693373					
+MUR017	burial 128, skeleton 2	M	Murzihinskiy II tomb	Russia	Eneolithic	Sidelkino	MUR	NA	NA	NA	NA	NA	6423.5	KrauseAncients	PosthYuNature2023	55.35	50.01	ERR10693230,ERR10693374					
+MUR021	burial 154	M	Murzihinskiy II tomb	Russia	Eneolithic	Sidelkino	MUR	3873	3585	BC	5896	5608	5752	KrauseAncients	PosthYuNature2023	55.35	50.01	ERR10693231,ERR10693375					
+OKL001	Oberkassel 1 D-999	F	Oberkassel	Germany	Late Magdalenian/Federmesser	Oberkassel	OKL	12058	11786	BC	14081	13809	13945	KrauseAncients	PosthYuNature2023	50.71	7.17	ERR10693232,ERR10693376					
+OKL002	Oberkassel 2 D-998	M	Oberkassel	Germany	Late Magdalenian/Federmesser	Oberkassel	OKL	11706	11163	BC	13729	13186	13457.5	KrauseAncients	PosthYuNature2023	50.71	7.17	ERR10693233,ERR10693377					
+ORM001	2988	F	Ormesson (Les Bossats)	France	Gravettian	Fournol	ORM	NA	NA	NA	NA	NA	30902.5	KrauseAncients	PosthYuNature2023	48.24	2.65	ERR10693234,ERR10693378					
+OST001	Ostorf 2012-ind. 1	F	Ostorf	Germany	Late Neolithic	Oberkassel	OST001	3443	3298	BC	5466	5321	5393.5	KrauseAncients	PosthYuNature2023	53.62	11.43	ERR10693235,ERR10693379					
+OST003	Ostorf2012-ind. 3 (mandible no 212)	M	Ostorf	Germany	Late Neolithic	Oberkassel	OST003	3291	3029	BC	5314	5052	5183	KrauseAncients	PosthYuNature2023	53.62	11.43	ERR10693237,ERR10693381					
+OST002	Skeleton 2	M	Ostorf	Germany	Late Neolithic	Oberkassel	OST002	3413	3030	BC	5436	5053	5244.5	KrauseAncients	PosthYuNature2023	53.62	11.43	ERR10693236,ERR10693380					
+PA12	PA12	F	Paglicci	Italy	Gravettian	Vestonice	PA12	27081	26655	BC	29104	28678	28891	KrauseAncients	PosthYuNature2023	41.65	15.61	ERR10693238,ERR10693239,ERR10693382,ERR10693383					
+Paglicci133	PA133	M	Paglicci	Italy	Early Gravettian	Unassigned	Paglicci133	NA	NA	NA	NA	NA	32964	KrauseAncients	PosthYuNature2023	41.65	15.61	ERR10693240,ERR10693241					
+PIN004	IV0-35,M104,26	F	Pincevent	France	Upper Magdalenian	GoyetQ2	PIN	13337	13018	BC	15360	15041	15200.5	KrauseAncients	PosthYuNature2023	48.37	2.89	ERR10693242,ERR10693243,ERR10693244,ERR10693384					
+PRD001	Grotte Pradis 1	M	Pradis	Italy	Late Epigravettian	Villabruna	PRD	11066	10875	BC	13089	12898	12993.5	KrauseAncients	PosthYuNature2023	46.25	12.89	ERR10693245,ERR10693385					
+GER002	RVS T4 330-350 (RVS-H-1)	M	Reclau Viver (Girona)	Spain	Gravettian	Fournol	GER	24332	23916	BC	26355	25939	26147	KrauseAncients	PosthYuNature2023	42.17	2.74	ERR10693152,ERR10693153,ERR10693154,ERR10693332					
+Rigney1	Rigney1	F	Rigney	France	Magdalenian	GoyetQ2	Rigney1	13623	13248	BC	15646	15271	15458.5	KrauseAncients	PosthYuNature2023	47.23	6.10	ERR10693249					
+RIP001	Tagliente 2	M	Riparo Tagliente	Italy	Ancient Epigravettian 	Villabruna	RIP	14953	14487	BC	16976	16510	16743	KrauseAncients	PosthYuNature2023	45.54	11.01	ERR10693250,ERR10693387					
+STO001	ST2	F	San Teodoro	Italy	Epigravettian	Villabruna	STO	11554	11324	BC	13577	13347	13462	KrauseAncients	PosthYuNature2023	37.85	14.69	ERR10693251,ERR10693388					
+TTK001	Burial n1	M	Tutkaul	Tajikistan	Neolithic	ANE	TTK	6396	6003	BC	8419	8026	8222.5	KrauseAncients	PosthYuNature2023	38.30	69.28	ERR10693252,ERR10693389					
+DOB001	711/59	M	Urdhöhle (Döbritz)	Germany	Mesolithic	Oberkassel	DOB	7520	7309	BC	9543	9332	9437.5	KrauseAncients	PosthYuNature2023	50.69	11.64	ERR10693129,ERR10693311					
+VSL002	11094	M	Vasilievka I	Ukraine	Mesolithic	UkraineHG	Ukraine_Vasilievka	NA	NA	NA	NA	NA	10482.5	KrauseAncients	PosthYuNature2023	48.22	35.40	ERR10693275,ERR10693276,ERR10693410,ERR10693411				10505/10492	10248
+VSL003	10072	M	Vasilievka I	Ukraine	Mesolithic	UkraineHG	Ukraine_Vasilievka	NA	NA	NA	NA	NA	10482.5	KrauseAncients	PosthYuNature2023	48.22	35.40	ERR10693277,ERR10693278,ERR10693412,ERR10693413				10505/10492	10248
+VSL004	10075	M	Vasilievka I	Ukraine	Mesolithic	UkraineHG	Ukraine_Vasilievka	NA	NA	NA	NA	NA	10482.5	KrauseAncients	PosthYuNature2023	48.22	35.40	ERR10693279,ERR10693414				10505/10492	10248
+VO1001	9479	M	Vovnigi I	Ukraine	Neolithic	UkraineHG	VO	5539	5341	BC	7562	7364	7463	KrauseAncients	PosthYuNature2023	48.14	35.08	ERR10693270,ERR10693405					
+VO1003	9496	M	Vovnigi I	Ukraine	Neolithic	UkraineHG	VO	5539	5341	BC	7562	7364	7463	KrauseAncients	PosthYuNature2023	48.14	35.08	ERR10693271,ERR10693406					
+VO1004	9485	M	Vovnigi I	Ukraine	Neolithic	UkraineHG	VO	5539	5341	BC	7562	7364	7463	KrauseAncients	PosthYuNature2023	48.14	35.08	ERR10693272,ERR10693407					
+VO1005	9868	M	Vovnigi I	Ukraine	Neolithic	UkraineHG	VO	5539	5341	BC	7562	7364	7463	KrauseAncients	PosthYuNature2023	48.14	35.08	ERR10693273,ERR10693408					
+VO2001	9861	M	Vovnigi II	Ukraine	Neolithic	UkraineHG	VO	5563	5411	BC	7586	7434	7510	KrauseAncients	PosthYuNature2023	48.14	35.08	ERR10693274,ERR10693409					
+WCX002	WLS-10	F	Waulsort Caverne X	Belgium	Mesolithic	Oberkassel	WCX	8621	8288	BC	10644	10311	10477.5	KrauseAncients	PosthYuNature2023	50.20	4.84	ERR10693280,ERR10693281,ERR10693282,ERR10693415,ERR10693416					
+WCX004	WLS-7	F	Waulsort Caverne X	Belgium	Mesolithic	Oberkassel	WCX	8554	8282	BC	10577	10305	10441	KrauseAncients	PosthYuNature2023	50.20	4.84	ERR10693283,ERR10693284,ERR10693285,ERR10693417,ERR10693418					
+BRM001	FWKL	M	Weyhe-Dreye	Germany	Late Neolithic	Oberkassel	BRM	3873	3638	BC	5896	5661	5778.5	KrauseAncients	PosthYuNature2023	55.32	8.87	ERR10693116,ERR10693305					
+WOL001	Gst. 1286/30/1286/31	M	Wöllersdorf	Austria	Mesolithic	Oberkassel	WOL	6961	6583	BC	8984	8606	8795	KrauseAncients	PosthYuNature2023	47.86	16.18	ERR10693286,ERR10693419					
+JAZ001	8619	F	Yazykovo	Russia	Neolithic	Sidelkino	JAZ	5292	5144	BC	7315	7167	7241	KrauseAncients	PosthYuNature2023	57.12	38.15	ERR10693192,ERR10693350					
+UOO004	5773-26_Grave71	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6144	5916	BC	8167	7939	8053	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693253,ERR10693390					
+UOO012	5773-17_Grave65	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693254,ERR10693391					
+UOO015	5773-126_Grave161	F	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693255,ERR10693392					
+UOO023	5773-87_Grave144	F	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693256,ERR10693257,ERR10693393					
+UOO025	5773-41_Grave94	F	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693258,ERR10693394					
+UOO029	5773-92_Grave127	F	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693259,ERR10693395					
+UOO033	5773-114_Grave153	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6359	6173	BC	8382	8196	8289	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693260,ERR10693396					
+UOO035.056	5773-5_Grave59	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6264	6001	BC	8287	8024	8155.5	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693261,ERR10693262,ERR10693397					
+UOO037	5773-4_Grave53	F	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693263,ERR10693398					
+UOO047	5773-6_Grave55	F	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6318	6016	BC	8341	8039	8190	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693264,ERR10693399					
+UOO049	5773-107_Grave163	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6005	5853	BC	8028	7876	7952	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693265,ERR10693400					
+UOO051	5773-148_Grave47	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693266,ERR10693401					
+UOO052	5773-147_Grave46	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693267,ERR10693402					
+UOO053	5773-136_Grave31	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693268,ERR10693403					
+UOO059	Grave72or75	M	Yuzhniy Oleniy Ostrov	Russia	Mesolithic	Sidelkino	Russia_Karelia	6227	5977	BC	8250	8000	8125	KrauseAncients	PosthYuNature2023	61.94	35.26	ERR10693269,ERR10693404					
