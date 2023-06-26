@@ -8,6 +8,10 @@ import h5py
 import json
 import pandas as pd
 
+#import pyarrow as pa
+#import pyarrow.csv as csv
+import csv
+import time as time
 """
 flat convolution of width n on an array x in O(n) time
 padded out to maintain shape
@@ -44,12 +48,68 @@ def create(args):
     h5_out.close()
 
 
-def coverage(args):
+def get_loci_by_contig(fn_loci):
+
+    loci = json.load(open(fn_loci))
+    loci_by_contig = {}
+
+    for locus, inf in loci['loci'].items():
+        contig = inf['contig']
+        if not contig in loci_by_contig:
+            loci_by_contig[contig] = {}
+        loci_by_contig[contig][locus] = inf
+    
+    return loci_by_contig
+
+
+def genotype(args):
+    stime = time.time()
     f = pyd4.D4File(args.d4_file)
     
     t_inf = pd.read_csv(args.fn_stats,sep="\t", header=0)
-    corr_factor = t_inf.qmax_filt_mu[t_inf.sample==args.sample]
+    corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
+    alt_corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
 
+    loci_by_contig = get_loci_by_contig(args.fn_loci)
+    outrows = []
+    for contig, loci in loci_by_contig.items():
+
+        d4depth = f.load_to_np(contig)
+        w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
+        windowed_mu = 2*windowed_mu/corr_factor
+
+        for locus, locus_inf in loci.items(): 
+            start = locus_inf['start']
+            end = locus_inf['end']
+            locs = np.where((w_starts>=start)&(w_ends<=end))
+            gt = np.mean(windowed_mu[locs])
+            gt_alt = gt/corr_factor*alt_corr_factor
+            outrows.append({"locus":locus,
+                            "contig":contig,
+                            "start":start,
+                            "end":end,
+                            "cp":gt,
+                            "cp_alt":gt_alt,
+                            "sample":args.sample})
+            
+    t = pd.DataFrame(outrows)
+    
+    t.to_csv(args.fn_out,
+             sep="\t", 
+             index=False,
+             columns=["locus","contig","start","end","cp","cp_alt","sample"], 
+             header=False,
+             quoting=csv.QUOTE_NONE)
+    print(time.time()-stime)
+
+
+
+def coverage(args):
+    stime = time.time()
+    f = pyd4.D4File(args.d4_file)
+    
+    t_inf = pd.read_csv(args.fn_stats,sep="\t", header=0)
+    corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
     d4depth = f.load_to_np(args.contig)
     w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
     
@@ -62,9 +122,23 @@ def coverage(args):
                       "start":w_starts,
                       "end":w_ends,
                       "cp":windowed_mu,
-                      "sample":sample})
+                      "sample":args.sample})
+    
+    #t_pa = pa.Table.from_pandas(t)
 
-    t.to_csv(args.fn_out,sep="\t", index=False)
+    #with pa.CompressedOutputStream(args.fn_out, 'gzip') as out:
+    #    opts = csv.WriteOptions(include_header=False)#,delimiter="\t")
+    #    csv.write_csv(t_pa, out, opts) 
+    #csv.write_csv(t_pa, args.fn_out, csv.WriteOptions(delimiter="\t",include_header=False))
+    #csv.write_csv(t_pa, args.fn_out)
+    t.to_csv(args.fn_out,
+             sep="\t", 
+             index=False,
+             columns=["contig","start","end","cp","sample"], 
+             header=False,
+             compression="gzip",
+             quoting=csv.QUOTE_NONE)
+    print(time.time()-stime)
 
 
 
@@ -183,27 +257,28 @@ if __name__=="__main__":
     subparsers = parser.add_subparsers() 
     
     #coverage
-    #parser_create = subparsers.add_parser("coverage")
-    #parser_create.add_argument("--d4_file", required=True)
-    #parser_create.add_argument("--fn_stats", required=True)
-    #parser_create.add_argument("--sample", required=True)
-    #parser_create.add_argument("--contig", required=True)
-    #parser_create.add_argument("--start", required=True)
-    #parser_create.add_argument("--end", required=True)
-    #parser_create.add_argument("--fn_out", required=True)
-    #parser_create.add_argument("-w", default=1000, type=int)
-    #parser_create.add_argument("-s", default=200, type=int)
-    #parser_create.set_defaults(func=coverage)
+    parser_create = subparsers.add_parser("coverage")
+    parser_create.add_argument("--d4_file", required=True)
+    parser_create.add_argument("--fn_stats", required=True)
+    parser_create.add_argument("--sample", required=True)
+    parser_create.add_argument("--contig", required=True)
+    parser_create.add_argument("--start", required=True,type=int)
+    parser_create.add_argument("--end", required=True,type=int)
+    parser_create.add_argument("--fn_out", required=True)
+    parser_create.add_argument("-w", default=1000, type=int)
+    parser_create.add_argument("-s", default=200, type=int)
+    parser_create.set_defaults(func=coverage)
 
     #genotype
-    #parser_create = subparsers.add_parser("genotype")
-    #parser_create.add_argument("--d4_file", required=True)
-    #parser_create.add_argument("--sample", required=True)
-    #parser_create.add_argument("--sample", required=True)
-    #parser_create.add_argument("--fn_out", required=True)
-    #parser_create.add_argument("-w", default=1000, type=int)
-    #parser_create.add_argument("-s", default=200, type=int)
-    #parser_create.set_defaults(func=stats)
+    parser_create = subparsers.add_parser("genotype")
+    parser_create.add_argument("--d4_file", required=True)
+    parser_create.add_argument("--sample", required=True)
+    parser_create.add_argument("--fn_stats", required=True)
+    parser_create.add_argument("--fn_out", required=True)
+    parser_create.add_argument("--fn_loci", required=True)
+    parser_create.add_argument("-w", default=1000, type=int)
+    parser_create.add_argument("-s", default=200, type=int)
+    parser_create.set_defaults(func=genotype)
 
     #d4 stats
     parser_create = subparsers.add_parser("stats")

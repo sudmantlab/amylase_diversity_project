@@ -16,18 +16,21 @@ pop_dict = {"South Asia": "SA",
             "Central Asia and Siberia":"CAS"}
 
 exclude = ["SGDP.LP6005441-DNA_C06.Japanese.EA",
-           #"SGDP.LP6005519-DNA_F06.Dusun.OCN",
            "SGDP.LP6005442-DNA_A09.Australian.OCN",
            "SGDP.LP6005441-DNA_H08.Mozabite.WEA",
-           "1KG.HG03025.GWD.AFR",
-           "1KG.HG03366.ESN.AFR",
-           "1KG.HG02635 .GWD.AFR",
            "1KG.HG03689.STU.SA",
-           "1KG.NA18974.JPT.EA",
-           "1KG.HG03689.STU.SA",
-           "1KG.HG02635.GWD.AFR",
-           "1KG.HG02635.GWD.AFR",
            "1KG.NA18974.JPT.EA"]
+           #"1KG.HG03025.GWD.AFR",
+           #"1KG.HG02635.GWD.AFR",
+           #"1KG.HG02635.GWD.AFR",
+           #"1KG.HG03366.ESN.AFR",
+           #"1KG.HG02635.GWD.AFR",
+           #"1KG.HG03689.STU.SA",
+           #"1KG.NA18974.JPT.EA"]
+
+
+
+
 
 pop_to_region = {"ACB":"AMR",
                  "ASW":"AMR",
