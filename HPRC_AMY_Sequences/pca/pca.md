@@ -115,7 +115,7 @@ pca <- read_table("plink/combined_bundle0.eigenvec", col_names = FALSE) %>%
   left_join(gene_count_by_haplotype, by=c("id"="chrom")) %>%
   pivot_longer(cols = c("AMY1", "AMY2A", "AMY2B"), names_to = "gene", values_to = "copy_number")
 eigenval <- read_table("plink/combined_bundle0.eigenval", col_names = FALSE) %>%
-  transmute(perc_var=round(X1/sum(X1)*100, 2), bundle="bundle0") %>%
+  transmute(perc_var=round(X1/sum(X1)*100, 1), bundle="bundle0") %>%
   bind_rows(read_table("plink/combined_bundle1a.eigenval", col_names = FALSE) %>% transmute(perc_var=round(X1/sum(X1)*100, 2), bundle="bundle1a")) %>%
   arrange(bundle, desc(perc_var))
 pca_haploid <- pca %>%
@@ -141,7 +141,7 @@ for(b in unique(pca_haploid$bundle)){
   for(g in unique(pca_haploid$gene)){
     e <- filter(eigenval, bundle==b) %>%
       pull(perc_var)
-    if(g=="AMY1"){copy_number_break <-c(0,3,6,9)} else {copy_number_break <- c(0, 1, 2, 3)}
+    if(g=="AMY1"){copy_number_break <-c(9,6,3,0)} else {copy_number_break <- c(3,2,1,0)}
     p <- pca_haploid %>%
       filter(gene==g, bundle==b) %>%
       arrange(desc(copy_number)) %>%
