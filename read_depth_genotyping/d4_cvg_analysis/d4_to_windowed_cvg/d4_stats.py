@@ -114,7 +114,7 @@ def coverage(args):
     
     t_inf = pd.read_csv(args.fn_stats,sep="\t", header=0)
     corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
-    #corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
+    alt_corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
     d4depth = f.load_to_np(args.contig)
     w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
     
@@ -123,11 +123,13 @@ def coverage(args):
     w_ends = w_ends[locs]
     windowed_mu = windowed_mu[locs]
     windowed_cp = 2*windowed_mu/corr_factor
+    windowed_cp_alt = 2*windowed_mu/alt_corr_factor
     
     t = pd.DataFrame({"contig":args.contig,
                       "start":w_starts,
                       "end":w_ends,
                       "cp":windowed_cp,
+                      "cp_alt":windowed_cp,
                       "raw":windowed_mu,
                       "sample":args.sample})
     
@@ -141,7 +143,7 @@ def coverage(args):
     t.to_csv(args.fn_out,
              sep="\t", 
              index=False,
-             columns=["contig","start","end","cp","raw","sample"], 
+             columns=["contig","start","end","cp","cp_alt","raw","sample"], 
              header=False,
              compression="gzip",
              quoting=csv.QUOTE_NONE)
