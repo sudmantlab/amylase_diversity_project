@@ -13,24 +13,46 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
-fn_gts = paste(outdir,"/genotypes.raw.tsv",sep="")
-t_gt = read.table(fn_gts, sep="\t",header=T)
+fn_gts = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/d4_to_windowed_cvg/output/genotype/genotypes.tsv"
 
-g=ggplot(t_gt %>% filter(!(name %in% c("AMY1A","AMY1B","AMY1C","AMY2Ap"))))
+
+ancient_qc = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/info/ancients_passed_QC.tsv", header=T,sep="\t")
+
+t_gt = read.table(fn_gts, sep="\t",header=T) %>%
+       dplyr::select(locus,cp,sample) %>%
+       pivot_wider(values_from = "cp",names_from="locus") %>%
+        mutate(amy1_sum = AMY1A + AMY1B + AMY1C) %>%
+        pivot_longer(cols=-c("sample"),values_to="gt") %>%
+        separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE) %>%
+  filter((dataset!="StoneAgeAncient")|ID %in% ancient_qc$sample)
+
+
+ancient_qc$sample
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
   facet_grid(name~dataset,scales="free")+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
 
-# to_gt_train_AMY2A = t_gt %>% filter(name=="AMY2A")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-# to_gt_train_AMY2B = t_gt %>% filter(name=="AMY2B")    %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-# to_gt_train_AMY1 =  t_gt %>% filter(name=="amy1_sum") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
-# to_gt_train_AMY2Ap =  t_gt %>% filter(name=="AMY2Ap") %>% dplyr::select(sample,gt) %>% filter(grepl("1KG",sample))
 
-#%>% filter(!grepl("1KG",sample))
-to_gt_AMY2A = t_gt %>% filter(name=="AMY2A")  %>% dplyr::select(sample,gt)
-to_gt_AMY2B = t_gt %>% filter(name=="AMY2B")  %>% dplyr::select(sample,gt)
-to_gt_AMY1 =  t_gt %>% filter(name=="amy1_sum")  %>% dplyr::select(sample,gt)
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("1KG",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_grid(name~dataset,scales="free")+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("StoneAgeAncient",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_grid(name~dataset,scales="free")+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Excof",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_grid(name~dataset,scales="free")+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
 
 
 ######ARCHAIC FIX
@@ -41,21 +63,6 @@ arch_AMY1_adj = 2-(to_gt_AMY1 %>% filter(grepl("Neand|Denis",sample)) %>% summar
 to_gt_AMY1=to_gt_AMY1 %>% mutate(gt = ifelse(grepl("Neand|Denis",sample),gt+arch_AMY1_adj,gt))
 
 
-#to_gt_AMY2B %>% filter(grepl("Neander",sample))
-
-
-# g=ggplot(t_gt %>% 
-#         filter(name %in% c("AMY2A","AMY2Ap")) %>%
-#         dplyr::select(sample,dataset,gt,name) %>%
-#         pivot_wider(names_from=name,values_from=gt))
-# g+geom_point(aes(x=AMY2A,y=AMY2Ap))+
-#   theme_bw(base_size=8)
-
-
-#t_HPRC_indivs = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/map_gene_locations/HPRC_indivs",header=FALSE,col.names=c("ID"))
-#inner_join(t_HPRC_indivs,t_gt,on="ID")
-#t_gt %>% filter(grepl("HG00735",ID)) %>% dplyr::select(ID) %>% unique()
-#to_gt_train_AMY1 %>% filter(grepl("HGDP",sample))
 ```
 ```{r}
 ###FUNCTIONS

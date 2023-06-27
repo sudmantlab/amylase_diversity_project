@@ -31,7 +31,7 @@ stats = read.table(fn,header=T,sep="\t") %>%
         filter(!(sample %in% exclude)) %>%
         separate(sample,c("group","ID","y","z"),sep="\\.",remove=FALSE) %>%
         dplyr::select(-c(y,z)) %>%
-        filter((group!="StoneAgeAncient")|ID %in% ancient_qc$sample)
+        
   #separate(name,into = c("source","ID","pop","region"),sep="\\.")
 #samples w/ median 0
 
