@@ -25,7 +25,7 @@ def do_convolve(X, n):
 def get_windowed_mu(X, w, s):
     mus = do_convolve(X, w)/w
     window_starts = np.arange(0,mus.shape[0],s)
-    window_ends = window_starts + s
+    window_ends = window_starts + w
     return window_starts, window_ends, mus[np.arange(0,mus.shape[0],s)] 
 
 
@@ -77,19 +77,23 @@ def genotype(args):
         d4depth = f.load_to_np(contig)
         w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
         windowed_mu = 2*windowed_mu/corr_factor
+        windowed_alt_mu = 2*windowed_mu/alt_corr_factor
 
         for locus, locus_inf in loci.items(): 
             start = locus_inf['start']
             end = locus_inf['end']
             locs = np.where((w_starts>=start)&(w_ends<=end))
             gt = np.mean(windowed_mu[locs])
-            gt_alt = np.mean(windowed_mu[locs]/corr_factor*alt_corr_factor)
+            gt_alt = np.mean(windowed_alt_mu[locs])
+            raw = np.mean(windowed_mu[locs]/2*corr_factor)
+            #gt_alt = np.mean(windowed_mu[locs]/corr_factor*alt_corr_factor)
             outrows.append({"locus":locus,
                             "contig":contig,
                             "start":start,
                             "end":end,
                             "cp":gt,
                             "cp_alt":gt_alt,
+                            "raw":raw,
                             "sample":args.sample})
             
     t = pd.DataFrame(outrows)
@@ -117,12 +121,14 @@ def coverage(args):
     locs = np.where((w_starts>=args.start)&(w_ends<=args.end))
     w_starts = w_starts[locs]
     w_ends = w_ends[locs]
-    windowed_mu = 2*windowed_mu[locs]/corr_factor
+    windowed_mu = windowed_mu[locs]
+    windowed_cp = 2*windowed_mu/corr_factor
     
     t = pd.DataFrame({"contig":args.contig,
                       "start":w_starts,
                       "end":w_ends,
-                      "cp":windowed_mu,
+                      "cp":windowed_cp,
+                      "raw":windowed_mu,
                       "sample":args.sample})
     
     #t_pa = pa.Table.from_pandas(t)
@@ -135,7 +141,7 @@ def coverage(args):
     t.to_csv(args.fn_out,
              sep="\t", 
              index=False,
-             columns=["contig","start","end","cp","sample"], 
+             columns=["contig","start","end","cp","raw","sample"], 
              header=False,
              compression="gzip",
              quoting=csv.QUOTE_NONE)
@@ -170,8 +176,11 @@ def stats(args):
     #qrng_filt_sd = np.sqrt(np.var((windowed_mu[(windowed_mu<=qmax)&(windowed_mu>=qmin)]))
 
     ##
-    b1 = (w_starts>103780000)&(w_ends<103500001)
-    b2 = (w_starts>103800000)&(w_ends<103900001)
+    b1 = (w_starts>103800000)&(w_ends<103900001)
+    b2 = (w_starts>102500000)&(w_ends<103500001)
+    #WRONG COORDS!
+    #b1 = (w_starts>103780000)&(w_ends<103500001)
+    #b2 = (w_starts>103800000)&(w_ends<103900001)
     x = windowed_mu[np.where(b1|b2)]
     CTRL_region_mean = np.mean(x)
     CTRL_region_med = np.median(x)
