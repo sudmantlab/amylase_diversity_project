@@ -83,7 +83,7 @@ def genotype(args):
             end = locus_inf['end']
             locs = np.where((w_starts>=start)&(w_ends<=end))
             gt = np.mean(windowed_mu[locs])
-            gt_alt = gt/corr_factor*alt_corr_factor
+            gt_alt = np.mean(windowed_mu[locs]/corr_factor*alt_corr_factor)
             outrows.append({"locus":locus,
                             "contig":contig,
                             "start":start,
@@ -110,6 +110,7 @@ def coverage(args):
     
     t_inf = pd.read_csv(args.fn_stats,sep="\t", header=0)
     corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
+    #corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
     d4depth = f.load_to_np(args.contig)
     w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
     
@@ -155,14 +156,22 @@ def stats(args):
     d4depth = f.load_to_np(contig)
     w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
     quantiles = np.quantile(windowed_mu,q=[0,0.025,0.975,1])
+    #quantiles = np.quantile(windowed_mu,q=[0,0.1,0.9,1])
+    #quantiles = np.quantile(windowed_mu,q=[0,0.05,0.95,1])
     qmax = quantiles[2]
+    qmin = quantiles[1]
+    
+    qmax_filt_mu = np.mean(windowed_mu[windowed_mu<=qmax])
+    qmax_filt_med = np.median(windowed_mu[windowed_mu<=qmax])
+    qmax_filt_sd = np.sqrt(np.var(windowed_mu[windowed_mu<=qmax]))
+    
+    #qrng_filt_mu = np.mean(windowed_mu[(windowed_mu<=qmax)&(windowed_mu>=qmin)])
+    #qrng_filt_med = np.median(windowed_mu[(windowed_mu<=qmax)&(windowed_mu>=qmin)])
+    #qrng_filt_sd = np.sqrt(np.var((windowed_mu[(windowed_mu<=qmax)&(windowed_mu>=qmin)]))
 
-    qmax_filt_mu = np.mean(windowed_mu[windowed_mu<qmax])
-    qmax_filt_med = np.median(windowed_mu[windowed_mu<qmax])
-    qmax_filt_sd = np.sqrt(np.var(windowed_mu[windowed_mu<qmax]))
     ##
-    b1 = (w_starts>103780000)&(w_starts<103500001)
-    b2 = (w_starts>103800000)&(w_starts<103900001)
+    b1 = (w_starts>103780000)&(w_ends<103500001)
+    b2 = (w_starts>103800000)&(w_ends<103900001)
     x = windowed_mu[np.where(b1|b2)]
     CTRL_region_mean = np.mean(x)
     CTRL_region_med = np.median(x)
@@ -183,6 +192,7 @@ def stats(args):
                        "CTRL_region_med":CTRL_region_med,
                        "CTRL_region_sd":CTRL_region_sd,
                        "sample":args.sample}])
+
     t.to_csv(args.fn_out,sep="\t", index=False)
 
 
