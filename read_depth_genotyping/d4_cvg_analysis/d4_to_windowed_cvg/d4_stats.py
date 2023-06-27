@@ -67,8 +67,8 @@ def genotype(args):
     f = pyd4.D4File(args.d4_file)
     
     t_inf = pd.read_csv(args.fn_stats,sep="\t", header=0)
-    corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
-    alt_corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
+    alt_corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
+    corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
 
     loci_by_contig = get_loci_by_contig(args.fn_loci)
     outrows = []
@@ -76,16 +76,16 @@ def genotype(args):
 
         d4depth = f.load_to_np(contig)
         w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
-        windowed_mu = 2*windowed_mu/corr_factor
-        windowed_alt_mu = 2*windowed_mu/alt_corr_factor
+        windowed_cp = 2*windowed_mu/corr_factor
+        windowed_alt_cp = 2*windowed_mu/alt_corr_factor
 
         for locus, locus_inf in loci.items(): 
             start = locus_inf['start']
             end = locus_inf['end']
             locs = np.where((w_starts>=start)&(w_ends<=end))
-            gt = np.mean(windowed_mu[locs])
-            gt_alt = np.mean(windowed_alt_mu[locs])
-            raw = np.mean(windowed_mu[locs]/2*corr_factor)
+            gt = np.mean(windowed_cp[locs])
+            gt_alt = np.mean(windowed_alt_cp[locs])
+            raw = np.mean(windowed_mu[locs])
             #gt_alt = np.mean(windowed_mu[locs]/corr_factor*alt_corr_factor)
             outrows.append({"locus":locus,
                             "contig":contig,
@@ -101,7 +101,7 @@ def genotype(args):
     t.to_csv(args.fn_out,
              sep="\t", 
              index=False,
-             columns=["locus","contig","start","end","cp","cp_alt","sample"], 
+             columns=["locus","contig","start","end","cp","cp_alt","raw","sample"], 
              header=False,
              quoting=csv.QUOTE_NONE)
     print(time.time()-stime)

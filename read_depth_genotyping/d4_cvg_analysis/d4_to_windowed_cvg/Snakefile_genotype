@@ -40,8 +40,10 @@ rule combine:
                                 "end",
                                 "cp",
                                 "cp_alt",
+                                "raw",
                                 "sample"])
         t.to_csv(output[0], sep="\t", index=False)
+
 rule get_copy_cvg:
     output:
         "output/genotype/by_indiv/{sample}.tsv"
