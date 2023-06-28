@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r }
+```{r, fig.height=2,fig.width=6}
 library(tidyverse)
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output"
@@ -26,44 +26,118 @@ t_gt = read.table(fn_gts, sep="\t",header=T) %>%
         separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE) %>%
   filter((dataset!="StoneAgeAncient")|ID %in% ancient_qc$sample)
 
-
-ancient_qc$sample
-
-g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")))
-g+geom_histogram(aes(x=gt),binwidth=0.05)+
-  facet_grid(name~dataset,scales="free")+
-  theme_bw(base_size=8)+
-  scale_x_continuous(breaks=seq(0,18,1))
+# g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")))
+# g+geom_histogram(aes(x=gt),binwidth=0.05)+
+#   facet_grid(name~dataset,scales="free")+
+#   theme_bw(base_size=8)+
+#   scale_x_continuous(breaks=seq(0,18,1))
 
 
 g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("1KG",sample)))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
-  facet_grid(name~dataset,scales="free")+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("HGDP",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("HGDP",sample)))
+g+geom_histogram(aes(x=gt*0.97),binwidth=0.05,color='blue')+
+  geom_vline(xintercept=6)+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("SGDP",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("SGDP",sample)))
+g+geom_histogram(aes(x=gt*1.05),binwidth=0.05,color="blue")+
+  geom_vline(xintercept=c(6,8,10))+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("GTEx",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  geom_vline(xintercept=c(6,8,10))+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("GTEx",sample)) %>% mutate(gt=ifelse(name=="amy1_sum",gt*0.9,gt)))
+g+geom_histogram(aes(x=gt),binwidth=0.05,color="blue")+
+  geom_vline(xintercept=c(6,8,10))+
+  facet_wrap(~name,scales="free",nrow=1)+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
 
 g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("StoneAgeAncient",sample)))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
-  facet_grid(name~dataset,scales="free")+
+  facet_wrap(~name,scales="free",nrow=1)+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Archaic",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1),lim=c(0,20))
+
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Archaic",sample)) %>% mutate(gt=ifelse(name=="amy1_sum",gt*0.8,gt)))
+g+geom_histogram(aes(x=gt),binwidth=0.05,color='blue')+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1),lim=c(0,20))
+
 
 g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Excof",sample)))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
-  facet_grid(name~dataset,scales="free")+
+  facet_wrap(~name,scales="free",nrow=1)+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
 
-
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Haak",sample)))
+g+geom_histogram(aes(x=gt),binwidth=0.05)+
+  facet_wrap(~name,scales="free",nrow=1)+
+  theme_bw(base_size=8)+
+  scale_x_continuous(breaks=seq(0,18,1),lim=c(0,20))
+```
+```{r}
+#### MODIFY THE SGDP AND HGDP BY A CONSTANT FACTOR SO THEY FIT INTEGERS
+#### This is likely due to GC bias in these libraries
+#HGDP 0.97
+#SGDP 1.05
+#ARCHAIC AMY1 0.8
 ######ARCHAIC FIX
 #Archaics consistently have a slight excess of coverage over the AMY1 copies, 
-#potentially due to gene conversion, resulting in consistent "copy 3" estimates
+#potentially due to gene conversion, resulting in consistent non-mendelian copy 3 (~2.5) estimates
 #this code is to correct for this
-arch_AMY1_adj = 2-(to_gt_AMY1 %>% filter(grepl("Neand|Denis",sample)) %>% summarize(mu = mean(gt)))$mu
-to_gt_AMY1=to_gt_AMY1 %>% mutate(gt = ifelse(grepl("Neand|Denis",sample),gt+arch_AMY1_adj,gt))
 
+# arch_AMY1_adj = 2-(to_gt_AMY1 %>% filter(grepl("Neand|Denis",sample)) %>% summarize(mu = mean(gt)))$mu
+# to_gt_AMY1=to_gt_AMY1 %>% mutate(gt = ifelse(grepl("Neand|Denis",sample),gt+arch_AMY1_adj,gt))
 
+t_gt_adj = t_gt %>% mutate(gt=ifelse(dataset=="SGDP",gt*1.05,gt)) %>%
+                    mutate(gt=ifelse(dataset=="HGDP",gt*0.97,gt)) %>%
+                    mutate(gt=ifelse((dataset=="Archaic")&(name=="amy1_sum"),gt*0.8,gt)) %>%
+                    filter(dataset %in% c("1KG","1KG_trio","Archaic","HGDP","SGDP","StoneAgeAncient"))
+
+unique(t_gt_adj$dataset)
+length(unique(t_gt_adj$sample))
+t_gt_adj %>% filter(dataset=="Archaic")
+
+to_gt_AMY2A = t_gt_adj %>% filter(name=="AMY2A")  %>% dplyr::select(sample,gt)
+to_gt_AMY2B = t_gt_adj %>% filter(name=="AMY2B")  %>% dplyr::select(sample,gt)
+to_gt_AMY1 =  t_gt_adj %>% filter(name=="amy1_sum")  %>% dplyr::select(sample,gt)
 ```
+
 ```{r}
 ###FUNCTIONS
 
@@ -139,10 +213,6 @@ get_dists = function(k,mx_copy,mu,offset,sigma,pi,iter){
   plot_df = do.call(rbind, plot_df)
   return(plot_df)
 }
-
-
-```
-```{r}
 
 #to_gt has samples and gts
 gt_likelihood_table = function(to_gt, k,mu,offset,sigma, pi, label){
@@ -284,37 +354,63 @@ AMY1_gt[["offset"]]
 AMY2A_gt[["offset"]]
 AMY2B_gt[["offset"]]
 
-adj = 200
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/genotyping"
+
+adj = 500
 g=ggplot(AMY1_gt$dists %>% filter(iter==20))+
-  geom_histogram(aes(x=gt),binwidth = 0.1,data=to_gt_AMY1)+
-  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  geom_histogram(aes(x=gt, fill=dataset),binwidth = 0.1,data=to_gt_AMY1 %>% separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE))+
+  geom_line(aes(x=x,y=y*adj,group=factor(i)),size=.5,alpha=.7)+
   theme_bw()+
-  facet_wrap(~iter)+
-  theme(legend.position="None")+
-  scale_x_continuous(breaks=seq(0,20,2))
+  theme(legend.position=c(0.7,0.8),
+        legend.background=element_blank(),
+        legend.key.size=unit(0.25,"cm"),
+        legend.text = element_text(size=8))+
+  scale_x_continuous(breaks=seq(0,20,2)) +
+  scale_fill_brewer("",palette="Set1")+
+  scale_y_continuous("count/density")
 
 print(g)
+fn_out = paste(outdir,"/AMY1_genotyping.pdf",sep="")
+pdf(fn_out,width=3,height=2)
+print(g)
+dev.off()
+
 
 g=ggplot(AMY2A_gt$dists %>% filter(iter==20))+
-  geom_histogram(aes(x=gt),binwidth = 0.1,data=to_gt_AMY2A)+
-  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  geom_histogram(aes(x=gt, fill=dataset),binwidth = 0.1,data=to_gt_AMY2A%>% separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE))+
+  geom_line(aes(x=x,y=y*adj,group=factor(i)),size=.5,alpha=.7)+
   theme_bw()+
-  facet_wrap(~iter)+
-  theme(legend.position="None")+
-  scale_x_continuous(breaks=seq(0,20,2))
+  theme(legend.position=c(0.7,0.8),
+        legend.background=element_blank(),
+        legend.key.size=unit(0.25,"cm"),
+        legend.text = element_text(size=8))+
+  scale_x_continuous(breaks=seq(0,20,2)) +
+  scale_fill_brewer("",palette="Set1")+
+  scale_y_continuous("count/density")
 
 print(g)
+fn_out = paste(outdir,"/AMY2A_genotyping.pdf",sep="")
+pdf(fn_out,width=3,height=2)
+print(g)
+dev.off()
 
 g=ggplot(AMY2B_gt$dists %>% filter(iter==20))+
-  geom_histogram(aes(x=gt),binwidth = 0.1,data=to_gt_AMY2B)+
-  geom_line(aes(x=x,y=y*adj,color=factor(i)))+
+  geom_histogram(aes(x=gt, fill=dataset),binwidth = 0.1,data=to_gt_AMY2B%>% separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE))+
+  geom_line(aes(x=x,y=y*adj,group=factor(i)),size=.5,alpha=.7)+
   theme_bw()+
-  facet_wrap(~iter)+
-  theme(legend.position="None")+
-  scale_x_continuous(breaks=seq(0,20,2))
+  theme(legend.position=c(0.7,0.8),
+        legend.background=element_blank(),
+        legend.key.size=unit(0.25,"cm"),
+        legend.text = element_text(size=8))+
+  scale_x_continuous(breaks=seq(0,20,2)) +
+  scale_fill_brewer("",palette="Set1")+
+  scale_y_continuous("count/density")
 
 print(g)
-
+fn_out = paste(outdir,"/AMY2B_genotyping.pdf",sep="")
+pdf(fn_out,width=3,height=2)
+print(g)
+dev.off()
 
 
 
