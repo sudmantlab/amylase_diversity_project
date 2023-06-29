@@ -25,7 +25,8 @@ stats = read.table(fn,header=T,sep="\t") %>%
 stats_new = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/d4_to_windowed_cvg/output/correction_factors/correction_factors.tsv",header=T,sep='\t')
 
 
-stats_new %>% filter(grepl("NEO283",sample))
+#stats_new %>% filter(grepl("NEO283",sample))
+stats_new %>% filter(grepl("Excoffier",sample))
 ```
 
 

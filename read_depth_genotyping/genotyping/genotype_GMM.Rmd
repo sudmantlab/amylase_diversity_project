@@ -98,17 +98,19 @@ g+geom_histogram(aes(x=gt),binwidth=0.05,color='blue')+
   scale_x_continuous(breaks=seq(0,18,1),lim=c(0,20))
 
 
-g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Excof",sample)))
+g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Excoffier",sample)))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
   facet_wrap(~name,scales="free",nrow=1)+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1))
 
+##Haak definitely look like they failed
 g=ggplot(t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Haak",sample)))
 g+geom_histogram(aes(x=gt),binwidth=0.05)+
   facet_wrap(~name,scales="free",nrow=1)+
   theme_bw(base_size=8)+
   scale_x_continuous(breaks=seq(0,18,1),lim=c(0,20))
+t_gt %>% filter(name %in% c("amy1_sum","AMY2A","AMY2B")) %>% filter(grepl("Haak",sample)) %>% filter(grepl("MLZ",sample))
 ```
 ```{r}
 #### MODIFY THE SGDP AND HGDP BY A CONSTANT FACTOR SO THEY FIT INTEGERS
@@ -128,15 +130,18 @@ t_gt_adj = t_gt %>% mutate(gt=ifelse(dataset=="SGDP",gt*1.05,gt)) %>%
                     mutate(gt=ifelse(dataset=="HGDP",gt*0.97,gt)) %>%
                     mutate(gt=ifelse((dataset=="GTEx")&(name=="amy1_sum"),gt*0.8,gt)) %>%
                     mutate(gt=ifelse((dataset=="Archaic")&(name=="amy1_sum"),gt*0.9,gt)) %>%
-                    filter(dataset %in% c("1KG","1KG_trio","Archaic","HGDP","SGDP","StoneAgeAncient","GTEx"))
+                    filter(dataset %in% c("1KG","1KG_trio","Archaic","HGDP","SGDP","StoneAgeAncient","GTEx","ExcoffierAncient")) %>%
+                    mutate(include_in_training = ifelse(dataset %in% c("1KG","1KG_trio","HGDP","SGDP"),TRUE,FALSE))
 
 unique(t_gt_adj$dataset)
 length(unique(t_gt_adj$sample))
 t_gt_adj %>% filter(dataset=="Archaic")
 
-to_gt_AMY2A = t_gt_adj %>% filter(name=="AMY2A")  %>% dplyr::select(sample,gt)
-to_gt_AMY2B = t_gt_adj %>% filter(name=="AMY2B")  %>% dplyr::select(sample,gt)
-to_gt_AMY1 =  t_gt_adj %>% filter(name=="amy1_sum")  %>% dplyr::select(sample,gt)
+to_gt_AMY2A = t_gt_adj %>% filter(name=="AMY2A")  %>% dplyr::select(sample,gt,include_in_training)
+to_gt_AMY2B = t_gt_adj %>% filter(name=="AMY2B")  %>% dplyr::select(sample,gt,include_in_training)
+to_gt_AMY1 =  t_gt_adj %>% filter(name=="amy1_sum")  %>% dplyr::select(sample,gt,include_in_training)
+
+unique(t_gt$dataset)
 ```
 
 ```{r}
@@ -243,7 +248,7 @@ genotype = function(to_gt, iters, label){
   offset = 0
   
   ##data
-  X = to_gt$gt
+  X = (to_gt %>% filter(include_in_training==TRUE))$gt
   
   params = list()
   dists = list()
@@ -260,15 +265,6 @@ genotype = function(to_gt, iters, label){
   dists = do.call(rbind, dists)
   
   final_resps = gt_likelihood_table(to_gt,k,mu,offset,sigma, pi, label)
-  
-  #final_resps = E_step(X,k,mu,offset,sigma,pi,-1)
-
-  #final_resps = to_gt %>% 
-  #  mutate(obs=row_number()) %>%
-  #  inner_join(final_resps,by="obs") %>%
-  #  inner_join(data.frame(cp=mu) %>% mutate(i=row_number()),by="i") %>%
-  #  mutate(label=label) %>%
-  #  dplyr::select(sample, obs, r, i, X, cp, label)
 
   return(list("k"=k,
               "mu"=mu,
@@ -288,8 +284,8 @@ genotype = function(to_gt, iters, label){
 #genotype(to_gt_train_AMY1, 20, "AMY1")
 
 AMY1_gt = genotype(to_gt_AMY1, 20, "AMY1")
-AMY2B_gt = genotype(to_gt_AMY2B, 20, "AMY2B")
 AMY2A_gt = genotype(to_gt_AMY2A, 20, "AMY2A")
+AMY2B_gt = genotype(to_gt_AMY2B, 20, "AMY2B")
 
 
 #MY2Ap_gt_trained = genotype(to_gt_train_AMY2Ap, 20, "AMY2Ap")

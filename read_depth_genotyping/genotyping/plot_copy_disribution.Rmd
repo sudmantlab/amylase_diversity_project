@@ -49,7 +49,7 @@ sample_counts = read.table("./output/genotypes.likelihoods.tsv",header=T,sep="\t
   group_by(dataset) %>%
   summarize(n=n())
 
-n_modern = sample_counts %>% filter(!dataset %in% c("StoneAgeAncient","Archaic")) %>% ungroup() %>% summarize(n=sum(n))
+n_modern = sample_counts %>% filter(!dataset %in% c("ExcoffierAncient", "StoneAgeAncient","Archaic")) %>% ungroup() %>% summarize(n=sum(n))
 sample_counts
 n_modern
 
@@ -59,7 +59,7 @@ t_gt_count = read.table("./output/genotypes.likelihoods.tsv",header=T,sep="\t") 
     filter(label=="AMY1") %>%
     separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') 
 
-  
+t_gt  %>% filter(grepl("Excof",sample))
 ```
 
 
@@ -71,7 +71,7 @@ t_gt_count = read.table("./output/genotypes.likelihoods.tsv",header=T,sep="\t") 
 t_plot = t_gt %>% 
           filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
           separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
-          filter(dataset!="StoneAgeAncient") %>%
+          filter(!dataset %in% c("StoneAgeAncient", "ExcoffierAncient","GTEx")) %>%
           group_by(p2,label) %>%
           mutate(p2_mu = mean(cp)) %>%
           ungroup() %>%
@@ -104,8 +104,6 @@ pop_list = t_gt %>%
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata"
 fn_out = paste(outdir,"/populations.tsv",sep="")
 write.table(pop_list,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
-
-
 
 
 ```
@@ -334,7 +332,7 @@ dev.off()
 t_data_by_superpop = t_gt %>% 
           filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
           separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
-          filter(dataset!="StoneAgeAncient") %>%
+          filter(!dataset %in% c("StoneAgeAncient","ExcoffierAncient","GTEx")) %>%
           mutate(super_pop = ifelse(p1 %in% c("Denisova","Neanderthal"), "archaic","modern")) %>%
           mutate(p2 = ifelse(super_pop=="archaic","ARC",p2)) 
           
@@ -404,6 +402,72 @@ pdf(fn_out,width=1.5,height=1.5)
 print(g)
 dev.off()
 
+```
+```{r}
+library(ggforce)
+#### plot jit AMYX vs AMYY
+
+t_struc = t_data_by_superpop %>% 
+  #dplyr::select(dataset,ID,p1,p2,X,cp,label) %>%
+  dplyr::select(dataset,ID,p1,p2,cp,label) %>%
+  pivot_wider(values_from = cp, names_from = label)
+
+t_struc$p2 = factor(t_struc$p2, levels=c("ARC", "AFR", "WEA", "SA", "CAS", "EA", "OCN", "AMR"))
+  
+colors = c("black", "#EDB829", "#94B669", "#E97C07", "#00496F", "#0C7996","purple", "#DD4124")
+
+g=ggplot(t_struc)
+g=g+geom_point(aes(x=AMY1,y=AMY2B), 
+               position=position_jitternormal(sd_x = 0.1, sd_y=0.1),
+               alpha=.8,
+               size=0.01,
+               shape=16)+
+  theme_bw(base_size=8)+
+  scale_color_manual(values=colors)+
+  theme(legend.position="None",
+        panel.grid=element_blank())+
+  scale_x_continuous("AMY1",breaks=seq(0,20,2))
+
+fn_out = "./output_figures/main_figs/copy_compare_AMY1_vs_AMY2B.pdf"
+pdf(fn_out,width=2,height=1)
+print(g)
+dev.off()
+
+g=ggplot(t_struc %>% arrange(p2))
+g=g+geom_point(aes(x=AMY2A,y=AMY2B,), 
+               position=position_jitternormal(sd_x = 0.1, sd_y=0.1),
+               alpha=.8,
+               shape=16,
+               size=0.01)+
+  theme_bw(base_size=8)+
+  scale_color_manual(values=colors)+
+  theme(legend.position="None",
+        panel.grid=element_blank())+
+  scale_x_continuous("AMY2A",breaks=seq(0,6))
+
+fn_out = "./output_figures/main_figs/copy_compare_AMY2A_vs_AMY2B.pdf"
+pdf(fn_out,width=1.25,height=1)
+print(g)
+dev.off()
+
+# t_1_v_2B_sum = t_struc %>% 
+#   group_by(AMY1,AMY2B) %>%
+#   summarize(n=n())
+# 
+# g=ggplot(t_1_v_2B_sum)
+# g=g+geom_point(aes(x=AMY1,y=AMY2B,size=n))+
+#   theme_bw(base_size=8)+
+#   scale_color_manual(values=colors)+
+#   theme(legend.position="None")+
+#   scale_x_continuous("AMY1",breaks=seq(0,20,2))
+# 
+# fn_out = "./output_figures/main_figs/copy_compare_AMY1_vs_AMY2B_sum.pdf"
+# pdf(fn_out,width=2,height=1)
+# print(g)
+# dev.off()
+
+
+
 
 ```
 
@@ -418,6 +482,7 @@ dev.off()
 t_gt_renamed = t_gt %>% 
           filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
           separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
+          mutate(p2 = ifelse(p2=="HunterGathererE","Hunter-GathererE",p2)) %>%
           filter(p2 %in% c("WEA","EarlyFarmer","Hunter-GathererW","Hunter-GathererE","Yamnaya","Europe")) %>%
           mutate(super_pop = ifelse(p1 %in% c("Denisova","Neanderthal"), "archaic","modern")) %>%
           mutate(super_pop = ifelse(p2 %in% c("EarlyFarmer","Hunter-GathererW","Hunter-GathererE","Yamnaya"), "ancient",super_pop)) %>%
@@ -542,6 +607,11 @@ ancient_info = read.table("/Users/petersudmant/Documents/science/sudmantlab/proj
   mutate(ID = sample, age=ageAverage) %>%
   dplyr::select(ID, age)
 
+ancient_info_excof = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/meta_data/ExcoffierAncients.tsv",header=T,sep="\t") %>%
+  mutate(ID = SAMPLE_ID, age=AGE_AVG_BP) %>%
+  dplyr::select(ID, age)
+
+ancient_info = rbind(ancient_info, ancient_info_excof)
 
 lmp <- function (modelobject) {
     if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
@@ -553,7 +623,7 @@ lmp <- function (modelobject) {
 
 
 t_gt_renamed_age = left_join(t_gt_renamed,ancient_info,by="ID") %>%
-               mutate(age=ifelse(dataset!="StoneAgeAncient",0,as.numeric(age))) %>%
+               mutate(age=ifelse(!dataset %in% c("StoneAgeAncient","ExcoffierAncient"),0,as.numeric(age))) %>%
                #filter(sample!="StoneAgeAncient.VK117.NorthernEurope.Yamnaya") %>%
                mutate(p2 = ifelse(dataset=="Archaic","Archaic",p2)) %>%
                mutate(age=ifelse(super_pop=="modern",0,age)) %>%
@@ -569,6 +639,8 @@ curr_gene = "AMY1"
 curr_gene = "AMY2A"
 #curr_gene = "AMY2B"
 inset_pos = data.frame(gene=c("AMY1","AMY2A","AMY2B"),y=c(18,8,8))
+dummy = data.frame(gene=c("AMY1","AMY2A","AMY2B"),y=c(2,2,-3))
+
 
 for (curr_gene in c("AMY1","AMY2A","AMY2B")){
 
@@ -596,11 +668,12 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
           plot.background=element_rect(fill='transparent', color=NA))
   
   inset_pos_y = (inset_pos %>% filter(gene==curr_gene))$y  
-  
+  dummy_y = (dummy %>% filter(gene==curr_gene))$y  
+    
   mn = min((t_gt_renamed_age %>% filter(label==curr_gene))$cp)
   mx = max((t_gt_renamed_age %>% filter(label==curr_gene))$cp)
   
-  data.tb <- tibble(x = -12500, y = mx+mx/20, 
+  data.tb <- tibble(x = -13500, y = mx+mx/20, 
                   plot = list(g_i))
   
   
@@ -617,7 +690,8 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
     theme(legend.position="None")+
     scale_y_continuous(paste(curr_gene," copy",sep=""),breaks=seq(2,20,2))+
     scale_x_continuous(label,breaks=breaks,labels=labels)+
-    coord_cartesian(xlim=c(-11000,0),ylim=c(mn,mx))+
+    coord_cartesian(xlim=c(-12000,0),ylim=c(mn,mx))+
+    #geom_blank(aes(x=0,y=dummy_y))+
     geom_text(aes(x=x,y=y,label=label),data=df_p,parse=TRUE,size=2,hjust=0)
 
        
@@ -626,34 +700,19 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
   dev.off()
 }
 
-#1/3 of the alleles are context specific
-#longenvity alleles, 1/3 of them are context specific
-#your idea of the variation in lifespan woudl be crazy
- 
-# pdf(fn_out,width=2,height=1)
-# print(g)
-# dev.off()
-
- 
-    #
-    # theme(legend.key.size=unit(0.5,"cm"))+
-    # scale_size(range=c(0.01,3.5))+
-    # scale_x_continuous(paste(curr_gene," copy",sep=" "),breaks=seq(0,20,2),lim=c(mn,mx))+
-    # #facet_grid(super_pop~.,space="free",scales="free_y")+
-    # theme(strip.background = element_blank(),
-    #       strip.text = element_text(size=1),
-    #       legend.position="None")+
-    # scale_y_discrete("")+
-    # geom_text(aes(x=x,y=plabel, label=label),parse=TRUE,data=p_values,size=1,position=position_nudge(x=0,y=.35),hjust=1)
-  
-
-
+### NOTE THIS INDIVIDUAL
+###**
 left_join(t_gt_renamed,ancient_info,by="ID") %>%
                mutate(age=ifelse(dataset!="StoneAgeAncient",0,as.numeric(age))) %>%
                #filter(sample!="StoneAgeAncient.VK117.NorthernEurope.Yamnaya") %>%
                mutate(p2 = ifelse(dataset=="Archaic","Archaic",p2)) %>%
                mutate(age=ifelse(super_pop=="modern",0,age)) %>%
                filter(age>20000)
+
+
+```
+```{r}
+
 
 
 ```
