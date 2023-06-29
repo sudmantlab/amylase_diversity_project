@@ -126,8 +126,9 @@ g+geom_histogram(aes(x=gt),binwidth=0.05)+
 
 t_gt_adj = t_gt %>% mutate(gt=ifelse(dataset=="SGDP",gt*1.05,gt)) %>%
                     mutate(gt=ifelse(dataset=="HGDP",gt*0.97,gt)) %>%
-                    mutate(gt=ifelse((dataset=="Archaic")&(name=="amy1_sum"),gt*0.8,gt)) %>%
-                    filter(dataset %in% c("1KG","1KG_trio","Archaic","HGDP","SGDP","StoneAgeAncient"))
+                    mutate(gt=ifelse((dataset=="GTEx")&(name=="amy1_sum"),gt*0.8,gt)) %>%
+                    mutate(gt=ifelse((dataset=="Archaic")&(name=="amy1_sum"),gt*0.9,gt)) %>%
+                    filter(dataset %in% c("1KG","1KG_trio","Archaic","HGDP","SGDP","StoneAgeAncient","GTEx"))
 
 unique(t_gt_adj$dataset)
 length(unique(t_gt_adj$sample))
