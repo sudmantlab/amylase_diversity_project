@@ -6,8 +6,10 @@ configfile: "SGDP_config.json"
 
 def get_inputs(wildcards):
     inputs = [] 
-    for s in config['samples']:
-        inputs.append("d4_files/SGDP/q0/{sample}.d4".format(sample=s))
+    #for s in config['samples']:
+    for s in config['sample_paths']:
+        sample = s.split("/")[-1].replace(".bam","")
+        inputs.append("d4_files/SGDP/q0/{sample}.d4".format(sample=sample))
                                                                  
     return inputs
 
@@ -20,6 +22,7 @@ rule make_d4:
         "d4_files/SGDP/{mapq}/{sample}.d4"
     run:
         d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
+        d4_tools = "/global/scratch/users/psudmant/software/d4-format/target/release/d4tools"
         path = "{path}/{sample}/{sample}.bam".format(path=config['path'],
                                             sample=wildcards.sample)
         cmd = "{d4} create -z -{mapq} {path} {output}"

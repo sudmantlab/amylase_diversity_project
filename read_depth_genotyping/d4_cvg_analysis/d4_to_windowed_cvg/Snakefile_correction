@@ -1,0 +1,68 @@
+#!vim set syntax=python
+import pandas as pd
+import numpy as np
+import pyd4 as d4
+import pdb
+
+#PLAN
+#read in locus
+#smooth locus
+#get mean / median
+#output to table to examine
+#np.savetxt("test", c, newline = "\n")
+
+configfile: "configs/allsamples_config.json"
+#configfile: "./configs/1kgsamples.json"
+#configfile: "./configs/1kgsamples_subset.json"
+#configfile: "genotype_ancient_subset.json"
+#configfile: "./configs/cvg_loci.config"
+#locus_contig = "chr1"
+#locus_start = 103100000
+#locus_end = 104200000
+
+#fn_loci = "usher_et_al_hg38_loci.bed"
+#fn_loci = "genotype_loci.bed"
+
+
+
+rule all:
+    input:
+        "output/correction_factors/correction_factors.tsv"
+
+
+def get_all_inputs(wildcards):
+    inputs = []
+    for sample, path in config['sample_paths'].items():
+        inputs.append("output/correction_factors/by_indiv/{sample}.tsv".format(sample=sample))
+    return inputs
+
+rule combine:
+    input:
+        get_all_inputs
+    output:
+        "output/correction_factors/correction_factors.tsv"
+    run:
+        tables = []
+        for f in input:
+            t = pd.read_csv(f, header=0, sep="\t")
+            #sample = f.split("/")[-1].replace(".json","")
+            #t[sample] = sample
+            tables.append(t)
+
+        t = pd.concat(tables)
+        t.to_csv(output[0], sep="\t", index=False)
+
+
+rule get_corr_factors:
+    output:
+        "output/correction_factors/by_indiv/{sample}.tsv"
+    run:
+        fn_d4 = config['sample_paths'][wildcards.sample]
+        cmd = ("python d4_stats.py stats "
+               "--d4_file {fn_d4} "
+               "--sample {sample} "
+               "--fn_out {fout}".format(fn_d4 = fn_d4,
+                                        sample=wildcards.sample,
+                                        fout = output[0]))
+        shell(cmd)
+

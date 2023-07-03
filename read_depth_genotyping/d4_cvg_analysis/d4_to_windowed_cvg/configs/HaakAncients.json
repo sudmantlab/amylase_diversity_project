@@ -1,0 +1,17 @@
+{
+    "sample_paths": {
+        "Haak.ADS003.Spain.Neolithic": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/ADS003.d4",
+        "Haak.ADS004.Spain.Neolithic": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/ADS004.d4",
+        "Haak.ADS005.Spain.Neolithic": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/ADS005.d4",
+        "Haak.ADS006.Spain.UNKNOWN": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/ADS006.d4",
+        "Haak.ADS007.Spain.UNKNOWN": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/ADS007.d4",
+        "Haak.ADS008.Spain.Chalcolithic": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/ADS008.d4",
+        "Haak.ADS009.Spain.UNKNOWN": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/ADS009.d4",
+        "Haak.AGS001.Spain.Neolithic": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/AGS001.d4",
+        "Haak.AGS003.Spain.UNKNOWN": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/AGS003.d4",
+        "Haak.CRS001.Spain.UNKNOWN": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/CRS001.d4",
+        "Haak.CRS002.Spain.BronzeAge": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/CRS002.d4",
+        "Haak.MLZ003.Spain.Solutrean": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/MLZ003.d4",
+        "Haak.MLZ005.Spain.Solutrean": "/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files//HaakAncients/q0/MLZ005.d4"
+    }
+}

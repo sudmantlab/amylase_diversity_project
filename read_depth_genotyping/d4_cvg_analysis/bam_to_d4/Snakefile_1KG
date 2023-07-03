@@ -22,7 +22,6 @@ def get_inputs(wildcards):
                                                           name=name)
         if cram_path in config['failed_paths']: continue
         inputs.append("d4_files/1KG/q0/{fn}".format(fn=fn))
-        inputs.append("d4_files/1KG/q20/{fn}".format(fn=fn))
     return inputs
 
 rule all:
@@ -35,6 +34,7 @@ rule make_d4:
         "d4_files/1KG/{mapq}/{name}.{run_id}.{pop}.d4"
     run:
         d4_tools = "/global/scratch2/psudmant/software/d4-format/target/release/d4tools"
+        d4_tools = "/global/scratch/users/psudmant/software/d4-format/target/release/d4tools"
         path = "{path}/{run_id}/{name}.final.cram".format(path=config['path'],
                                                           run_id=wildcards.run_id,
                                                           name=wildcards.name)

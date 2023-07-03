@@ -16,16 +16,21 @@ pop_dict = {"South Asia": "SA",
             "Central Asia and Siberia":"CAS"}
 
 exclude = ["SGDP.LP6005441-DNA_C06.Japanese.EA",
-           "SGDP.LP6005519-DNA_F06.Dusun.OCN",
-           "1KG.HG03025.GWD.AFR",
-           "1KG.HG03366.ESN.AFR",
-           "1KG.HG02635 .GWD.AFR",
+           "SGDP.LP6005442-DNA_A09.Australian.OCN",
+           "SGDP.LP6005441-DNA_H08.Mozabite.WEA",
            "1KG.HG03689.STU.SA",
-           "1KG.NA18974.JPT.EA",
-           "1KG.HG03689.STU.SA",
-           "1KG.HG02635.GWD.AFR",
-           "1KG.HG02635.GWD.AFR",
            "1KG.NA18974.JPT.EA"]
+           #"1KG.HG03025.GWD.AFR",
+           #"1KG.HG02635.GWD.AFR",
+           #"1KG.HG02635.GWD.AFR",
+           #"1KG.HG03366.ESN.AFR",
+           #"1KG.HG02635.GWD.AFR",
+           #"1KG.HG03689.STU.SA",
+           #"1KG.NA18974.JPT.EA"]
+
+
+
+
 
 pop_to_region = {"ACB":"AMR",
                  "ASW":"AMR",
@@ -58,39 +63,103 @@ pop_to_region = {"ACB":"AMR",
 
 rule all:
     input:
-        "configs/allsamples_config.json"
-
-
-rule make_config:
-    output:
         "configs/allsamples_config.json",
         "configs/SGDPsamples.json",
         "configs/HGDPsamples.json",
-        "configs/ancientsamples.json",
         "configs/1kgsamples.json",
-        "configs/1kgsamples_subset.json",
-        "configs/1kg_trios.json"
+        "configs/1kg_trios.json",
+        #"configs/ancientsamples.json",
+        "configs/AGDP_hg19.json",
+        "configs/Reich2022.json",
+        "configs/KrauseHG.json",
+        "configs/HaakAncients.json",
+        "configs/GTEx.json",
+        "configs/Excoffier.json",
+        "configs/Neanderthal.json",
+        "configs/StoneAge.json"
+
+rule combine:
+    input:
+        "configs/SGDPsamples.json",
+        "configs/HGDPsamples.json",
+        "configs/1kgsamples.json",
+        "configs/1kg_trios.json",
+        "configs/GTEx.json",
+        "configs/StoneAge.json",
+        "configs/Neanderthal.json",
+        "configs/Excoffier.json",
+        "configs/KrauseHG.json",
+        "configs/HaakAncients.json",
+        "configs/Reich2022.json"
+    output:
+        "configs/allsamples_config.json"
+    run:
+        config_all = {"sample_paths":{}}
+
+        for fn in input:
+            j = json.load(open(fn,"r"))
+            config_all['sample_paths'].update(j['sample_paths'])
+
+        open(output[0],"w").write(json.dumps(config_all, indent=4, sort_keys=True))
+
+
+
+rule make_SGDP_HGDP_config:
+    output:
+        "configs/SGDPsamples.json",
+        "configs/HGDPsamples.json"
     run:
         t = pd.read_csv("../bam_to_d4/meta_data/HGDP_SGDP_human_table.tsv",header=0,sep="\t")
-        
+        mapq = "q0"        
+        config_HGDP = {"sample_paths":{}} 
+        config_SGDP = {"sample_paths":{}} 
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+        for ix, row in t[t.DATSET=="SGDP"].iterrows():
+            pop = row["ETHNIC GROUP"].replace(" ","")
+            sample_path = "{d4_path}/SGDP/{mapq}/{id}.d4".format(d4_path=d4_path,
+                                                          mapq=mapq,
+                                                          id = row["NAME"])
+                                                        
+            sample_name = "SGDP.{ID}.{E}.{R}".format(ID=row["NAME"],
+                                                     E=pop,
+                                                     R=pop_dict[row["REGION"]])
+            if sample_name in exclude: continue
 
+            config_SGDP["sample_paths"][sample_name] = sample_path
+                                          
+
+        for ix, row in t[t.DATSET=="HGDP"].iterrows():
+            pop = row["ETHNIC GROUP"].replace(" ","")
+            sample_path = "{d4_path}/HGDP/{mapq}/{id}.alt_bwamem_GRCh38DH.20181023.{pop}.d4".format(d4_path=d4_path,
+                                                          mapq=mapq,
+                                                          id = row["NAME"],
+                                                          pop = pop)
+                                                        
+            sample_name = "HGDP.{ID}.{E}.{R}".format(ID=row["NAME"],
+                                                     E=pop,
+                                                     R=pop_dict[row["REGION"]])
+            config_HGDP["sample_paths"][sample_name] = sample_path
+
+        open(output[0],"w").write(json.dumps(config_SGDP, indent=4, sort_keys=True))
+        open(output[1],"w").write(json.dumps(config_HGDP, indent=4, sort_keys=True))
+
+
+
+rule make_1kg_config:
+    output:
+        "configs/1kgsamples.json",
+        "configs/1kg_trios.json"
+    run:    
         t_1kg = pd.read_csv("../bam_to_d4/meta_data/1000G_2504_high_coverage.sequence.index", sep="\t") 
         t_1kg_trio = pd.read_csv("../bam_to_d4/meta_data/1000G_698_related_high_coverage.sequence.index", sep="\t") 
         
         mapq = "q0"        
-
-        config_out = {"sample_paths":{}} 
-        config_HGDP = {"sample_paths":{}} 
-        config_SGDP = {"sample_paths":{}} 
-        config_ancient = {"sample_paths":{}} 
+        
         config_1kg = {"sample_paths":{}} 
         config_1kg_subset = {"sample_paths":{}} 
         config_1kg_trio = {"sample_paths":{}} 
-
-
-        #d4_path="/global/scratch2/psudmant/projects/amylase/d4_files"
         d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
-
+        
         for ix,row in t_1kg.iterrows():
             SID = row['SAMPLE_ID']
             name= row['SAMPLE_NAME'].rstrip()
@@ -108,11 +177,7 @@ rule make_config:
                                                              region=region)
             if sample_name in exclude: continue
 
-            config_out["sample_paths"][sample_name] = sample_path
             config_1kg["sample_paths"][sample_name] = sample_path
-            if ix%50 == 0:
-                print(ix)
-                config_1kg_subset["sample_paths"][sample_name] = sample_path
 
 
         for ix,row in t_1kg_trio.iterrows():
@@ -132,56 +197,203 @@ rule make_config:
                                                              region=region)
             if sample_name in exclude: continue
 
-            config_out["sample_paths"][sample_name] = sample_path
             config_1kg_trio["sample_paths"][sample_name] = sample_path
 
+        open(output[0],"w").write(json.dumps(config_1kg, indent=4, sort_keys=True))
+        open(output[1],"w").write(json.dumps(config_1kg_trio, indent=4, sort_keys=True))
         
+rule make_hg19_AGDP:
+    output:
+        "configs/AGDP_hg19.json"
+    run:
+        mapq = "q0"        
 
-        for ix, row in t[t.DATSET=="SGDP"].iterrows():
-            pop = row["ETHNIC GROUP"].replace(" ","")
-            sample_path = "{d4_path}/SGDP/{mapq}/{id}.d4".format(d4_path=d4_path,
-                                                          mapq=mapq,
-                                                          id = row["NAME"])
-                                                        
-            sample_name = "SGDP.{ID}.{E}.{R}".format(ID=row["NAME"],
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+        
+        t_AGDP = pd.read_csv("../bam_to_d4/meta_data/AGDP.metadata.txt", header=0,sep="\t")
+        AGDP_inf = {}
+        for i, row in t_AGDP.iterrows():
+            #print(row['I-ID'])
+            AGDP_inf[row['I-ID']] = {"pop":row["Group ID"],
+                                     "region":row["Country"].replace(" ", "")}
+
+        for sample_path in glob.glob("{path}/ReichAncients_agdp_subset_hg19/{mapq}/*".format(path=d4_path,mapq=mapq)):
+            sample = sample_path.split("/")[-1].split(".")[0].split("--")[0] 
+            sample_inf = AGDP_inf[sample]
+            pop = sample_inf["pop"]
+            region = sample_inf["region"]
+            sample_name = "AGDP.{ID}.{E}.{R}".format(ID=sample,
                                                      E=pop,
-                                                     R=pop_dict[row["REGION"]])
-            if sample_name in exclude: continue
-            if row["NAME"] in config['exclude_SGDP']:
-                print("EXCLUDING {S}".format(S=row["NAME"]))
+                                                     R=region)
+            config_ancient["sample_paths"][sample_name] = sample_path
+            #print(sample_name)
+            #StoneAgeAncient.NEO113.CentralEasternEurope.Hunter-GathererE
+        
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
+
+
+rule make_Krause:
+    output:
+        "configs/KrauseHG.json"
+    run:
+        mapq = "q0"        
+
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+        
+        t = pd.read_csv("../bam_to_d4/meta_data/KrauseAncients.tsv", header=0,sep="\t")
+        inf = {}
+        for i, row in t.iterrows():
+            sample = row['SAMPLE_ID'].split(".")[0]
+            inf[sample] = {"pop":row["COUNTRY"].replace(" ",""),
+                                     "region":"HunterGatherer"}
+
+        for sample_path in glob.glob("{path}/KrauseAncients/{mapq}/*".format(path=d4_path,mapq=mapq)):
+            sample = sample_path.split("/")[-1].split(".")[0]
+            if not sample in inf:
+                print("SKIPPING",sample)
                 continue
-
-            config_out["sample_paths"][sample_name] = sample_path
-            config_SGDP["sample_paths"][sample_name] = sample_path
-                                          
-
-        for ix, row in t[t.DATSET=="HGDP"].iterrows():
-            pop = row["ETHNIC GROUP"].replace(" ","")
-            sample_path = "{d4_path}/HGDP/{mapq}/{id}.alt_bwamem_GRCh38DH.20181023.{pop}.d4".format(d4_path=d4_path,
-                                                          mapq=mapq,
-                                                          id = row["NAME"],
-                                                          pop = pop)
-                                                        
-            sample_name = "HGDP.{ID}.{E}.{R}".format(ID=row["NAME"],
+            sample_inf = inf[sample]
+            pop = sample_inf["pop"]
+            region = sample_inf["region"]
+            sample_name = "Krause.{ID}.{E}.{R}".format(ID=sample,
                                                      E=pop,
-                                                     R=pop_dict[row["REGION"]])
-            config_out["sample_paths"][sample_name] = sample_path
-            config_HGDP["sample_paths"][sample_name] = sample_path
+                                                     R=region)
+            config_ancient["sample_paths"][sample_name] = sample_path
+        
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
 
 
-        for sample_path in glob.glob("{path}/StoneAgeAncients/{mapq}/*".format(path=d4_path,mapq=mapq)):
+
+rule make_Haak:
+    output:
+        "configs/HaakAncients.json"
+    run:
+        mapq = "q0"        
+
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+        
+        t = pd.read_csv("../bam_to_d4/meta_data/HaakAncients.tsv", header=0,sep="\t")
+        inf = {}
+        for i, row in t.iterrows():
+            sample = row['SAMPLE_ID'].split(".")[0]
+            inf[sample] = {"pop":row["COUNTRY"].replace(" ",""),
+                                     "region":row['CULTURE'].replace(" ","")}
+
+        for sample_path in glob.glob("{path}/HaakAncients/{mapq}/*".format(path=d4_path,mapq=mapq)):
+            sample = sample_path.split("/")[-1].split(".")[0]
+            if not sample in inf:
+                print("SKIPPING",sample)
+                continue
+            sample_inf = inf[sample]
+            pop = sample_inf["pop"]
+            region = sample_inf["region"]
+            sample_name = "Haak.{ID}.{E}.{R}".format(ID=sample,
+                                                     E=pop,
+                                                     R=region)
+            config_ancient["sample_paths"][sample_name] = sample_path
+        
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
+
+
+rule make_GTEx:
+    output:
+        "configs/GTEx.json"
+    run:
+        mapq = "q0"        
+
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+        
+        for sample_path in glob.glob("{path}/GTEx/{mapq}/*".format(path=d4_path,mapq=mapq)):
+            sample = sample_path.split("/")[-1].split(".")[0]
+            sample_name = "GTEx.{ID}.UNK.modern".format(ID=sample)
+            config_ancient["sample_paths"][sample_name] = sample_path
+        
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
+
+
+rule make_Reich2022:
+    output:
+        "configs/Reich2022.json"
+    run:
+        mapq = "q0"        
+
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+        
+        t = pd.read_csv("../bam_to_d4/meta_data/ReichAncients2022.tsv", header=0,sep="\t")
+        inf = {}
+        for i, row in t.iterrows():
+            #print(row['I-ID'])
+            inf[row['SAMPLE_ID']] = {"pop":row["COUNTRY"].replace(" ",""),
+                                     "region":row["SAMPLE_TITLE"].split("_")[-1].replace(" ","")}
+
+        for sample_path in glob.glob("{path}/ReichAncients2022/{mapq}/*".format(path=d4_path,mapq=mapq)):
+            sample = sample_path.split("/")[-1].split(".")[0]
+            if not sample in inf:
+                print("SKIPPING",sample)
+                continue
+            sample_inf = inf[sample]
+            pop = sample_inf["pop"]
+            region = sample_inf["region"]
+            sample_name = "Reich2022.{ID}.{E}.{R}".format(ID=sample,
+                                                     E=pop,
+                                                     R=region)
+            config_ancient["sample_paths"][sample_name] = sample_path
+            #print(sample_name)
+            #StoneAgeAncient.NEO113.CentralEasternEurope.Hunter-GathererE
+            #pdb.set_trace()
+        
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
+
+    
+
+rule make_Excoffier:
+    output:
+        "configs/Excoffier.json"
+    run:
+        mapq = "q0"        
+
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+        t_excoffier = pd.read_csv("../bam_to_d4/meta_data/ExcoffierAncients.tsv", header=0,sep="\t")
+        ex_inf = {}
+        for i, row in t_excoffier.iterrows():
+            print(row['SAMPLE_ID'])
+            ex_inf[row['SAMPLE_ID']] = {"pop":row["MAIN_CLUSTER"],
+                                       "region":row["COUNTRY"]}
+
+        for sample_path in glob.glob("{path}/ExcoffierAncients/{mapq}/*".format(path=d4_path,mapq=mapq)):
             sample = sample_path.split("/")[-1].split(".")[0] 
-            sample_inf = config[sample]
-            pop = sample_inf["region"].replace("(","").replace(")","")
-            region = sample_inf["popGrouping"].replace(" ","").replace("(","").replace(")","")
-            sample_name = "StoneAgeAncient.{ID}.{E}.{R}".format(ID=sample,
-                                                                E=pop,
+            sample_inf = ex_inf[sample]
+            pop = sample_inf["pop"]
+            region = sample_inf["region"]
+            #ExcoffierAncient.VLASA7-3.Serbia.Hunter-GathererE
+            sample_name = "ExcoffierAncient.{ID}.{R}.{P}".format(ID=sample,
+                                                                P=pop,
                                                                 R=region)
-            config_out["sample_paths"][sample_name] = sample_path
             config_ancient["sample_paths"][sample_name] = sample_path
 
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
 
+rule make_Neanderthal:
+    output:
+        "configs/Neanderthal.json"
+    run:
+        mapq = "q0"        
 
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
         for sample_path in glob.glob("{path}/Neanderthals/{mapq}/*".format(path=d4_path,mapq=mapq)):
             sample = sample_path.split("/")[-1].split(".")[0] 
             neanderthal_inf = {"Altai":"Neanderthal",
@@ -193,15 +405,34 @@ rule make_config:
             sample_name = "Archaic.{ID}.{E}.{R}".format(ID=sample,
                                                         E=pop,
                                                         R=region)
-            config_out["sample_paths"][sample_name] = sample_path
             config_ancient["sample_paths"][sample_name] = sample_path
 
-        #print(json.dumps(config_out, indent=4, sort_keys=True))
-        open(output[0],"w").write(json.dumps(config_out, indent=4, sort_keys=True))
-        open(output[1],"w").write(json.dumps(config_SGDP, indent=4, sort_keys=True))
-        open(output[2],"w").write(json.dumps(config_HGDP, indent=4, sort_keys=True))
-        open(output[3],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
-        open(output[4],"w").write(json.dumps(config_1kg, indent=4, sort_keys=True))
-        open(output[5],"w").write(json.dumps(config_1kg_subset, indent=4, sort_keys=True))
-        open(output[6],"w").write(json.dumps(config_1kg_trio, indent=4, sort_keys=True))
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
+
+rule make_StoneAge:
+    output:
+        "configs/StoneAge.json"
+    run:
+        mapq = "q0"        
+
+        config_ancient = {"sample_paths":{}} 
+
+        d4_path="/global/scratch/users/psudmant/projects/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/d4_files/"
+
+        for sample_path in glob.glob("{path}/StoneAgeAncients/{mapq}/*".format(path=d4_path,mapq=mapq)):
+            sample = sample_path.split("/")[-1].split(".")[0] 
+            sample_inf = config[sample]
+            pop = sample_inf["region"].replace("(","").replace(")","")
+            region = sample_inf["popGrouping"].replace(" ","").replace("(","").replace(")","")
+            sample_name = "StoneAgeAncient.{ID}.{E}.{R}".format(ID=sample,
+                                                                E=pop,
+                                                                R=region)
+            config_ancient["sample_paths"][sample_name] = sample_path
+            #StoneAgeAncient.NEO113.CentralEasternEurope.Hunter-GathererE
+
+
+
+
+    
+        open(output[0],"w").write(json.dumps(config_ancient, indent=4, sort_keys=True))
         

@@ -1,0 +1,81 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-03-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+
+t_ddata = read.table("dplace-data/datasets/EA/data.csv",header=T,sep=",",quote='"')
+t_codes = read.table("dplace-data/datasets/EA/codes.csv",header=T,sep=",",quote='"')
+t_vars = read.table("dplace-data/datasets/EA/variables.csv",header=T,sep=",",quote='"')
+t_soc = read.table("dplace-data/datasets/EA/societies.csv",header=T,sep=",",quote='"') %>% mutate(soc_id=id)
+
+assessed_pops = read.table("populations.tsv",header=T,sep="\t")
+
+t_vars %>% filter(id=="EA042")
+
+t_vars %>% filter(id=="EA001")
+t_vars %>% filter(id=="EA002")
+t_vars %>% filter(id=="EA003")
+t_vars %>% filter(id=="EA004")
+t_vars %>% filter(id=="EA005")
+
+
+t_codes %>% filter(var_id=="EA042")
+
+dom_subsis = t_ddata %>% 
+              filter(var_id=="EA042") %>%
+              inner_join(t_codes,on="code") %>%
+              inner_join(t_soc,on="soc_id") %>%
+              dplyr::select(name,pref_name_for_society) %>%
+              mutate(p1 = pref_name_for_society)
+
+t_intersected = inner_join(assessed_pops,dom_subsis,by="p1") %>%
+                  mutate(type = case_when(name=="Intensive agriculture" ~ "Agriculture",
+                                          name == "Extensive agriculture" ~ "Agriculture",
+                                          name == "Agriculture, type unknown" ~ "Agriculture",
+                                          TRUE ~ name))
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata"
+fn_out = paste(outdir,"/populations_subsistence.tsv",sep="")
+write.table(t_intersected,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+
+
+subsis_breakdown = t_ddata %>% 
+              filter(var_id %in% c("EA001","EA002","EA003","EA004","EA005")) %>%
+              inner_join(t_codes,on="code") %>%
+              inner_join(t_soc,on="soc_id") %>%
+              mutate(id = var_id) %>%
+              inner_join(t_vars,on="id") %>%
+              dplyr::select(name,pref_name_for_society,id,title) %>%
+              arrange(pref_name_for_society) %>%
+              mutate(p1 = pref_name_for_society)
+
+subsis_breakdown_intersected = inner_join(assessed_pops,subsis_breakdown,by="p1") 
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata"
+fn_out = paste(outdir,"/populations_subsistence_breakdown.tsv",sep="")
+write.table(subsis_breakdown_intersected,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+
+#subsis_breakdown_intersected %>% filter(id=="EA005") %>% arrange(name)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

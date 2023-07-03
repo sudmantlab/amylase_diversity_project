@@ -1,0 +1,266 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-06-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+```{r}
+dir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/old"
+fn = paste(dir,"/genome_summary_stats.tsv",sep="")
+ancient_qc = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/info/ancients_passed_QC.tsv", header=T,sep="\t")
+stats = read.table(fn,header=T,sep="\t") %>%
+        filter(cvg_med>0) %>%
+        filter(!(sample %in% exclude)) %>%
+        separate(sample,c("group","ID","y","z"),sep="\\.",remove=FALSE) %>%
+        dplyr::select(-c(y,z)) %>%
+        filter((group!="StoneAgeAncient")|ID %in% ancient_qc$sample)
+
+stats_new = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/d4_to_windowed_cvg/output/correction_factors/correction_factors.tsv",header=T,sep='\t')
+
+
+#stats_new %>% filter(grepl("NEO283",sample))
+stats_new %>% filter(grepl("Excoffier",sample))
+```
+
+
+```{r}
+
+compare = inner_join(stats,stats_new,by="sample")
+
+
+#CTRL_region_meanqmax_filt_mu
+g=ggplot(compare)
+g+geom_point(aes(x=cvg_mu,y=CTRL_region_mean))+
+  geom_abline(slop=1)
+
+g=ggplot(compare)
+g+geom_point(aes(x=CTRL_region_mean,y=qmax_filt_mu),color='red',size=0.1)+
+  geom_abline(slop=1)
+
+
+g=ggplot(compare %>% mutate(frac = qmax_filt_mu/cvg_mu) %>% arrange(frac) %>% mutate(i=row_number()))
+g+#geom_point(aes(x=cvg_mu,y=CTRL_region_mean))+
+  geom_point(aes(x=i,y=log(frac,2)),color='red')+
+  facet_wrap(~group)
+
+plot_var = stats_new %>% filter(grepl("HGDP",sample)) %>% arrange(qmax_filt_sd) %>% mutate(n=row_number())
+
+
+tsum = compare %>% 
+        filter(grepl("1KG",group)) %>%
+        group_by(group) %>%
+        summarize(mu=mean(log(qmax_filt_mu/cvg_mu,2)))
+
+g=ggplot(compare)# %>% filter(grepl("1KG",group)))# %>% mutate(frac = CTRL_region_mean/qmax_filt_mu) %>% arrange(frac) %>% mutate(i=row_number()))
+g+#geom_point(aes(x=cvg_mu,y=CTRL_region_mean))+
+  geom_histogram(aes(x=log(qmax_filt_mu/cvg_mu,2)),binwidth=0.01)+
+  geom_vline(aes(xintercept=mu),data=tsum)+
+  facet_wrap(~group)
+
+g=ggplot(compare)# %>% filter(grepl("1KG",group)))# %>% mutate(frac = CTRL_region_mean/qmax_filt_mu) %>% arrange(frac) %>% mutate(i=row_number()))
+g+#geom_point(aes(x=cvg_mu,y=CTRL_region_mean))+
+  geom_histogram(aes(x=log(qmax_filt_mu/CTRL_region_mean,2)),binwidth=0.01)+
+  geom_vline(aes(xintercept=mu),data=tsum)+
+  facet_wrap(~group)
+
+g=ggplot(compare)# %>% filter(grepl("1KG",group)))# %>% mutate(frac = CTRL_region_mean/qmax_filt_mu) %>% arrange(frac) %>% mutate(i=row_number()))
+g+#geom_point(aes(x=cvg_mu,y=CTRL_region_mean))+
+  geom_histogram(aes(x=log(CTRL_region_mean/cvg_mu,2)),binwidth=0.0001)+
+  geom_vline(aes(xintercept=mu),data=tsum)+
+  facet_wrap(~group)
+
+compare %>% mutate(test = log(CTRL_region_mean/cvg_mu),2) %>% arrange(-test) %>% filter(sample=="StoneAgeAncient.NEO852.NorthernEurope.Hunter-GathererW")
+
+compare %>% mutate(test = log(CTRL_region_mean/cvg_mu),2) %>% arrange(-test) %>% filter(sample=="StoneAgeAncient.VK18.CentralEasternEurope.Yamnaya")
+
+# g=ggplot(plot_var)
+# g+geom_point(aes(x=qmax_filt_mu,y=qmax_filt_sd,color=sample %in% weird))
+# g=ggplot(plot_var)
+# g+geom_point(aes(x=qmax_filt_mu,y=qmax_filt_sd))
+
+
+#IN THE MORNING -> look at the alt_genotypes again. They should make more sense, and possibly be better...
+
+
+g=ggplot(stats_new %>% separate(sample,c("group","ID","y","z"),sep="\\.",remove=FALSE))
+g+geom_point(aes(x=CTRL_region_mean, CTRL_region_sd))+
+  facet_wrap(~group,scales="free")
+```
+```{r}
+
+plot_frac = stats_new %>% 
+            mutate(frac = CTRL_region_mean/qmax_filt_mu) %>% 
+            separate(sample,c("group","ID","p1","p2"),sep = "\\.",remove=FALSE) %>%
+            group_by(group) %>%
+            arrange(frac) %>% 
+            mutate(i=row_number())
+            
+
+
+
+g=ggplot(plot_frac)
+g+#geom_point(aes(x=cvg_mu,y=CTRL_region_mean))+
+  geom_point(aes(x=i,y=log(frac,2)),color='red')+
+  facet_wrap(~group,scales="free_x")
+
+
+
+weird = c("1KG.HG01251.CLM.AMR", "1KG.HG01865.KHV.EA", "1KG.HG02885.GWD.AFR", "1KG.HG03848.STU.SA", "1KG.HG04001.ITU.SA",
+          "1KG.NA12413.CEU.WEA", "1KG.NA19328.LWK.AFR", "1KG.NA20854.GIH.SA", "1KG.NA20856.GIH.SA", "1KG_trio.HG03170.ESN.AFR")
+
+bad_samples = plot_frac %>% 
+  filter(group %in% c("1KG","1KG_trio")) %>% 
+  filter((frac==0)|(frac>1.07)) %>% 
+  ungroup() %>%
+  dplyr::select(sample)
+
+write.table(bad_samples,"/Users/petersudmant/tmp/amylase/input/bad_samples.txt",quote = FALSE,row.names = FALSE,col.names=FALSE)
+
+  
+  #filter(sample=="1KG.HG01251.CLM.AMR")
+  #
+
+g=ggplot(plot_frac)
+g+geom_point(aes(x=CTRL_region_mean,y=qmax_filt_mu),color='red',alpha=.5,size=.1)+
+  geom_abline(slope=1)+
+  facet_wrap(~group,scales="free")
+
+plot_frac %>% filter(sample=="1KG.NA20892.GIH.SA")
+#1KG.NA20892.GIH.SA	
+
+g=ggplot(plot_frac %>% filter(grepl("1KG",group)))
+g+#geom_point(aes(x=cvg_mu,y=CTRL_region_mean))+
+  geom_histogram(aes(x=log(qmax_filt_mu/CTRL_region_mean,2)),binwidth=0.01)+
+  facet_wrap(~group)
+
+```
+
+```{r, fig.height=2,fig.width=6}
+t_new_gts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/d4_to_windowed_cvg/output/genotype/genotypes.tsv",header=T,sep="\t") %>%
+  dplyr::select(locus,cp,sample) %>%
+       pivot_wider(values_from = "cp",names_from="locus") %>%
+        mutate(amy1_sum = AMY1A + AMY1B + AMY1C) %>%
+        pivot_longer(cols=-c("sample"),values_to="gt") %>%
+        separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE)  %>%
+  mutate(new_cp = gt) %>% dplyr::select(sample,name,new_cp)
+  #mutate(new_cp = cp, new_cp_alt = cp_alt,name=locus) %>% dplyr::select(sample,name,new_cp,new_cp_alt)
+
+t_old_gts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/old/genotypes.raw.tsv",header=T,sep="\t") %>%
+  mutate(cp=gt,locus=name) %>%
+  dplyr::select(locus,cp,sample) %>%
+       pivot_wider(values_from = "cp",names_from="locus") %>%
+        mutate(amy1_sum = AMY1A + AMY1B + AMY1C) %>%
+        pivot_longer(cols=-c("sample"),values_to="gt") %>%
+        separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE)  %>%
+  #mutate(old_cp = gt,name=locus) %>% dplyr::select(sample,name,olc_cp)
+  mutate(old_cp = gt) %>% dplyr::select(sample,name,old_cp)
+
+x = inner_join(t_new_gts, t_old_gts, by=c("sample","name")) %>% dplyr::filter(name %in% c("amy1_sum","AMY2A","AMY2B")) #dplyr::filter(name %in% c("AMY1A","AMY1B","AMY1C")) 
+
+
+x = inner_join(stats_new, x,by="sample") %>% mutate(cp_fix = new_cp/qmax_filt_mu*CTRL_region_mean)
+
+
+g=ggplot(x %>% filter(grepl("1KG",sample)))
+g+geom_point(aes(x=old_cp,y=new_cp),alpha=0.5,size=0.1)+
+  geom_abline(slope=1)+
+  facet_wrap(~name)
+
+g=ggplot(x %>% filter(grepl("1KG",sample)))
+g+geom_histogram(aes(x=old_cp),binwidth=0.05)+
+    facet_wrap(~name,scales="free")
+
+g=ggplot(x %>% filter(grepl("1KG",sample)))
+g+geom_histogram(aes(x=new_cp),binwidth=0.05)+
+    facet_wrap(~name,scales="free")
+
+g=ggplot(x %>% filter(grepl("HGDP",sample)))
+g+geom_histogram(aes(x=new_cp),binwidth=0.05)+
+    facet_wrap(~name,scales="free")
+
+
+g=ggplot(x %>% filter(grepl("SGDP",sample)))
+g+geom_histogram(aes(x=old_cp),binwidth=0.05,color='red')+
+    facet_wrap(~name,scales="free")
+
+
+g=ggplot(x %>% filter(grepl("SGDP",sample)))
+g+geom_histogram(aes(x=new_cp),binwidth=0.05,color='blue')+
+    facet_wrap(~name,scales="free")
+
+
+
+g=ggplot(x %>% filter(grepl("Stone",sample)))
+g+geom_histogram(aes(x=new_cp),binwidth=0.05)+
+  facet_wrap(~name,scales="free")
+
+# g=ggplot(x %>% filter(grepl("SGDP",sample)))
+# g+geom_point(aes(x=old_cp,y=new_cp))+
+#   facet_wrap(~name)
+
+# g=ggplot(x %>% filter(grepl("HGDP",sample)))
+# g+geom_point(aes(x=old_cp,y=new_cp))+
+#   facet_wrap(~name)
+# 
+# g=ggplot(x %>% filter(grepl("Stone",sample)))
+# g+geom_point(aes(x=old_cp,y=new_cp),alpha=0.5,size=.1)+
+#   facet_wrap(~name)
+
+
+x %>% filter(grepl("Stone",sample))
+
+#CONCLUSION
+#new normalization process is better, less noisy, can compare the two and see shrink
+
+# g=ggplot(x %>% filter(grepl("Stone",sample)))
+# g+geom_histogram(aes(x=log(new_cp/old_cp,2)),binwidth=0.01)+
+#   facet_wrap(~name,scales="free_y")
+# 
+# # g=ggplot(x %>% filter(grepl("1KG",sample)))
+# # g+geom_histogram(aes(x=log(cp_fix/old_cp,2)),binwidth=0.01)+
+# #   facet_wrap(~name,scales="free_y")
+# 
+# x %>% filter(grepl("NA20505",sample))
+# x %>% filter(grepl("StoneAgeAncient.VK151.WesternEurope.Yamnaya",sample))
+# 
+# g=ggplot(x %>% filter(grepl("Stone",sample)))
+# g+geom_histogram(aes(x=log(new_cp/old_cp,2)),binwidth=0.01)+
+#   facet_wrap(~name,scales="free_y")
+
+```
+
+```{r}
+weird = (x %>% filter(grepl("1KG",sample)) %>%
+          filter(name=="AMY2B") %>%
+          filter(old_cp<2.2)%>%
+          filter(new_cp>2.5))$sample
+
+g=ggplot(x %>% filter(grepl("SGDP",sample)))
+#g=ggplot(x %>% filter(grepl("1KG",sample)))
+g+geom_point(aes(x=old_cp,y=new_cp,color=sample %in% weird))+
+  facet_wrap(~name)
+
+# exclude = c("1KG.HG00403.CHS.EA", "1KG.HG00662.CHS.EA", "1KG.HG01773.IBS.WEA", "1KG.HG01857.KHV.EA", 
+#             "1KG.NA18644.CHB.EA", "1KG.NA18916.YRI.AFR", "1KG.NA18985.JPT.EA", "1KG.NA19159.YRI.AFR",
+#             "1KG.NA19201.YRI.AFR", "1KG.NA19204.YRI.AFR", "1KG.NA20892.GIH.SA") 
+
+
+pivot_wider(values_from = "gt",names_from="locus") %>%
+        mutate(amy1_sum = AMY1A + AMY1B + AMY1C) %>%
+        pivot_longer(cols=-c("sample"),values_to="gt") %>%
+        separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE)
+
+g+geom_histogram(aes(x=new_cp,fill=sample %in% weird),binwidth=0.05)+
+  facet_wrap(~name)
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -1,5 +1,7 @@
 {
 "path":"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams/",
+"failed_paths":[
+	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H08/LP6005441-DNA_H08.bam"],
 "sample_paths":[
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_A01/LP6005441-DNA_A01.bam",
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_A03/LP6005441-DNA_A03.bam",
@@ -79,7 +81,6 @@
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H05/LP6005441-DNA_H05.bam",
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H06/LP6005441-DNA_H06.bam",
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H07/LP6005441-DNA_H07.bam",
-	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H08/LP6005441-DNA_H08.bam",
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H10/LP6005441-DNA_H10.bam",
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H11/LP6005441-DNA_H11.bam",
 	"/global/scratch/p2p3/pl1_sudmant/human_diversity/SGDP/bams//LP6005441-DNA_H12/LP6005441-DNA_H12.bam",

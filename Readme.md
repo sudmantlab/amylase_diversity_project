@@ -2,6 +2,7 @@
 
 A repo for code and methods related to analyses as well as for a manuscript
 
+[Ancient DNA table](https://docs.google.com/spreadsheets/d/1ZYty8-Vjv_z_C4Qu-zX4G7yUwE74USH5/edit?usp=share_link&ouid=100649124313766242630&rtpof=true&sd=true)
 
 
 20230125

@@ -49,9 +49,8 @@ t = read.table(fn,
 #bad samples determined from compare_RD_to_HPRC script
 bad_samples = data.frame(id=c("HG00673", "HG00735", "HG01106", "HG01175", "HG01361", "HG01952", "HG02148", "HG02257", "HG02572"))
 
-fn_out_bad = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output/bad_samples.txt"
-
-write.table(bad_samples,fn_out_bad,row.names = FALSE)
+#fn_out_bad = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/assess_haplotypes/output/bad_samples.txt"
+#write.table(bad_samples,fn_out_bad,row.names = FALSE)
 
 t=t %>% 
   group_by(contig) %>%
@@ -61,8 +60,6 @@ t=t %>%
   separate(contig,c("sample_id","sample_hap",'sample_contig'),sep="#",remove=FALSE) %>%
   dplyr::select(-c(sample_hap,sample_contig)) %>%
   mutate(collapsed_assembly = sample_id %in% bad_samples)
-  #
-  #dplyr::select(sample,X,cp,label) %>%
 
 hap_sums = t %>% 
             mutate(bID_d = paste(bID,".",bOrientation,sep="")) %>%
