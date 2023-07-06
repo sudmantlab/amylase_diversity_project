@@ -53,6 +53,7 @@ n_modern = sample_counts %>% filter(!dataset %in% c("ExcoffierAncient", "StoneAg
 sample_counts
 n_modern
 
+
 t_gt_count = read.table("./output/genotypes.likelihoods.tsv",header=T,sep="\t") %>%
       group_by(sample,label) %>% 
       filter(r==max(r)) %>%
@@ -416,56 +417,101 @@ t_struc$p2 = factor(t_struc$p2, levels=c("ARC", "AFR", "WEA", "SA", "CAS", "EA",
   
 colors = c("black", "#EDB829", "#94B669", "#E97C07", "#00496F", "#0C7996","purple", "#DD4124")
 
-g=ggplot(t_struc)
-g=g+geom_point(aes(x=AMY1,y=AMY2B), 
-               position=position_jitternormal(sd_x = 0.1, sd_y=0.1),
-               alpha=.8,
-               size=0.01,
-               shape=16)+
+# g=ggplot(t_struc)
+# g=g+geom_point(aes(x=AMY1,y=AMY2B), 
+#                position=position_jitternormal(sd_x = 0.1, sd_y=0.1),
+#                alpha=.8,
+#                size=0.01,
+#                shape=16)+
+#   theme_bw(base_size=8)+
+#   scale_color_manual(values=colors)+
+#   theme(legend.position="None",
+#         panel.grid=element_blank())+
+#   scale_x_continuous("AMY1",breaks=seq(0,20,2))
+# 
+# fn_out = "./output_figures/main_figs/copy_compare_AMY1_vs_AMY2B.pdf"
+# pdf(fn_out,width=2,height=1)
+# print(g)
+# dev.off()
+# 
+# g=ggplot(t_struc %>% arrange(p2))
+# g=g+geom_point(aes(x=AMY2A,y=AMY2B,), 
+#                position=position_jitternormal(sd_x = 0.1, sd_y=0.1),
+#                alpha=.8,
+#                shape=16,
+#                size=0.01)+
+#   theme_bw(base_siz e=8)+
+#   scale_color_manual(values=colors)+
+#   theme(legend.position="None",
+#         panel.grid=element_blank())+
+#   scale_x_continuous("AMY2A",breaks=seq(0,6))
+# 
+# fn_out = "./output_figures/main_figs/copy_compare_AMY2A_vs_AMY2B.pdf"
+# pdf(fn_out,width=1.25,height=1)
+# print(g)
+# dev.off()
+
+
+library(scales)
+norm_trans <- function(){
+  trans_new('norm', function(x) log10(x), function(x) 10^(x))
+}
+
+#badVersion + geom_point() + scale_colour_continuous(trans = 'norm'))
+
+t_1_v_2B_sum = t_struc %>%
+  group_by(AMY1,AMY2B) %>%
+  summarize(n=n())
+
+g=ggplot(t_1_v_2B_sum)
+g=g+geom_point(aes(x=AMY1,y=AMY2B,size=n,color=n))+
   theme_bw(base_size=8)+
   scale_color_manual(values=colors)+
-  theme(legend.position="None",
+  theme(legend.position=c(0.9,0.8),
+        legend.key.size=unit(0.05,"cm"),
+        legend.text = element_text(size=3),
+        legend.title = element_text(size=4),
+        legend.background = element_blank(),
         panel.grid=element_blank())+
-  scale_x_continuous("AMY1",breaks=seq(0,20,2))
+  scale_x_continuous("AMY1",breaks=seq(0,20,2))+
+#  scale_color_viridis_c("", option="inferno",trans = 'norm')+
+#  scale_size_continuous(range=c(0.01,3))+
+  scale_color_viridis_c("", option="inferno",trans = 'norm',breaks=c(100,250,500,750))+
+  scale_size_continuous(range=c(0.01,3),breaks=c(100,250,500,750))+
+  geom_blank(aes(x=4,y=1.5))+
+  guides(color = guide_legend(""),
+         size = guide_legend(""))
 
-fn_out = "./output_figures/main_figs/copy_compare_AMY1_vs_AMY2B.pdf"
+fn_out = "./output_figures/main_figs/copy_compare_AMY1_vs_AMY2B_heatmap.pdf"
 pdf(fn_out,width=2,height=1)
 print(g)
 dev.off()
 
-g=ggplot(t_struc %>% arrange(p2))
-g=g+geom_point(aes(x=AMY2A,y=AMY2B,), 
-               position=position_jitternormal(sd_x = 0.1, sd_y=0.1),
-               alpha=.8,
-               shape=16,
-               size=0.01)+
+t_2A_v_2B_sum = t_struc %>%
+  group_by(AMY2A,AMY2B) %>%
+  summarize(n=n())
+
+g=ggplot(t_2A_v_2B_sum)
+g=g+geom_point(aes(x=AMY2A,y=AMY2B,color=n,size=n))+
   theme_bw(base_size=8)+
   scale_color_manual(values=colors)+
-  theme(legend.position="None",
+  theme(legend.position=c(0.15,0.8),
+        legend.key.size=unit(0.05,"cm"),
+        legend.text = element_text(size=3),
+        legend.title = element_text(size=4),
+        legend.background = element_blank(),
         panel.grid=element_blank())+
-  scale_x_continuous("AMY2A",breaks=seq(0,6))
+  scale_x_continuous("AMY2A",breaks=seq(0,20,1))+
+  geom_blank(aes(x=0,y=1.5))+
+  scale_color_viridis_c("", option="inferno",trans = 'norm',breaks=c(100,500,1000,2000))+
+  scale_size_continuous(range=c(0.01,3),breaks=c(100,500,1000,2000))+
+  guides(color = guide_legend(""),
+         size = guide_legend(""))
 
-fn_out = "./output_figures/main_figs/copy_compare_AMY2A_vs_AMY2B.pdf"
-pdf(fn_out,width=1.25,height=1)
+fn_out = "./output_figures/main_figs/copy_compare_AMY2A_vs_AMY2B_heatmap.pdf"
+pdf(fn_out,width=1.5,height=1)
 print(g)
 dev.off()
-
-# t_1_v_2B_sum = t_struc %>% 
-#   group_by(AMY1,AMY2B) %>%
-#   summarize(n=n())
-# 
-# g=ggplot(t_1_v_2B_sum)
-# g=g+geom_point(aes(x=AMY1,y=AMY2B,size=n))+
-#   theme_bw(base_size=8)+
-#   scale_color_manual(values=colors)+
-#   theme(legend.position="None")+
-#   scale_x_continuous("AMY1",breaks=seq(0,20,2))
-# 
-# fn_out = "./output_figures/main_figs/copy_compare_AMY1_vs_AMY2B_sum.pdf"
-# pdf(fn_out,width=2,height=1)
-# print(g)
-# dev.off()
-
 
 
 
