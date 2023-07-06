@@ -161,9 +161,62 @@ awk -F' ' 'NR==FNR{a[$1];next}FNR==1{FS="\t"}($10 in a){print $0}' md5comp_notma
 
 ```
 
+## implementation of aDNAs
+
+these does not have the bai. 
+```
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO1_MA427_CAP.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO27_MA988_L1.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO28_MA990_L1.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO309.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO36.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO557.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO558.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO589_MA1707_L2.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO5_MA429_L0.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO625.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO636.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO792.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO813_MA2176_L1.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO865.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/NEO953.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/RISE00_MA826_L1.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/RISE150.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/RISE386_MA626_L2.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/RISE509.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/RISE511_MA879_L1.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/RISE562.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/VK157.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/VK329.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/VK385.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/VK415.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/VK419.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/VK475.bam.*i: No such file or directory
+ls: cannot access /global/scratch/users/alessandroraveane/bam_adnatest_StoneAge/VK58.bam.*i: No such file or directory
+```
+
+I re-index them.
 
 
-## implemente for the ancient samples
+```
+ls list_aDNA_nobai.tsv | xargs -P 10 -I{} samtools index {} -M -o {}.bai
+```
+
+## re-run
+
+alma and peter provided this table 
+
+https://docs.google.com/spreadsheets/d/1ZYty8-Vjv_z_C4Qu-zX4G7yUwE74USH5/edit?usp=sharing&ouid=109890202487727640748&rtpof=true&sd=true
+
+I have selected for the sheet of Allentoft et al., only the 'usable' samples and I ran the cosigt on two different dataset:
+
+- hg38 results in `/global/scratch/users/alessandroraveane/graph_geno_separated/graph_genotyper_aDNA_StoneAge` region used `chr1:103456065-10386397`
+
+
+- hg19 results in `/global/scratch/users/alessandroraveane/graph_geno_separated/graph_genotyper_aDNA_StoneAge_hg19` region used `1:103998686-104406594`
+
+
+
 
 ## plot the results for these (everything)
 

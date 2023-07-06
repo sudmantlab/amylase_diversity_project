@@ -1,0 +1,116 @@
+p1	p2	name	pref_name_for_society	id	title
+Hazara	SA	0-5%	Hazara	EA001	Subsistence economy: gathering
+Hazara	SA	0-5%	Hazara	EA002	Subsistence economy: hunting
+Hazara	SA	0-5%	Hazara	EA003	Subsistence economy: fishing
+Hazara	SA	46-55%	Hazara	EA004	Subsistence economy: animal husbandry
+Hazara	SA	46-55%	Hazara	EA005	Subsistence economy: agriculture
+Sindhi	SA	0-5%	Sindhi	EA001	Subsistence economy: gathering
+Sindhi	SA	0-5%	Sindhi	EA002	Subsistence economy: hunting
+Sindhi	SA	16-25%	Sindhi	EA003	Subsistence economy: fishing
+Sindhi	SA	26-35%	Sindhi	EA004	Subsistence economy: animal husbandry
+Sindhi	SA	46-55%	Sindhi	EA005	Subsistence economy: agriculture
+Burusho	SA	0-5%	Burusho	EA001	Subsistence economy: gathering
+Burusho	SA	0-5%	Burusho	EA002	Subsistence economy: hunting
+Burusho	SA	0-5%	Burusho	EA003	Subsistence economy: fishing
+Burusho	SA	36-45%	Burusho	EA004	Subsistence economy: animal husbandry
+Burusho	SA	56-65%	Burusho	EA005	Subsistence economy: agriculture
+Mbuti	AFR	26-35%	Mbuti	EA001	Subsistence economy: gathering
+Mbuti	AFR	66-75%	Mbuti	EA002	Subsistence economy: hunting
+Mbuti	AFR	0-5%	Mbuti	EA003	Subsistence economy: fishing
+Mbuti	AFR	0-5%	Mbuti	EA004	Subsistence economy: animal husbandry
+Mbuti	AFR	0-5%	Mbuti	EA005	Subsistence economy: agriculture
+Druze	WEA	0-5%	Druze	EA001	Subsistence economy: gathering
+Druze	WEA	0-5%	Druze	EA002	Subsistence economy: hunting
+Druze	WEA	0-5%	Druze	EA003	Subsistence economy: fishing
+Druze	WEA	6-15%	Druze	EA004	Subsistence economy: animal husbandry
+Druze	WEA	86-100%	Druze	EA005	Subsistence economy: agriculture
+Japanese	EA	0-5%	Japanese	EA001	Subsistence economy: gathering
+Japanese	EA	0-5%	Japanese	EA002	Subsistence economy: hunting
+Japanese	EA	0-5%	Japanese	EA003	Subsistence economy: fishing
+Japanese	EA	6-15%	Japanese	EA004	Subsistence economy: animal husbandry
+Japanese	EA	86-100%	Japanese	EA005	Subsistence economy: agriculture
+Yakut	CAS	6-15%	Yakut	EA001	Subsistence economy: gathering
+Yakut	CAS	16-25%	Yakut	EA002	Subsistence economy: hunting
+Yakut	CAS	16-25%	Yakut	EA003	Subsistence economy: fishing
+Yakut	CAS	36-45%	Yakut	EA004	Subsistence economy: animal husbandry
+Yakut	CAS	6-15%	Yakut	EA005	Subsistence economy: agriculture
+Pima	AMR	26-35%	Pima	EA001	Subsistence economy: gathering
+Pima	AMR	6-15%	Pima	EA002	Subsistence economy: hunting
+Pima	AMR	6-15%	Pima	EA003	Subsistence economy: fishing
+Pima	AMR	0-5%	Pima	EA004	Subsistence economy: animal husbandry
+Pima	AMR	46-55%	Pima	EA005	Subsistence economy: agriculture
+Miao	EA	0-5%	Miao	EA001	Subsistence economy: gathering
+Miao	EA	6-15%	Miao	EA002	Subsistence economy: hunting
+Miao	EA	6-15%	Miao	EA003	Subsistence economy: fishing
+Miao	EA	16-25%	Miao	EA004	Subsistence economy: animal husbandry
+Miao	EA	56-65%	Miao	EA005	Subsistence economy: agriculture
+Tu	EA	0-5%	Tu	EA001	Subsistence economy: gathering
+Tu	EA	0-5%	Tu	EA002	Subsistence economy: hunting
+Tu	EA	6-15%	Tu	EA003	Subsistence economy: fishing
+Tu	EA	26-35%	Tu	EA004	Subsistence economy: animal husbandry
+Tu	EA	56-65%	Tu	EA005	Subsistence economy: agriculture
+Piapoco	AMR	0-5%	Piapoco	EA001	Subsistence economy: gathering
+Piapoco	AMR	16-25%	Piapoco	EA002	Subsistence economy: hunting
+Piapoco	AMR	16-25%	Piapoco	EA003	Subsistence economy: fishing
+Piapoco	AMR	0-5%	Piapoco	EA004	Subsistence economy: animal husbandry
+Piapoco	AMR	56-65%	Piapoco	EA005	Subsistence economy: agriculture
+Ami	EA	0-5%	Ami	EA001	Subsistence economy: gathering
+Ami	EA	6-15%	Ami	EA002	Subsistence economy: hunting
+Ami	EA	6-15%	Ami	EA003	Subsistence economy: fishing
+Ami	EA	6-15%	Ami	EA004	Subsistence economy: animal husbandry
+Ami	EA	66-75%	Ami	EA005	Subsistence economy: agriculture
+Chechen	WEA	0-5%	Chechen	EA001	Subsistence economy: gathering
+Chechen	WEA	0-5%	Chechen	EA002	Subsistence economy: hunting
+Chechen	WEA	0-5%	Chechen	EA003	Subsistence economy: fishing
+Chechen	WEA	46-55%	Chechen	EA004	Subsistence economy: animal husbandry
+Chechen	WEA	46-55%	Chechen	EA005	Subsistence economy: agriculture
+Bengali	SA	0-5%	Bengali	EA001	Subsistence economy: gathering
+Bengali	SA	0-5%	Bengali	EA002	Subsistence economy: hunting
+Bengali	SA	16-25%	Bengali	EA003	Subsistence economy: fishing
+Bengali	SA	16-25%	Bengali	EA004	Subsistence economy: animal husbandry
+Bengali	SA	56-65%	Bengali	EA005	Subsistence economy: agriculture
+Mende	AFR	6-15%	Mende	EA001	Subsistence economy: gathering
+Mende	AFR	0-5%	Mende	EA002	Subsistence economy: hunting
+Mende	AFR	6-15%	Mende	EA003	Subsistence economy: fishing
+Mende	AFR	6-15%	Mende	EA004	Subsistence economy: animal husbandry
+Mende	AFR	66-75%	Mende	EA005	Subsistence economy: agriculture
+Aleut	CAS	6-15%	Aleut	EA001	Subsistence economy: gathering
+Aleut	CAS	26-35%	Aleut	EA002	Subsistence economy: hunting
+Aleut	CAS	56-65%	Aleut	EA003	Subsistence economy: fishing
+Aleut	CAS	0-5%	Aleut	EA004	Subsistence economy: animal husbandry
+Aleut	CAS	0-5%	Aleut	EA005	Subsistence economy: agriculture
+Zapotec	AMR	0-5%	Zapotec	EA001	Subsistence economy: gathering
+Zapotec	AMR	0-5%	Zapotec	EA002	Subsistence economy: hunting
+Zapotec	AMR	6-15%	Zapotec	EA003	Subsistence economy: fishing
+Zapotec	AMR	6-15%	Zapotec	EA004	Subsistence economy: animal husbandry
+Zapotec	AMR	76-85%	Zapotec	EA005	Subsistence economy: agriculture
+Thai	EA	0-5%	Thai	EA001	Subsistence economy: gathering
+Thai	EA	0-5%	Thai	EA002	Subsistence economy: hunting
+Thai	EA	6-15%	Thai	EA003	Subsistence economy: fishing
+Thai	EA	6-15%	Thai	EA004	Subsistence economy: animal husbandry
+Thai	EA	76-85%	Thai	EA005	Subsistence economy: agriculture
+Dinka	AFR	0-5%	Dinka	EA001	Subsistence economy: gathering
+Dinka	AFR	6-15%	Dinka	EA002	Subsistence economy: hunting
+Dinka	AFR	6-15%	Dinka	EA003	Subsistence economy: fishing
+Dinka	AFR	46-55%	Dinka	EA004	Subsistence economy: animal husbandry
+Dinka	AFR	26-35%	Dinka	EA005	Subsistence economy: agriculture
+Tlingit	CAS	6-15%	Tlingit	EA001	Subsistence economy: gathering
+Tlingit	CAS	26-35%	Tlingit	EA002	Subsistence economy: hunting
+Tlingit	CAS	56-65%	Tlingit	EA003	Subsistence economy: fishing
+Tlingit	CAS	0-5%	Tlingit	EA004	Subsistence economy: animal husbandry
+Tlingit	CAS	0-5%	Tlingit	EA005	Subsistence economy: agriculture
+Mixe	AMR	0-5%	Mixe	EA001	Subsistence economy: gathering
+Mixe	AMR	6-15%	Mixe	EA002	Subsistence economy: hunting
+Mixe	AMR	0-5%	Mixe	EA003	Subsistence economy: fishing
+Mixe	AMR	6-15%	Mixe	EA004	Subsistence economy: animal husbandry
+Mixe	AMR	76-85%	Mixe	EA005	Subsistence economy: agriculture
+Mansi	CAS	16-25%	Mansi	EA001	Subsistence economy: gathering
+Mansi	CAS	26-35%	Mansi	EA002	Subsistence economy: hunting
+Mansi	CAS	46-55%	Mansi	EA003	Subsistence economy: fishing
+Mansi	CAS	0-5%	Mansi	EA004	Subsistence economy: animal husbandry
+Mansi	CAS	0-5%	Mansi	EA005	Subsistence economy: agriculture
+Mixtec	AMR	0-5%	Mixtec	EA001	Subsistence economy: gathering
+Mixtec	AMR	0-5%	Mixtec	EA002	Subsistence economy: hunting
+Mixtec	AMR	6-15%	Mixtec	EA003	Subsistence economy: fishing
+Mixtec	AMR	6-15%	Mixtec	EA004	Subsistence economy: animal husbandry
+Mixtec	AMR	76-85%	Mixtec	EA005	Subsistence economy: agriculture
