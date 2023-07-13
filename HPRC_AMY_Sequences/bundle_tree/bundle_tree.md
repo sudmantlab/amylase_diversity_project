@@ -317,7 +317,7 @@ nj_tree <- function(x, pairwise.deletion = TRUE){
 }
 combine_tree_data <- function(x) {
   x %>%
-    midpoint.root() %>%
+    #midpoint.root() %>%
     as_tibble() %>%
     mutate(label = str_replace_all(label, "#", "_") %>% str_replace_all(":", "_")) %>%
     left_join(bundle_info, by="label") %>%
@@ -341,10 +341,10 @@ opposing_trees <- function(p1, p2, join_line_by){
   d2 <- p2$data
   ## reverse x-axis and 
   ## set offset to make the tree on the right-hand side of the first tree
-  d2$x <- max(d2$x) - d2$x + max(d1$x) + 0.0001
+  d2$x <- max(d2$x) - d2$x + max(d1$x) + 0.0003
   pp <- p1 + 
     geom_tree(data=d2, layout='rectangular') +
-    geom_text2(data=d2, aes(subset=!isTip, label=node), hjust=-.3, size=2) +
+    #geom_text2(data=d2, aes(subset=!isTip, label=node), hjust=-.3, size=2) +
     geom_tippoint(data=d2, mapping = aes(fill=group), size=3, color="black", shape = 21)
   dd <- bind_rows(d1, d2) %>% 
     filter(!is.na(label))
@@ -480,8 +480,8 @@ lambda_table_separate %>%
     ## # A tibble: 2 × 4
     ##   bundle       AMY1       AMY2A       AMY2B
     ##   <chr>       <dbl>       <dbl>       <dbl>
-    ## 1 0      0.00000513 0.000000938 0.000000227
-    ## 2 1a     0.00000359 0.000000903 0.000000251
+    ## 1 0      0.00000513 0.000000937 0.000000227
+    ## 2 1a     0.00000359 0.000000903 0.000000252
 
 ``` r
 lambda_table_combined <- NULL
@@ -506,18 +506,18 @@ lambda_table_combined %>%
 ```
 
     ## # A tibble: 10 × 6
-    ##    bundle   run likelihood       AMY1       AMY2A       AMY2B
-    ##    <chr>  <int>      <dbl>      <dbl>       <dbl>       <dbl>
-    ##  1 0          5      0.292 0.00000513 0.00000127  0.000000134
-    ##  2 0          2      0.293 0.00000513 0.000000475 0.000000475
-    ##  3 0          3      0.293 0.00000513 0.000000514 0.000000514
-    ##  4 0          1      0.293 0.00000513 0.000000657 0.000000657
-    ##  5 0          4      0.293 0.00000513 0.000000661 0.000000661
-    ##  6 1a         1      0.299 0.00000359 0.00000112  0.000000194
-    ##  7 1a         5      0.299 0.00000359 0.00000115  0.000000208
-    ##  8 1a         3      0.300 0.00000359 0.00000129  0.000000297
-    ##  9 1a         4      0.301 0.00000359 0.000000540 0.000000540
-    ## 10 1a         2      0.301 0.00000359 0.000000437 0.000000437
+    ##    bundle   run likelihood       AMY1       AMY2A        AMY2B
+    ##    <chr>  <int>      <dbl>      <dbl>       <dbl>        <dbl>
+    ##  1 0          1      0.292 0.00000513 0.00000126  0.000000133 
+    ##  2 0          3      0.292 0.00000513 0.00000106  0.0000000751
+    ##  3 0          4      0.293 0.00000513 0.000000607 0.000000607 
+    ##  4 0          5      0.293 0.00000513 0.000000682 0.000000682 
+    ##  5 0          2      0.294 0.00000513 0.000000374 0.000000374 
+    ##  6 1a         2      0.299 0.00000359 0.00000115  0.000000211 
+    ##  7 1a         1      0.299 0.00000359 0.00000106  0.000000162 
+    ##  8 1a         5      0.299 0.00000359 0.00000127  0.000000284 
+    ##  9 1a         3      0.300 0.00000359 0.00000129  0.000000297 
+    ## 10 1a         4      0.300 0.00000359 0.00000143  0.000000394
 
 Ancestral state reconstruction visualization
 
@@ -529,14 +529,17 @@ expSup <- function(w, digits=0) {
 for (bundle in c("0", "1a")){
   for (gene in c("AMY1", "AMY2A", "AMY2B")){
     if(gene=="AMY1"){copy_number_break <-c(0,3,6,9)} else {copy_number_break <- c(0,1,2,3)}
-    lambda <- read_tsv(str_c("../bundle_tree/cafe/bundle", bundle, "_", gene, "_results/Base_results.txt"), col_names = FALSE) %>%
+    lambda <- read_tsv(str_c("../bundle_tree/cafe/bundle", bundle, "_", gene, "_results/Base_results.txt"), col_names = FALSE, show_col_types = FALSE) %>%
       separate(X1, c("name", "value"), sep = ":", fill = "right") %>%
       mutate(value=parse_double(value)/1000) %>%
       .[[2,2]]
+    time_to_root <- str_c("cafe/bundle", bundle, "_", gene, "_results/Base_asr.tre") %>%
+      read.nexus() %>% 
+      castor::get_all_distances_to_root() 
     tree <- str_c("cafe/bundle", bundle, "_", gene, "_results/Base_asr.tre") %>%
       read.nexus() %>%
       as.treedata() %>%
-      mutate(trait=str_extract(label, "(\\d+)$") %>% as.integer())
+      mutate(trait=str_extract(label, "(\\d+)$") %>% as.integer(), time_to_present=time_to_root-max(time_to_root))
     amy_ace_tree <- ggtree(tree, aes(color = trait), 
            layout = 'circular', 
            ladderize = TRUE, continuous = "color", size = 1.5) +
@@ -549,6 +552,15 @@ for (bundle in c("0", "1a")){
         legend.title = element_blank())
     assign(str_c("p_", bundle, "_", gene), amy_ace_tree)
     ggsave(str_c("figures/bundle", bundle, "_", gene, "_ace_tree.pdf"), amy_ace_tree, width = 6, height = 6)
+    amy_in_time <- tree %>%
+      as_tibble() %>%
+      ggplot(aes(x=time_to_present, y=trait)) +
+      geom_point()+
+      geom_smooth(method="lm") +
+      theme_cowplot() +
+      theme(panel.border = element_rect(color="black", linewidth = 0.5))
+    assign(str_c("time_", bundle, "_", gene), amy_in_time)
+    lm(trait~time_to_present, tree%>%as_tibble) %>% summary() %>% .$coefficients %>% knitr::kable()
   }
 }
 amy_ace_plot_bundle0 <- plot_grid(p_0_AMY1, p_0_AMY2A, p_0_AMY2B, ncol = 1)
@@ -565,55 +577,22 @@ amy_ace_plot_bundle1a
 ![](bundle_tree_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
 ``` r
-ggsave("figures/bundle0_ace_tree.pdf", amy_ace_plot_bundle0, width = 6, height = 18)
-ggsave("figures/bundle1a_ace_tree.pdf", amy_ace_plot_bundle1a, width = 6, height = 18)
+time_plot_bundle0 <- plot_grid(time_0_AMY1, time_0_AMY2A, time_0_AMY2B, ncol = 1)
+time_plot_bundle1a <- plot_grid(time_1a_AMY1, time_1a_AMY2A, time_1a_AMY2B, ncol = 1)
+time_plot_bundle0
 ```
 
-#### Ancestral state reconstruction with phytools
+![](bundle_tree_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->
 
 ``` r
-## without the outgroups
-set.seed(42)
-for (bundle in c("0", "1a")){
-  bundle_treedata <-str_c("iqtree/bundle", bundle, "_with_outgroup.timetree.nwk") %>%
-    read.tree() %>%
-    combine_tree_data() %>% 
-    treeio::drop.tip(tip = c("Altai","Chagyrskaya", "Denisova", "Vindija"))
-  for (gene in c("AMY1", "AMY2A", "AMY2B")){
-    bundle_tip_data <- bundle_treedata %>%
-      as_tibble() %>%
-      filter(!is.na(label)) %>%
-      transmute(node=node, trait=get(gene), label=label)
-    bundle_trait <- bundle_tip_data %>%
-      mutate(trait = set_names(trait, label)) %>%
-      pull(trait)
-    #bundle_fit <- fastAnc(as.phylo(bundle_treedata), bundle_trait, vars = TRUE, CI = TRUE)
-    bundle_fit <- anc.ML(as.phylo(bundle_treedata), bundle_trait, model = "BM")
-    #junk<-brownieREML(as.phylo(bundle_treedata), bundle_trait)
-    bundle_node_data <- data.frame(node = names(bundle_fit$ace), trait = bundle_fit$ace)
-    bundle_combined_data <- rbind(dplyr::select(bundle_tip_data, -label), bundle_node_data)
-    bundle_combined_data$node <- as.numeric(bundle_combined_data$node)
-    tree <- full_join(bundle_treedata, bundle_combined_data, by = 'node')
-    amy_ace_tree <- ggtree(
-      tree, 
-      aes(color = trait), 
-      layout = 'circular', 
-      ladderize = TRUE, continuous = "color", size = 1.5) +
-      geom_tiplab(aes(label=trait), hjust = -1, size = 5) +
-      #scale_color_viridis_c(name = "AMY2A") + 
-      scico::scale_color_scico(palette = "bilbao", name = gene, begin = 0.05, limits=c(0, NA), midpoint = NA, direction = 1) + 
-      #scale_color_gradient2(name = gene, limits=c(0, 9), midpoint = 3, low = "white", mid = "darkred", high = "darkblue")
-      #xlim(0, 0.0007) + 
-      ggtitle(label = gene, subtitle = str_c("sig2=", round(bundle_fit$sig2))) +
-      theme(
-        legend.position = c(0.05, 0.85),
-        legend.text = element_text(size = 10),
-        legend.title = element_blank()
-      )
-    print(amy_ace_tree)
-    #ggsave(str_c("figures/bundle", bundle, "_", gene, "_ace_tree.pdf"), amy_ace_tree, width = 6, height = 6)
-  }
-}
+time_plot_bundle1a
+```
+
+![](bundle_tree_files/figure-gfm/unnamed-chunk-16-4.png)<!-- -->
+
+``` r
+ggsave("figures/bundle0_ace_tree.pdf", amy_ace_plot_bundle0, width = 6, height = 18)
+ggsave("figures/bundle1a_ace_tree.pdf", amy_ace_plot_bundle1a, width = 6, height = 18)
 ```
 
 #### Rectangular
@@ -632,7 +611,7 @@ bundle0_tree +
   xlim_tree(0.0015)
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 ## with amy copy numbers
@@ -668,7 +647,7 @@ bundle0_tree_with_gene_count <- bundle0_histo_dots_plot %>%
 bundle0_tree_with_gene_count
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
 
 ``` r
 ggsave("figures/bundle0_tree_with_gene_count.pdf", bundle0_tree_with_gene_count, height = 12, width = 10, units = "in")
@@ -691,13 +670,14 @@ Bundle 1a
 bundle1a_tree <- str_c("iqtree/bundle", "1a", "_with_outgroup.timetree.nwk") %>%
   read.tree() %>%
   combine_tree_data() %>% 
+  mutate(group=ifelse(is.na(group), "outgroup", group)) %>%
   plot_tree("rectangular", "bundle1a")
 bundle1a_tree +
   geom_tiplab(aes(label=ifelse(is.na(chrom), label, chrom)), align = TRUE, size = 3, hjust = 0, offset = 0.00002) +
   xlim_tree(0.0015)
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 ## with amy copy numbers
@@ -733,7 +713,7 @@ bundle1a_tree_with_gene_count <- bundle1a_histo_dots_plot %>%
 bundle1a_tree_with_gene_count
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-20-2.png)<!-- -->
 
 ``` r
 ggsave("figures/bundle1a_tree_with_gene_count.pdf", bundle1a_tree_with_gene_count, height = 12, width = 10, units = "in")
@@ -762,6 +742,7 @@ for (bundle in c("0", "1a")){
   p2 <- str_c("kalign/bundle", bundle, "_with_outgroup.afa") %>%
     read_fasta() %>%
     nj_tree() %>%
+    midpoint.root() %>%
     combine_tree_data() %>%
     ggtree()
   assign(str_c("p1_bundle", bundle), p1)
@@ -772,7 +753,7 @@ opposing_trees(p1_bundle0 %>% ggtree::rotate(149) %>% ggtree::rotate(150),
                label)
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 opposing_trees(p1_bundle1a, 
@@ -780,7 +761,7 @@ opposing_trees(p1_bundle1a,
                label)
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-24-2.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-23-2.png)<!-- -->
 
 #### Trees with first vs. second half of bundle 1
 
@@ -807,22 +788,24 @@ ggsave("figures/bundle1_opposing_trees.pdf", bundle1_opposing_trees, width = 8, 
 
 ``` r
 bundle0 <- read.tree("iqtree/bundle0_with_outgroup.timetree.nwk") %>%
-  combine_tree_data() %>%
+  combine_tree_data() %>%  
+  mutate(chrom=ifelse(is.na(chrom)&!is.na(label), label, chrom)) %>%
   plot_tree("rectangular", str_c("Bundle 0 vs. 1a")) 
 bundle1a <- read.tree("iqtree/bundle1a_with_outgroup.timetree.nwk") %>%
-  combine_tree_data() %>%
-  ggtree() 
-bundle0_vs_bundle1_opposing_trees <- opposing_trees(bundle0 +
-                                                      geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2), 
-                                                    bundle1a %>% ggtree::rotate(110), 
+  combine_tree_data() %>%  
+  mutate(chrom=ifelse(is.na(chrom)&!is.na(label), label, chrom)) %>%
+  ggtree() %>% 
+  ggtree::rotate(110) %>% ggtree::rotate(107) 
+bundle0_vs_bundle1_opposing_trees <- opposing_trees(bundle0 #+ geom_text2(aes(subset=!isTip, label=node), hjust=-.3, size=2)
+                                                    ,bundle1a , 
                                                     chrom)
 bundle0_vs_bundle1_opposing_trees
 ```
 
-![](bundle_tree_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](bundle_tree_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ``` r
-ggsave("figures/bundle0_vs_bundle1_opposing_trees.pdf", bundle0_vs_bundle1_opposing_trees, width = 8, height = 8, unit="in")
+ggsave("figures/bundle0_vs_bundle1_opposing_trees.pdf", bundle0_vs_bundle1_opposing_trees, width = 10, height = 12, unit="in")
 ```
 
 #### Plot with 3 trees
