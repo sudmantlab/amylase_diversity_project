@@ -1,0 +1,337 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-04-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output"
+t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+  transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
+
+t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/cosigt_results.bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
+  filter(cohort!="SGDP") %>%
+  mutate(cohort=ifelse(cohort=="SGDPv2","SGDP",cohort))
+
+#t_ancient = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/tables/aDNA_best_geno_totv2.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge")
+
+t_samples = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",header=TRUE) %>% 
+  dplyr::select(sample) %>% 
+  separate(sample,c("cohort","sample","p1","p2"),sep = "\\.") %>% 
+  unique()
+
+t_cp = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",header=TRUE) %>% 
+  #separate(sample,c("cohort","sample","p1","p2"),sep = "\\.") %>% 
+  group_by(sample,label) %>% 
+      filter(r==max(r)) %>%
+  dplyr::select(sample,cp,label) %>%
+  separate(sample,c("cohort","sample","p1","p2"),sep = "\\.")
+
+
+#t_HC_ancient_modpipe = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/tables/highcov_nea_MODdnapipe_bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge")
+
+#t_HC_ancient_apipe = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/tables/highcov_nea_adnapipe_bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge")
+
+
+t_grouped = t %>% 
+  inner_join(t_clusts %>% transmute(hap1=sample, hap1_clust = cluster),on="hap1") %>%
+  inner_join(t_clusts %>% transmute(hap2=sample, hap2_clust = cluster),on="hap2") %>%
+  dplyr::select(-c(cohort)) %>%
+  inner_join(t_samples,on="sample") %>%
+  dplyr::select(sample,cohort,hap1_clust,hap2_clust,p1,p2) %>%
+  pivot_longer(cols=c("hap1_clust","hap2_clust"),names_to = "hap", values_to = "cluster")
+
+hap1_bad = t %>% 
+  left_join(t_clusts %>% transmute(hap1=sample, hap1_clust = cluster),on="hap1") %>% filter(is.na(hap1_clust))
+
+hap2_bad = t %>% 
+  left_join(t_clusts %>% transmute(hap2=sample, hap2_clust = cluster),on="hap2") %>% filter(is.na(hap2_clust))
+
+#unique(hap1_bad$hap1)
+#unique(hap2_bad$hap2)
+#SEND LIST OF OVERSIGHT INDIVIDUALS TO ALE
+
+# t %>% 
+#   inner_join(t_clusts %>% transmute(hap1=sample, hap1_clust = cluster),on="hap1") %>%
+#   inner_join(t_clusts %>% transmute(hap2=sample, hap2_clust = cluster),on="hap2") %>%
+#   left_join(t_samples,on="sample")
+# 
+# t_samples %>% filter(sample == "HG00096")
+
+g=ggplot(t)
+g+geom_histogram(aes(x=best_score))+
+  theme_bw()+
+  facet_wrap(~cohort)
+
+# g=ggplot(t_HC_ancient_modpipe)
+# g+geom_histogram(aes(x=best_score))+theme_bw()
+# 
+# g=ggplot(t_HC_ancient_apipe)
+# g+geom_histogram(aes(x=best_score))+theme_bw()
+
+
+# pipeline_compare = t_HC_ancient_apipe %>% transmute(sample=sample,best_score_apipe = best_score) %>%
+#   inner_join(t_HC_ancient_modpipe %>% transmute(sample=sample,best_score_modpipe = best_score),by="sample")
+# 
+# g=ggplot(pipeline_compare)
+# g+geom_point(aes(x=best_score_apipe,y=best_score_modpipe))+
+#   geom_abline(slope=1)+
+#   theme_bw()
+
+t_plot = rbind(t_ancient %>% mutate(type="ancient"),t %>% mutate(type="modern")) %>%
+          mutate(is_neo = grepl("NEO",sample)) %>%
+          mutate(is_err = grepl("ERR",sample)) %>%
+          mutate(is_prs = grepl("prs",sample))
+
+g=ggplot(t_plot)
+g+geom_histogram(aes(x=best_score,fill=is_prs))+
+  #geom_histogram(aes(x=best_score,fill=is_err))+
+  theme_bw()+
+  facet_wrap(~type,scale="free")
+
+
+t_plot %>% 
+  filter(type=="ancient") %>%
+  filter(best_score>0.75) %>%
+  summarize(n=n())
+
+pipeline_compare %>% arrange(-best_score_apipe)
+```
+```{r}
+t_clusts %>% filter(grepl("HG02004",sample))
+
+```
+
+```{r}
+t_grouped 
+#install.packages("ggbreak")
+library(ggbreak)
+
+#plot haplotype frequencies worldwide
+#unique(t$hap1)
+
+
+#### PLOT SORTED BY HAPLOTYPE copy number
+
+t_sum = t_grouped %>%
+          group_by(p2) %>%
+          mutate(n_total = n()) %>%
+          group_by(p2, cluster,n_total) %>%
+          summarize(count = n()) %>%
+          mutate(proportion=count/n_total)
+
+
+t_sum = t_sum %>% dplyr::select(p2,cluster,proportion) %>%
+  pivot_wider(names_from = cluster, values_from = proportion) %>%
+  pivot_longer(cols = -c(p2),names_to = "cluster",values_to="proportion") %>%
+  mutate(proportion = ifelse(is.na(proportion),0,proportion)) %>%
+  ungroup() %>%
+  arrange(cluster,proportion) %>%
+  mutate(order=row_number())
+
+#https://stackoverflow.com/questions/52214071/how-to-order-data-by-value-within-ggplot-facets
+
+t_sum$cluster = factor(t_sum$cluster, levels=c(1,3,4,0,10,7,6,8,2,5))
+
+AMY1_clust_to_copy = data.frame(cluster=seq(0,10),
+                                AMY1_cp = c(7, #0
+                                             3, #1
+                                             2, #2
+                                             5, #3
+                                             1, #4
+                                             3, #5
+                                             9, #6
+                                             4, #7
+                                             2, #8
+                                             3, #9
+                                             4 #10
+                                             ))
+
+haplotype_pred_copy = t_grouped %>% 
+  inner_join(AMY1_clust_to_copy,by="cluster") %>%
+  group_by(sample,cohort,p1,p2) %>%
+  summarize(AMY1_hap_cp = sum(AMY1_cp))
+
+```
+```{r}
+library(ggforce)
+#install.packages("ggforce")
+
+haplotype_vs_readdepth = inner_join(haplotype_pred_copy, t_cp %>% filter(label=="AMY1") %>% dplyr::select(cp,sample), on="sample")
+
+g=ggplot(haplotype_vs_readdepth)
+g=g+geom_point(aes(x=cp,
+                 y=AMY1_hap_cp),
+             position=position_jitternormal(),
+             alpha=0.2,
+             size=0.05)+
+  scale_x_continuous("AMY1 read depth copy",breaks=seq(0,20,2))+
+  scale_y_continuous("Haplotype deconvolution copy",breaks=seq(0,20,2))+
+  #geom_smooth(aes(x=cp,y=AMY1_hap_cp),method='lm')+
+  theme_bw(base_size=8)
+
+print(g)
+
+fout = paste(outdir,"/copy_number_comparison_AMY1.pdf",sep="")
+pdf(fout, width=2.1 ,height=2)
+print(g)
+dev.off()
+
+
+cor(haplotype_vs_readdepth$cp,haplotype_vs_readdepth$AMY1_hap_cp)
+
+haplotype_vs_readdepth %>% 
+  mutate(correct = cp == AMY1_hap_cp) %>%
+  group_by(correct) %>%
+  summarize(n=n())
+
+3667/(3667+218)
+
+3667/3885
+```
+
+
+```{r}
+
+colors = c("#EDB829", "#94B669", "#E97C07", "#00496F", "#0C7996","purple", "#DD4124")
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output"
+
+
+hacked_min_max = data.frame(cluster = c(1,3,4,0,10,7,6,8,2,5),
+                            mxs = c(0.6,0.6,0.6,0.6,0.6,0.1,0.1,0.1,0.1,0.1),
+                            line = rep(0.1,10))
+
+
+
+
+g=ggplot(t_sum)
+g=g+geom_bar(aes(y=order,fill=p2,x=proportion),stat='identity',position='dodge',alpha=.8)+
+  geom_text(aes(y=order,label=p2,x=proportion),size=.75,hjust=0,position=position_nudge(x=0.001,y=0))+
+  theme_bw(base_size=4)+
+  scale_fill_manual(values=colors)+
+  facet_wrap(~cluster,scales="free",ncol=1,strip.position = "right")+
+  geom_vline(xintercept=0.1,linetype="dotted",size=.25)+
+  #facet_wrap(~cluster,nrow=2)+
+  theme(strip.background = element_blank())+
+        #axis.text.y = element_text(angle=90,hjust=0))+
+  theme(legend.position="None")+
+  geom_blank(aes(x=mxs),data=hacked_min_max)+
+  scale_y_discrete("")+
+  scale_x_continuous("allele frequency")
+  #theme(panel.spacing.y = unit(0.5, "cm"))+
+  #theme(panel.spacing.x = unit(0.1, "cm"))
+
+fout = paste(outdir,"/hap_proportions_v3.pdf",sep="")
+pdf(fout, width=1 ,height=3)
+print(g)
+dev.off()
+
+
+
+
+```
+```{r}
+t_subsistence = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata/populations_subsistence.tsv",header=T,sep="\t")
+
+t_subsistence_breakdown = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata/populations_subsistence_breakdown.tsv",header=T,sep="\t")
+
+t_subsistence_breakdown_AG = t_subsistence_breakdown %>% filter(id=="EA005")
+
+
+t_data_by_sus = t_grouped %>% dplyr::select(sample,p1,hap,cluster) %>%
+          inner_join(t_subsistence, on="p1") %>%
+          #left_join(t_subsistence, on="p1") %>%
+          #mutate(type = ifelse(is.na(type),"other",type)) %>%
+          mutate(type=case_when(type=="Fishing" ~ "Fishing/Hunting",
+                                type=="Hunting" ~ "Fishing/Hunting",
+                                TRUE ~ type)) %>%
+          mutate(simple_type = ifelse(type=="Agriculture",type,"other"))
+
+t_sum_sus = t_data_by_sus %>%
+            group_by(type) %>%
+            mutate(n_total = n()) %>%
+            group_by(type, cluster,n_total) %>%
+            summarize(count = n()) %>%
+            mutate(proportion=count/n_total)
+
+
+t_sum_sus = t_sum_sus %>% dplyr::select(type,cluster,proportion) %>%
+  pivot_wider(names_from = cluster, values_from = proportion) %>%
+  pivot_longer(cols = -c(type),names_to = "cluster",values_to="proportion") %>%
+  mutate(proportion = ifelse(is.na(proportion),0,proportion)) %>%
+  ungroup() %>%
+  arrange(cluster,proportion) %>%
+  mutate(order=row_number())
+
+
+t_sum_sus$cluster = factor(t_sum_sus$cluster, levels=c(1,3,4,0,10,7,6,8,2,5))
+
+hacked_min_max = data.frame(cluster = c(1,3,4,0,10,7,6,8,2),
+                            mxs = c(0.7,0.6,0.6,0.6,0.6,0.1,0.1,0.1,0.1),
+                            line = rep(0.1,9))
+
+
+g=ggplot(t_sum_sus)
+g=g+geom_bar(aes(y=order,fill=type,x=proportion),stat='identity',position='dodge',alpha=0.5)+
+  geom_text(aes(y=order,label=type,x=proportion),size=1,hjust=0,position=position_nudge(x=0.001,y=0))+
+  theme_bw(base_size=4)+
+  scale_fill_brewer(palette="Spectral")+
+  #facet_wrap(~cluster,scales="free",ncol=1,strip.position = "right")+
+  facet_wrap(~cluster,scales="free_y",ncol=1,strip.position = "right")+
+  #geom_vline(xintercept=0.1,linetype="dotted",size=.25)+
+  geom_blank(aes(x=mxs),data=hacked_min_max)+
+  theme(strip.background = element_blank())+
+  theme(legend.position="None")+
+  scale_y_discrete("")+
+  scale_x_continuous("allele frequency")
+  #theme(panel.spacing.y = unit(0.5, "cm"))+
+  #theme(panel.spacing.x = unit(0.1, "cm"))
+
+fout = paste(outdir,"/hap_proportions_by_sustinance.pdf",sep="")
+pdf(fout, width=1 ,height=3)
+print(g)
+dev.off()
+
+
+
+```
+
+```{r}
+
+t_sum_sub= t_grouped %>%
+          group_by(p1) %>%
+          mutate(n_total = n()) %>%
+          group_by(p1, cluster,n_total) %>%
+          summarize(count = n()) %>%
+          mutate(proportion=count/n_total)
+
+g=ggplot(t_sum_sub)
+g+geom_bar(aes(x=p1,fill=p1,y=proportion),stat='identity',position='dodge')+
+  theme_bw()+
+  #scale_fill_brewer(palette="Paired")+
+  #facet_wrap(~cluster,scales="free_y",nrow=2)+
+  facet_wrap(~cluster,nrow=2)+
+  theme(strip.background = element_blank(),
+        axis.text.x = element_text(angle=90,hjust=0))+
+  theme(legend.position="None")
+
+
+########LOOK IN HUNTER GATHERER VS NOT
+
+```
+
+```{r}
+
+g=ggplot(t_sum)
+g+geom_bar(aes(x=value,fill=p2,y=count),position="fill",stat='identity')+
+  theme_bw()+
+  scale_fill_brewer(palette="Spectral")
+
+
+```
