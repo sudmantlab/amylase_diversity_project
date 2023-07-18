@@ -18,8 +18,6 @@ t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancien
   filter(cohort!="SGDP") %>%
   mutate(cohort=ifelse(cohort=="SGDPv2","SGDP",cohort))
 
-#t_ancient = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/tables/aDNA_best_geno_totv2.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge")
-
 t_samples = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",header=TRUE) %>% 
   dplyr::select(sample) %>% 
   separate(sample,c("cohort","sample","p1","p2"),sep = "\\.") %>% 
@@ -32,10 +30,6 @@ t_cp = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/anc
   dplyr::select(sample,cp,label) %>%
   separate(sample,c("cohort","sample","p1","p2"),sep = "\\.")
 
-
-#t_HC_ancient_modpipe = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/tables/highcov_nea_MODdnapipe_bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge")
-
-#t_HC_ancient_apipe = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/tables/highcov_nea_adnapipe_bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge")
 
 
 t_grouped = t %>% 
@@ -52,55 +46,12 @@ hap1_bad = t %>%
 hap2_bad = t %>% 
   left_join(t_clusts %>% transmute(hap2=sample, hap2_clust = cluster),on="hap2") %>% filter(is.na(hap2_clust))
 
-#unique(hap1_bad$hap1)
-#unique(hap2_bad$hap2)
-#SEND LIST OF OVERSIGHT INDIVIDUALS TO ALE
-
-# t %>% 
-#   inner_join(t_clusts %>% transmute(hap1=sample, hap1_clust = cluster),on="hap1") %>%
-#   inner_join(t_clusts %>% transmute(hap2=sample, hap2_clust = cluster),on="hap2") %>%
-#   left_join(t_samples,on="sample")
-# 
-# t_samples %>% filter(sample == "HG00096")
 
 g=ggplot(t)
 g+geom_histogram(aes(x=best_score))+
   theme_bw()+
   facet_wrap(~cohort)
 
-# g=ggplot(t_HC_ancient_modpipe)
-# g+geom_histogram(aes(x=best_score))+theme_bw()
-# 
-# g=ggplot(t_HC_ancient_apipe)
-# g+geom_histogram(aes(x=best_score))+theme_bw()
-
-
-# pipeline_compare = t_HC_ancient_apipe %>% transmute(sample=sample,best_score_apipe = best_score) %>%
-#   inner_join(t_HC_ancient_modpipe %>% transmute(sample=sample,best_score_modpipe = best_score),by="sample")
-# 
-# g=ggplot(pipeline_compare)
-# g+geom_point(aes(x=best_score_apipe,y=best_score_modpipe))+
-#   geom_abline(slope=1)+
-#   theme_bw()
-
-t_plot = rbind(t_ancient %>% mutate(type="ancient"),t %>% mutate(type="modern")) %>%
-          mutate(is_neo = grepl("NEO",sample)) %>%
-          mutate(is_err = grepl("ERR",sample)) %>%
-          mutate(is_prs = grepl("prs",sample))
-
-g=ggplot(t_plot)
-g+geom_histogram(aes(x=best_score,fill=is_prs))+
-  #geom_histogram(aes(x=best_score,fill=is_err))+
-  theme_bw()+
-  facet_wrap(~type,scale="free")
-
-
-t_plot %>% 
-  filter(type=="ancient") %>%
-  filter(best_score>0.75) %>%
-  summarize(n=n())
-
-pipeline_compare %>% arrange(-best_score_apipe)
 ```
 ```{r}
 t_clusts %>% filter(grepl("HG02004",sample))
