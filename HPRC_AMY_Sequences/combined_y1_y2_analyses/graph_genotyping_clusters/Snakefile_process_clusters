@@ -1,13 +1,27 @@
-
+#! set syntax=python
 import pandas as pd
-
-
 
 
 rule all:
     input:
-        "output/clusters_processed.tsv"
+        "output/clusters_processed.tsv",
+        "output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv"
 
+
+rule process_clusters2:
+    input:
+        "input/20230718_dendrogram.jaccard.bestcut.tsv"
+    output:
+        "output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv"
+    run:
+        rows = [] 
+        for i, l in enumerate(open(input[0]).readlines()):
+            for indiv in l.rstrip().split(","):
+                #print(indiv, i)
+                rows.append({"sample": indiv,
+                             "cluster": i})
+        t = pd.DataFrame(rows)
+        t.to_csv(output[0], sep="\t", index=False)
 
 rule process_clusters:
     input:

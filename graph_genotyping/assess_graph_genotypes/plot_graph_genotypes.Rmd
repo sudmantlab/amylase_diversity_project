@@ -11,8 +11,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output"
-t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+
+# t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+#   transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
+
+t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
   transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
+
+
 
 t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/cosigt_results.bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
   filter(cohort!="SGDP") %>%
@@ -30,14 +36,12 @@ t_cp = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/anc
   dplyr::select(sample,cp,label) %>%
   separate(sample,c("cohort","sample","p1","p2"),sep = "\\.")
 
-
-
 t_grouped = t %>% 
   inner_join(t_clusts %>% transmute(hap1=sample, hap1_clust = cluster),on="hap1") %>%
   inner_join(t_clusts %>% transmute(hap2=sample, hap2_clust = cluster),on="hap2") %>%
   dplyr::select(-c(cohort)) %>%
   inner_join(t_samples,on="sample") %>%
-  dplyr::select(sample,cohort,hap1_clust,hap2_clust,p1,p2) %>%
+  dplyr::select(sample,cohort,hap1_clust,hap2_clust,p1,p2,best_score) %>%
   pivot_longer(cols=c("hap1_clust","hap2_clust"),names_to = "hap", values_to = "cluster")
 
 hap1_bad = t %>% 
@@ -46,15 +50,10 @@ hap1_bad = t %>%
 hap2_bad = t %>% 
   left_join(t_clusts %>% transmute(hap2=sample, hap2_clust = cluster),on="hap2") %>% filter(is.na(hap2_clust))
 
-
 g=ggplot(t)
 g+geom_histogram(aes(x=best_score))+
   theme_bw()+
-  facet_wrap(~cohort)
-
-```
-```{r}
-t_clusts %>% filter(grepl("HG02004",sample))
+  facet_wrap(~cohort,scales="free_y")
 
 ```
 
@@ -66,84 +65,201 @@ library(ggbreak)
 #plot haplotype frequencies worldwide
 #unique(t$hap1)
 
-
 #### PLOT SORTED BY HAPLOTYPE copy number
 
 t_sum = t_grouped %>%
+          filter(cohort %in% c("SGDP","1KG","1KG_trio","HGDP")) %>%
           group_by(p2) %>%
           mutate(n_total = n()) %>%
           group_by(p2, cluster,n_total) %>%
           summarize(count = n()) %>%
           mutate(proportion=count/n_total)
 
+t_sum_ww = t_grouped %>%
+          filter(cohort %in% c("SGDP","1KG","1KG_trio","HGDP")) %>%
+          ungroup() %>%
+          mutate(n_total = n()) %>%
+          group_by(cluster,n_total) %>%
+          summarize(count = n()) %>%
+          mutate(proportion=count/n_total)
+
+write.table(t_sum_ww,
+            file=paste(outdir,"/world_wide_cluster_freqs.tsv",sep=""),
+            sep="\t",
+            quote=FALSE,
+            row.names = FALSE)
 
 t_sum = t_sum %>% dplyr::select(p2,cluster,proportion) %>%
   pivot_wider(names_from = cluster, values_from = proportion) %>%
   pivot_longer(cols = -c(p2),names_to = "cluster",values_to="proportion") %>%
   mutate(proportion = ifelse(is.na(proportion),0,proportion)) %>%
   ungroup() %>%
-  arrange(cluster,proportion) %>%
+  group_by(cluster) %>%
+  arrange(proportion) %>%
   mutate(order=row_number())
 
 #https://stackoverflow.com/questions/52214071/how-to-order-data-by-value-within-ggplot-facets
 
-t_sum$cluster = factor(t_sum$cluster, levels=c(1,3,4,0,10,7,6,8,2,5))
 
-AMY1_clust_to_copy = data.frame(cluster=seq(0,10),
-                                AMY1_cp = c(7, #0
-                                             3, #1
-                                             2, #2
-                                             5, #3
-                                             1, #4
-                                             3, #5
-                                             9, #6
-                                             4, #7
-                                             2, #8
-                                             3, #9
-                                             4 #10
-                                             ))
+clust_to_copy = data.frame(cluster=seq(0,10),
+                            AMY1_cp = c(7, #0
+                                         3, #1
+                                         2, #2
+                                         5, #3
+                                         1, #4
+                                         3, #5
+                                         9, #6
+                                         4, #7
+                                         2, #8
+                                         3, #9
+                                         4 #10
+                                         ),
+                            AMY2A_cp = c(1, #0
+                                         1, #1
+                                         2, #2
+                                         1, #3
+                                         1, #4
+                                         3, #5
+                                         1, #6
+                                         2, #7
+                                         0, #8
+                                         1, #9
+                                         2 #10
+                                         ),
+                            AMY2B_cp = c(1, #0
+                                         1, #1
+                                         2, #2
+                                         1, #3
+                                         1, #4
+                                         3, #5
+                                         1, #6
+                                         2, #7
+                                         1, #8
+                                         1, #9
+                                         1 #10
+                                         ))
 
 haplotype_pred_copy = t_grouped %>% 
-  inner_join(AMY1_clust_to_copy,by="cluster") %>%
+  filter(cohort %in% c("SGDP","1KG","1KG_trio","HGDP")) %>%
+  inner_join(clust_to_copy,by="cluster") %>%
   group_by(sample,cohort,p1,p2) %>%
-  summarize(AMY1_hap_cp = sum(AMY1_cp))
+  summarize(pred_AMY1 = sum(AMY1_cp),
+            pred_AMY2A = sum(AMY2A_cp),
+            pred_AMY2B = sum(AMY2B_cp))
+
+g=ggplot(t_grouped %>% filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient")))
+g+geom_histogram(aes(x=best_score))
+
+
+haplotype_pred_copy_ancient = t_grouped %>% 
+  filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient")) %>%
+  filter(best_score>0.6) %>%
+  inner_join(clust_to_copy,by="cluster") %>%
+  group_by(sample,cohort,p1,p2) %>%
+  summarize(pred_AMY1 = sum(AMY1_cp),
+            pred_AMY2A = sum(AMY2A_cp),
+            pred_AMY2B = sum(AMY2B_cp))
 
 ```
 ```{r}
 library(ggforce)
 #install.packages("ggforce")
 
-haplotype_vs_readdepth = inner_join(haplotype_pred_copy, t_cp %>% filter(label=="AMY1") %>% dplyr::select(cp,sample), on="sample")
+#haplotype_vs_readdepth = inner_join(haplotype_pred_copy, t_cp %>% filter(label=="AMY1") %>% dplyr::select(cp,sample), on="sample")
+haplotype_vs_readdepth = inner_join(haplotype_pred_copy, t_cp %>% mutate(label=paste("cp_",label,sep="")) %>% pivot_wider(names_from=label,values_from=cp) , on="sample") 
+                          #filter(cohort %in% c("1KG","1KG_trio"))
+#https://stackoverflow.com/questions/61367186/pivot-longer-into-multiple-columns
+longer = pivot_longer(haplotype_vs_readdepth, -c("sample","cohort","p1","p2"), names_pattern = "(.*)_(...*)$", names_to = c("type", "name")) 
+tidy_hap_vs_rd = pivot_wider(longer, id_cols=c(sample,cohort,p1,p2,name),names_from=type,values_from=value)
 
-g=ggplot(haplotype_vs_readdepth)
-g=g+geom_point(aes(x=cp,
-                 y=AMY1_hap_cp),
+
+haplotype_vs_readdepth_ancient = inner_join(haplotype_pred_copy_ancient, t_cp %>% mutate(label=paste("cp_",label,sep="")) %>% pivot_wider(names_from=label,values_from=cp) , on="sample") 
+longer_anc = pivot_longer(haplotype_vs_readdepth_ancient, -c("sample","cohort","p1","p2"), names_pattern = "(.*)_(...*)$", names_to = c("type", "name")) 
+tidy_hap_vs_rd_anc = pivot_wider(longer_anc, id_cols=c(sample,cohort,p1,p2,name),names_from=type,values_from=value)
+
+
+
+stats = tidy_hap_vs_rd %>%
+  mutate(corr = pred==cp) %>%
+  group_by(name) %>%
+  summarize(corr = sum(corr),
+            n=n()) %>%
+  mutate(prop=corr/n) %>%
+  mutate(label=paste(signif(prop*100,2),"% (",corr,"/",n,")",sep="")) %>%
+  mutate(x=ifelse(name=="AMY2A",0,2),
+         y=ifelse(name=="AMY1",20,7))
+
+stats_anc = tidy_hap_vs_rd_anc %>%
+  mutate(corr = pred==cp) %>%
+  group_by(name) %>%
+  summarize(corr = sum(corr),
+            n=n()) %>%
+  mutate(prop=corr/n) %>%
+  mutate(label=paste(signif(prop*100,2),"% (",corr,"/",n,")",sep="")) %>%
+  mutate(x=ifelse(name=="AMY2A",0,2),
+         y=ifelse(name=="AMY1",20,7))
+
+
+plot_sum = tidy_hap_vs_rd %>%
+            group_by(name) %>%
+            mutate(n_total=n()) %>%
+            group_by(name,pred,cp,n_total) %>%
+            summarize(n = n()) %>%
+            mutate(prop=n/n_total)
+       
+dummy_data = data.frame(name=c("AMY1","AMY2A","AMY2A","AMY2B"),
+                        pred=c(20,0,7,7),
+                        cp=c(20,0,7,7))            
+
+g=ggplot(plot_sum)
+g=g+
+  geom_abline(slope=1,color="lightblue",size=.5)+
+  geom_point(aes(x=cp,
+                   y=pred),
+             position=position_jitternormal(),
+             alpha=0.2,
+             size=0.05,
+             data=tidy_hap_vs_rd)+
+  theme_bw(base_size=7)+
+  facet_wrap(~name,scales="free")+
+  scale_size_continuous(range=c(0.01,2))+
+  scale_x_continuous("copy number (read depth)", breaks=seq(0,20,2))+
+  scale_y_continuous("copy number\n(haplotype deconvolution)", breaks=seq(0,20,2))+
+  theme(strip.background=element_blank(),
+        panel.grid=element_blank())+
+  #theme(legend.position = "none")+
+  geom_blank(aes(x=cp,y=pred),data=dummy_data)+
+  geom_text(aes(x=x,y=y,label=label),data=stats,size=2,hjust=0)
+
+fout = paste(outdir,"/copy_number_comparison.pdf",sep="")
+pdf(fout, width=4 ,height=1.55)
+print(g)
+dev.off()
+
+g=ggplot(tidy_hap_vs_rd_anc)
+g=g+geom_abline(slope=1,color="lightblue",size=.5)+
+  geom_point(aes(x=cp,
+                   y=pred),
              position=position_jitternormal(),
              alpha=0.2,
              size=0.05)+
-  scale_x_continuous("AMY1 read depth copy",breaks=seq(0,20,2))+
-  scale_y_continuous("Haplotype deconvolution copy",breaks=seq(0,20,2))+
-  #geom_smooth(aes(x=cp,y=AMY1_hap_cp),method='lm')+
-  theme_bw(base_size=8)
+  theme_bw(base_size=7)+
+  facet_wrap(~name,scales="free")+
+  scale_size_continuous(range=c(0.01,2))+
+  scale_x_continuous("copy number (read depth)", breaks=seq(0,20,2))+
+  scale_y_continuous("copy number\n(haplotype deconvolution)", breaks=seq(0,20,2))+
+  theme(strip.background=element_blank(),
+        panel.grid=element_blank())+
+  #theme(legend.position = "none")+
+  geom_blank(aes(x=cp,y=pred),data=dummy_data)+
+  geom_text(aes(x=x,y=y,label=label),data=stats_anc,size=2,hjust=0)
 
-print(g)
-
-fout = paste(outdir,"/copy_number_comparison_AMY1.pdf",sep="")
-pdf(fout, width=2.1 ,height=2)
+fout = paste(outdir,"/copy_number_comparison.pdf",sep="")
+pdf(fout, width=4 ,height=1.55)
 print(g)
 dev.off()
 
 
-cor(haplotype_vs_readdepth$cp,haplotype_vs_readdepth$AMY1_hap_cp)
-
-haplotype_vs_readdepth %>% 
-  mutate(correct = cp == AMY1_hap_cp) %>%
-  group_by(correct) %>%
-  summarize(n=n())
-
-3667/(3667+218)
-
-3667/3885
 ```
 
 
@@ -153,108 +269,480 @@ colors = c("#EDB829", "#94B669", "#E97C07", "#00496F", "#0C7996","purple", "#DD4
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output"
 
+hap_names = data.frame(cluster=seq(0,10),
+                       hap_names = c("H7", #0,
+                                     "H3^r", #1,
+                                     "H2A2B2", #2,
+                                     "H5", #3,
+                                     "H1^a", #4,
+                                     "H3A3B3", #5,
+                                     "H9", #6,
+                                     "H4A2B2", #7,
+                                     "H2A0", #8,
+                                     "H3.2", #9,
+                                     "H4A2" #10
+                       )) %>%
+  inner_join(t_sum_ww,by="cluster") %>%
+  mutate(ww_prop = proportion) %>%
+  dplyr::select(-proportion)
+  
+#t_sum$cluster = factor(t_sum$cluster, levels=c(1,3,4,0,10,7,6,8,2,5,9))
+#H7, H3, H2, H5, H1, H3, H9, H4, H2, H3, H4
 
-hacked_min_max = data.frame(cluster = c(1,3,4,0,10,7,6,8,2,5),
-                            mxs = c(0.6,0.6,0.6,0.6,0.6,0.1,0.1,0.1,0.1,0.1),
-                            line = rep(0.1,10))
+hacked_min_max = data.frame(cluster = c(1,3,4,0,10,7,6,8,2,5,9),
+                            mxs = c(0.55,0.55,0.55,0.1,0.1,0.1,0.1,0.1,0.1,0.1,.1),
+                            line = rep(0.1,11)) %>%
+                      inner_join(hap_names,by="cluster")
 
+t_plot = inner_join(t_sum %>% mutate(cluster=as.numeric(cluster)), hap_names, by="cluster")
 
+#t_plot$cluster = factor(t_plot$cluster, levels=c(1,3,4,0,10,7,6,8,2,5,9))
+t_plot$hap_names = factor(t_plot$hap_names, levels=(hap_names %>% arrange(-ww_prop))$hap_names)
+hacked_min_max$hap_names = factor(hacked_min_max$hap_names, levels=(hap_names %>% arrange(-ww_prop))$hap_names)
 
+t_plot = t_plot %>% filter(!hap_names %in% c("H3.2"))
+hacked_min_max = hacked_min_max %>% filter(!hap_names %in% c("H3.2"))
 
-g=ggplot(t_sum)
+t_plot = t_plot %>% filter(!hap_names %in% c("H3.2"))
+hacked_min_max = hacked_min_max %>% filter(!hap_names %in% c("H3.2"))
+ 
+g=ggplot(t_plot)
 g=g+geom_bar(aes(y=order,fill=p2,x=proportion),stat='identity',position='dodge',alpha=.8)+
   geom_text(aes(y=order,label=p2,x=proportion),size=.75,hjust=0,position=position_nudge(x=0.001,y=0))+
   theme_bw(base_size=4)+
   scale_fill_manual(values=colors)+
-  facet_wrap(~cluster,scales="free",ncol=1,strip.position = "right")+
+  facet_wrap(~hap_names,scales="free",ncol=1,strip.position = "right",labeller = label_parsed)+
   geom_vline(xintercept=0.1,linetype="dotted",size=.25)+
+  #geom_text(aes(x=mxs-.1,y=0,label=hap_names),size=1,hjust=0,data=hacked_min_max,parse=TRUE)+
   #facet_wrap(~cluster,nrow=2)+
-  theme(strip.background = element_blank())+
+  theme(strip.background = element_blank(),
+        strip.text = element_text(angle=0))+
         #axis.text.y = element_text(angle=90,hjust=0))+
   theme(legend.position="None")+
   geom_blank(aes(x=mxs),data=hacked_min_max)+
   scale_y_discrete("")+
   scale_x_continuous("allele frequency")
-  #theme(panel.spacing.y = unit(0.5, "cm"))+
-  #theme(panel.spacing.x = unit(0.1, "cm"))
+
 
 fout = paste(outdir,"/hap_proportions_v3.pdf",sep="")
-pdf(fout, width=1 ,height=3)
+pdf(fout, width=1.25 ,height=3)
 print(g)
 dev.off()
 
+fout = paste(outdir,"/hap_proportions_v4.pdf",sep="")
+pdf(fout, width=2 ,height=2.5)
+print(g+facet_wrap(~hap_names,scales="free",ncol=2))
+dev.off()
 
 
+#g=ggplot(t_plot %>% filter(hap_names %in% c("H3^r","H5","H1^a")))
+g=ggplot(t_plot)
+g=g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',alpha=.8)+
+  geom_text(aes(x=order,label=p2,y=proportion),size=.75,hjust=0.5,position=position_nudge(y=0.01,x=0),angle=0)+
+  #geom_text(aes(x=0,y=mxs-0.01,label=hap_names),size=2,hjust=0,data=hacked_min_max %>% filter(!hap_names %in% c("H3^r","H5","H1^a")),parse=TRUE)+
+  geom_text(aes(x=0.5,y=0.5,label=hap_names),size=2,hjust=0,data=hacked_min_max,parse=TRUE)+
+  theme_bw(base_size=6)+
+  scale_fill_manual(values=colors)+
+  facet_wrap(~hap_names,scales="free_x",ncol=2,strip.position = "bottom",labeller = label_parsed)+
+  #facet_grid(.~hap_names,scales="free_x",labeller = labeller(type = label_parsed))+
+  #geom_hline(yintercept=0.1,linetype="dashed",size=.25)+
+  #facet_wrap(~cluster,nrow=2)+
+  theme(strip.background = element_blank(),
+        strip.text=element_blank())+
+  theme(legend.position="None")+
+  #geom_blank(aes(y=mxs),data=hacked_min_max)+
+  scale_x_discrete("")+
+  scale_y_continuous("allele frequency")
+
+
+fout = paste(outdir,"/hap_proportions_v5.pdf",sep="")
+pdf(fout, width=1.5 ,height=4)
+print(g)
+dev.off()
 
 ```
 ```{r}
-t_subsistence = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata/populations_subsistence.tsv",header=T,sep="\t")
 
-t_subsistence_breakdown = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata/populations_subsistence_breakdown.tsv",header=T,sep="\t")
+hap_names = data.frame(cluster=seq(0,10),
+                       hap_names = c("H7", #0,
+                                     "H3^r", #1,
+                                     "H2A2B2", #2,
+                                     "H5", #3,
+                                     "H1^a", #4,
+                                     "H3A3B3", #5,
+                                     "H9", #6,
+                                     "H4A2B2", #7,
+                                     "H2A0", #8,
+                                     "H3.2", #9,
+                                     "H4A2" #10
+                       )) %>%
+  inner_join(t_sum_ww,by="cluster") %>%
+  mutate(ww_prop = proportion) %>%
+  dplyr::select(-proportion)
 
-t_subsistence_breakdown_AG = t_subsistence_breakdown %>% filter(id=="EA005")
+###MCCARROLL COMPARISON
+###SUPER COMPARISON
+t_sum = t_grouped %>%
+          filter(cohort %in% c("1KG","HGDP","SGDP")) %>%
+          group_by(p1,p2) %>%
+          mutate(n_total = n()) %>%
+          group_by(p1,p2, cluster,n_total) %>%
+          summarize(count = n()) %>%
+          mutate(proportion=count/n_total) %>%
+  inner_join(hap_names, by="cluster") %>%
+  ungroup() %>%
+  group_by(hap_names) %>%
+  arrange(proportion) %>%
+  mutate(order=n())
+
+# t_sum = t_sum %>% dplyr::select(p2,cluster,proportion) %>%
+#   pivot_wider(names_from = cluster, values_from = proportion) %>%
+#   pivot_longer(cols = -c(p2),names_to = "cluster",values_to="proportion") %>%
+#   mutate(proportion = ifelse(is.na(proportion),0,proportion)) %>%
+#   ungroup() %>%
+#   group_by(cluster) %>%
+#   arrange(proportion) %>%
+#   mutate(order=row_number())
+
+g=ggplot(t_sum)
+g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',alpha=0.8)+
+  #geom_text(aes(x=order,label=type,y=ifelse(hap_names=="H3^r",0,proportion)),size=1,hjust=0,angle=90,position=position_nudge(y=0.001,x=0))+
+  theme_bw(base_size=4)+
+  #scale_fill_brewer(palette="Spectral")+
+  #scale_fill_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
+  facet_wrap(~hap_names,scales="free_x",nrow=1,strip.position = "bottom",labeller = label_parsed)+
+  theme(strip.background = element_blank())+
+  theme(legend.position="None")+
+  scale_x_discrete("")+
+  scale_y_continuous("allele frequency")
+
+t_sum %>% filter(p1=="CEU")
+
+```
 
 
-t_data_by_sus = t_grouped %>% dplyr::select(sample,p1,hap,cluster) %>%
+```{r}
+t_subsistence = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/metadata/populations_subsistence.tsv",header=T,sep="\t") %>% 
+                dplyr::select(type,p1)
+
+
+exist = c("Yakut","Aleut","Tlingit","Mansi")
+#t_subsistence %>% filter(p1 %in% exist)
+#all_CAS = unique(t_gt %>% ungroup() %>% separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>% filter(p2=="CAS") %>% dplyr::select(p1))$p1
+
+additional_info_df = data.frame(p1=c("Tubular",
+                                    "Altaian",
+                                    "Ulchi",
+                                    "Chukchi",
+                                    "EskimoSireniki",
+                                    "EskimoChaplin",
+                                    "EskimoNaukan",
+                                    "Even",
+                                    "Itelman",
+                                    "Mansi"),
+                               type=c("Hunting",
+                                      "Pastoralism",
+                                      "Fishing",
+                                      "Hunting",
+                                      "Hunting",
+                                      "Hunting",
+                                      "Hunting",
+                                      "Hunting",
+                                      "Fishing",
+                                      "Fishing"))
+
+### SEE PLOT_COPY DISTRIBUTION FOR details on IDs
+
+t_subsistence = rbind(t_subsistence,additional_info_df)
+
+
+t_data_by_sus = t_grouped %>% dplyr::select(sample,p1,hap,cluster) %>% #filtering out GTEx etc doesnt matter cause of inner join
           inner_join(t_subsistence, on="p1") %>%
-          #left_join(t_subsistence, on="p1") %>%
-          #mutate(type = ifelse(is.na(type),"other",type)) %>%
           mutate(type=case_when(type=="Fishing" ~ "Fishing/Hunting",
                                 type=="Hunting" ~ "Fishing/Hunting",
                                 TRUE ~ type)) %>%
-          mutate(simple_type = ifelse(type=="Agriculture",type,"other"))
+          mutate(simple_type = ifelse(type=="Agriculture",type,"other")) %>%
+          filter(type!="Two or more sources") %>%
+          inner_join(hap_names, by="cluster")
+          
 
 t_sum_sus = t_data_by_sus %>%
             group_by(type) %>%
             mutate(n_total = n()) %>%
-            group_by(type, cluster,n_total) %>%
+            group_by(type, cluster,hap_names,n_total) %>%
             summarize(count = n()) %>%
             mutate(proportion=count/n_total)
 
 
-t_sum_sus = t_sum_sus %>% dplyr::select(type,cluster,proportion) %>%
-  pivot_wider(names_from = cluster, values_from = proportion) %>%
-  pivot_longer(cols = -c(type),names_to = "cluster",values_to="proportion") %>%
+t_sum_sus = t_sum_sus %>% ungroup() %>% dplyr::select(type,hap_names,proportion) %>%
+  pivot_wider(names_from = hap_names, values_from = proportion) %>%
+  pivot_longer(cols = -c(type),names_to = "hap_names",values_to="proportion") %>%
   mutate(proportion = ifelse(is.na(proportion),0,proportion)) %>%
   ungroup() %>%
-  arrange(cluster,proportion) %>%
+  group_by(hap_names) %>%
+  arrange(-proportion) %>%
   mutate(order=row_number())
 
+t_sum_sus$type = factor(t_sum_sus$type, levels=c("Agriculture","Pastoralism","Fishing/Hunting"))
+#t_sum_sus$cluster = factor(t_sum_sus$cluster, levels=c(1,3,4,0,10,7,6,8,2,5))
 
-t_sum_sus$cluster = factor(t_sum_sus$cluster, levels=c(1,3,4,0,10,7,6,8,2,5))
+sus_mx_f = t_sum_sus %>% 
+  group_by(hap_names) %>%
+  summarize(mx_f = max(proportion))
+
 
 hacked_min_max = data.frame(cluster = c(1,3,4,0,10,7,6,8,2),
                             mxs = c(0.7,0.6,0.6,0.6,0.6,0.1,0.1,0.1,0.1),
                             line = rep(0.1,9))
 
+#hacked_min_max$hap_names = factor(hacked_min_max$hap_names, levels=(sus_mx_f %>% arrange(-mx_f))$hap_names)
+
+t_sum_sus$hap_names = factor(t_sum_sus$hap_names, levels=(sus_mx_f %>% arrange(-mx_f))$hap_names)
+
 
 g=ggplot(t_sum_sus)
-g=g+geom_bar(aes(y=order,fill=type,x=proportion),stat='identity',position='dodge',alpha=0.5)+
+g=g+geom_bar(aes(y=order,fill=type,x=proportion),stat='identity',position='dodge',alpha=0.8)+
   geom_text(aes(y=order,label=type,x=proportion),size=1,hjust=0,position=position_nudge(x=0.001,y=0))+
   theme_bw(base_size=4)+
-  scale_fill_brewer(palette="Spectral")+
-  #facet_wrap(~cluster,scales="free",ncol=1,strip.position = "right")+
-  facet_wrap(~cluster,scales="free_y",ncol=1,strip.position = "right")+
-  #geom_vline(xintercept=0.1,linetype="dotted",size=.25)+
-  geom_blank(aes(x=mxs),data=hacked_min_max)+
+  scale_fill_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
+  facet_wrap(~hap_names,scales="free_y",ncol=1,strip.position = "right",labeller = label_parsed)+
   theme(strip.background = element_blank())+
   theme(legend.position="None")+
   scale_y_discrete("")+
   scale_x_continuous("allele frequency")
-  #theme(panel.spacing.y = unit(0.5, "cm"))+
-  #theme(panel.spacing.x = unit(0.1, "cm"))
 
 fout = paste(outdir,"/hap_proportions_by_sustinance.pdf",sep="")
 pdf(fout, width=1 ,height=3)
 print(g)
 dev.off()
 
+g=ggplot(t_sum_sus)
+g=g+geom_bar(aes(x=order,fill=type,y=proportion),stat='identity',position='dodge',alpha=0.8)+
+  geom_text(aes(x=order,label=type,y=ifelse(hap_names=="H3^r",0,proportion)),size=1,hjust=0,angle=90,position=position_nudge(y=0.001,x=0))+
+  theme_bw(base_size=4)+
+  scale_fill_brewer(palette="Spectral")+
+  scale_fill_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
+  facet_wrap(~hap_names,scales="free_x",nrow=1,strip.position = "bottom",labeller = label_parsed)+
+  theme(strip.background = element_blank())+
+  theme(legend.position="None")+
+  scale_x_discrete("")+
+  scale_y_continuous("allele frequency")
+
+fout = paste(outdir,"/hap_proportions_by_sustinance_v2.pdf",sep="")
+pdf(fout, width=3 ,height=.75)
+print(g)
+dev.off()
 
 
 ```
 
 ```{r}
 
+
+lmp <- function (modelobject) {
+    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(modelobject)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+}
+
+ancient_info = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/haplotype_analysis/metadata/ancient_info.tsv",header=T,sep="\t") %>%
+  mutate(ID = sample, age=ageAverage) %>%
+  mutate(sample=ID) %>%
+  dplyr::select(sample, age)
+
+ancient_info_excof = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/d4_cvg_analysis/bam_to_d4/meta_data/ExcoffierAncients.tsv",header=T,sep="\t") %>%
+  mutate(ID = SAMPLE_ID, age=AGE_AVG_BP) %>%
+  mutate(sample=ID) %>%
+  dplyr::select(sample, age)
+
+ancient_info = rbind(ancient_info, ancient_info_excof)
+
+
+t_sum = t_grouped %>%
+          filter(best_score>0.6) %>%
+          filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient","1KG","SGDP","HGDP")) %>%
+          filter(p2 %in% c("WEA","EarlyFarmer","Hunter-GathererW","Hunter-GathererE","Yamnaya","Europe")) %>%
+          mutate(p2 = ifelse(p2=="WEA","modern-WEA",p2)) %>%
+          group_by(p2) %>%
+          mutate(n_total = n()) %>%
+          group_by(p2, cluster,n_total) %>%
+          summarize(count = n()) %>%
+          mutate(proportion=count/n_total) %>%
+          inner_join(hap_names %>% dplyr::select(cluster,hap_names),by="cluster") %>%
+          ungroup() %>%
+          group_by(hap_names) %>%
+          arrange(-proportion) %>%
+          mutate(order=row_number())
+
+hap_order = (t_sum %>% group_by(hap_names) %>% summarize(max_freq = max(proportion)) %>% ungroup() %>% arrange(max_freq))$hap_names
+
+
+t_sum$p2 = factor(t_sum$p2, levels=c("modern-WEA", "Hunter-GathererE", "Hunter-GathererW", "EarlyFarmer","Yamnaya"))
+colors = c("#94B669", pnw_palette(name="Starfish",n=4,type="discrete"))
+
+g=ggplot(t_sum)
+g=g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',alpha=0.7)+
+  geom_text(aes(x=order,label=p2,y=ifelse(hap_names=="H3^r",0,proportion)),size=1,hjust=0,angle=90,position=position_nudge(y=0.001,x=0))+
+  theme_bw(base_size=4)+
+  scale_fill_manual(values=colors)+
+  #scale_fill_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
+  facet_wrap(~hap_names,scales="free_x",nrow=1,strip.position = "bottom",labeller = label_parsed)+
+  theme(strip.background = element_blank())+
+  theme(legend.position="None")+
+  scale_x_discrete("")+
+  scale_y_continuous("allele frequency")
+
+fout = paste(outdir,"/ancient_hap_proportions.pdf",sep="")
+pdf(fout, width=3 ,height=.75)
+print(g)
+dev.off()
+
+
+
+subset = c("H5", "H3.2", "H4A2B2", "H1^a", "H2A0", "H3^r")
+g=ggplot(t_sum %>% filter(hap_names %in% subset))
+g=g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',alpha=0.7)+
+  geom_text(aes(x=order,label=p2,y=ifelse(hap_names=="H3^r",0,proportion)),size=1,hjust=0,angle=90,position=position_nudge(y=0.001,x=0))+
+  theme_bw(base_size=4)+
+  scale_fill_manual(values=colors)+
+  #scale_fill_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
+  facet_wrap(~hap_names,scales="free_x",nrow=2,strip.position = "bottom",labeller = label_parsed)+
+  theme(strip.background = element_blank())+
+  theme(legend.position="None")+
+  scale_x_discrete("")+
+  scale_y_continuous("allele frequency")
+
+fout = paste(outdir,"/ancient_hap_proportions_subset.pdf",sep="")
+pdf(fout, width=1 ,height=1.5)
+print(g)
+dev.off()
+
+
+
+```
+
+```{r}
+t_hap_by_age = t_grouped %>%
+       filter(best_score>0.6) %>%
+        filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient","HGDP","SGDP")) %>%
+   filter(p2 %in% c("WEA","EarlyFarmer","Hunter-GathererW","Hunter-GathererE","Yamnaya","Europe")) %>%
+        left_join(ancient_info,by="sample") %>%
+        mutate(age=ifelse(!cohort %in% c("StoneAgeAncient","ExcoffierAncient"),0,as.numeric(age))) %>% 
+        filter(age<20000) %>%
+        inner_join(hap_names %>% dplyr::select(cluster,hap_names),by="cluster") %>%
+        mutate(age=-1*age) %>%
+        mutate(time_bin = cut(age,breaks=c(-11000,-8000,-4000,-500,0),ordered_result = TRUE))
+        #mutate(time_bin = ntile(age,n=3))
+
+t_sum_hap_by_age = t_hap_by_age %>%
+          group_by(time_bin) %>%
+          mutate(n_total = n()) %>%
+          group_by(time_bin, hap_names,n_total) %>%
+          summarize(count = n()) %>%
+          mutate(proportion=count/n_total) %>%
+          group_by(hap_names) %>%
+          mutate(mu_freq = mean(proportion)) 
+
+g=ggplot(t_sum_hap_by_age %>% filter(mu_freq >0.05))
+g=g+geom_point(aes(x=time_bin,y=proportion),size=.1)+
+  geom_line(aes(x=time_bin,y=proportion,group=hap_names))+
+  facet_wrap(~hap_names,nrow=1,labeller = label_parsed,strip.position = "bottom") +
+  scale_x_discrete("",labels=c("<8000","8000-4000","4000-500","modern"))+
+  theme_bw(base_size=4)+
+  theme(strip.background=element_blank(),
+        axis.text.x=element_text(angle=45,hjust=1))
+
+fout = paste(outdir,"/ancient_hap_freqs_binned.pdf",sep="")
+pdf(fout, width=3 ,height=1)
+print(g)
+dev.off()
+
+
+```
+
+```{r}
+#install.packages("effects")
+#https://stackoverflow.com/questions/65946270/multinomial-logistic-regression-in-r
+#https://stats.oarc.ucla.edu/r/dae/multinomial-logistic-regression/
+
+#This puts the reference hap first so all stat comparisons are against it (it is highest freq)
+m = nnet::multinom(hap_names~age,data=t_hap_by_age %>% mutate(hap_names=ifelse(hap_names=="H3^r","0H3^r",hap_names)))
+#m = nnet::multinom(hap_names~age,data=t_hap_by_age)
+summary(m)
+z = summary(m)$coefficients/summary(m)$standard.errors
+p = (1 - pnorm(abs(z), 0, 1)) * 2
+#epiDisplay::mlogit.display(m, decimal=3, alpha=0.05)
+
+p_vals = as.data.frame(p) %>% 
+  mutate(padj=p.adjust(age)) %>%
+  mutate(sig=padj<=0.05) %>%
+  add_rownames(var="hap_names")
+
+#sig = c((p_vals %>% filter(sig))$hap_names,"H1^a")
+sig = c((p_vals %>% filter(sig))$hap_names,"H3^r")
+
+unique(t_hap_by_age$hap_names)
+breaks = seq(-12000,0,100)
+
+dmodel = data.frame(hap_names = rep(unique(t_hap_by_age$hap_names),each=length(breaks)),age=rep(breaks,11))
+pp.model = cbind(dmodel %>% dplyr::select(age),predict(m,newdata=dmodel,type="probs",se=TRUE))
+
+plot_df = pp.model %>% 
+          pivot_longer(-c(age),names_to="hap_names",values_to="freq") %>%
+          mutate(hap_names=ifelse(hap_names=="0H3^r","H3^r",hap_names)) %>%
+          filter(hap_names %in% sig)
+
+fit.eff = effects::Effect("age",m,xlevels=list(age=breaks))
+conf_ints = data.frame(fit.eff$model.matrix, fit.eff$lower.prob, fit.eff$upper.prob) %>%
+          dplyr::select(-c(X.Intercept.)) %>%
+          pivot_longer(-age,names_pattern = "(..prob)\\.(.*)",names_to=c("type","hap_names"),values_to="freq") %>%
+          pivot_wider(names_from="type",values_from="freq") %>%
+          mutate(hap_names = case_when(hap_names=="H1.a" ~ "H1^a",
+                                       hap_names=="H3.r" ~ "H3^r",
+                                       hap_names=="X0H3.r" ~ "H3^r",
+                                       TRUE ~ hap_names)) %>%
+          filter(hap_names %in% sig)
+
+#conf_ints$hap_names = factor(conf_ints$hap_names, levels=c("H3^r", "H5", "H1^a","H4A2B2"))
+#plot_df$hap_names = factor(plot_df$hap_names, levels=c("H3^r", "H5", "H1^a","H4A2B2"))
+
+unique(conf_ints$hap_names)
+
+cols = pnw_palette("Sunset2",4)
+
+cols = pnw_palette("Sunset2",6)
+cols = pnw_palette("Sunset",6)
+#cols = pnw_palette("Sunset2",5)
+g=ggplot(plot_df)
+g=g+geom_ribbon(aes(x=age,ymin=L.prob,ymax=U.prob,group=hap_names,fill=hap_names),data=conf_ints,alpha=.1)+
+  geom_line(aes(x=age,y=freq,group=hap_names,color=hap_names),size=1)+
+  theme_bw(base_size=8)+
+  #facet_wrap(~hap_names,labeller = label_parsed,strip.position = "top",nrow=1)+
+  theme(strip.background = element_blank(),
+        panel.grid=element_blank(),
+        legend.key.height = unit(.25,"cm"),
+        legend.key.width = unit(.5,"cm"))+
+  scale_x_continuous("kyr BP",breaks=seq(-12000,0,4000),labels=-1*seq(-12,0,4))+
+  scale_y_continuous("haplotype frequency")+
+  scale_color_manual("",values=cols,labels=scales::parse_format())+
+  scale_fill_manual("",values=cols,labels=scales::parse_format())+
+  theme(legend.text = element_text(hjust=0))
+
+fout = paste(outdir,"/ancient_hap_freqs_cont.pdf",sep="")
+pdf(fout, width=2.5 ,height=1.5)
+print(g)
+dev.off()
+
+
+p_vals %>% arrange(padj)
+
+
+```
+
+```{r}
+#DUNNO
 t_sum_sub= t_grouped %>%
           group_by(p1) %>%
           mutate(n_total = n()) %>%
