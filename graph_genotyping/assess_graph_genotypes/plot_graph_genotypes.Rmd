@@ -713,7 +713,7 @@ unique(conf_ints$hap_names)
 cols = pnw_palette("Sunset2",4)
 
 cols = pnw_palette("Sunset2",6)
-cols = pnw_palette("Sunset",6)
+cols = pnw_palette("Bay",6)
 #cols = pnw_palette("Sunset2",5)
 g=ggplot(plot_df)
 g=g+geom_ribbon(aes(x=age,ymin=L.prob,ymax=U.prob,group=hap_names,fill=hap_names),data=conf_ints,alpha=.1)+
