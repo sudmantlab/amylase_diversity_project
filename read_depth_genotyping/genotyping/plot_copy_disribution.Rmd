@@ -49,9 +49,25 @@ sample_counts = read.table("./output/genotypes.likelihoods.tsv",header=T,sep="\t
   group_by(dataset) %>%
   summarize(n=n())
 
-n_modern = sample_counts %>% filter(!dataset %in% c("ExcoffierAncient", "StoneAgeAncient","Archaic")) %>% ungroup() %>% summarize(n=sum(n))
+n_modern = sample_counts %>% 
+              filter(!dataset %in% c("ExcoffierAncient", "StoneAgeAncient","Archaic")) %>% 
+              filter(!dataset %in% c("GTEx")) %>% 
+              ungroup() %>% 
+  summarize(n=sum(n))
+
 sample_counts
 n_modern
+
+p1_counts = read.table("./output/genotypes.likelihoods.tsv",header=T,sep="\t") %>%
+  separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE) %>%
+  filter(!dataset %in% c("ExcoffierAncient", "StoneAgeAncient","Archaic")) %>% 
+  filter(!dataset %in% c("GTEx")) %>% 
+  dplyr::select(dataset,ID,p1,p2) %>%
+  group_by(p1) %>%
+  summarize(n=n())
+  
+p1_counts %>% arrange()
+
 
 
 t_gt_count = read.table("./output/genotypes.likelihoods.tsv",header=T,sep="\t") %>%
@@ -107,9 +123,18 @@ fn_out = paste(outdir,"/populations.tsv",sep="")
 write.table(pop_list,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 
 
+t_plot %>% 
+  ungroup() %>%
+  dplyr::select(p2,label,p2_mu) %>% 
+  unique() %>% 
+  filter(label=="AMY1") %>% 
+  arrange(-p2_mu)
+
 ```
 ```{r}
 library(RColorBrewer)
+#install.packages("ggsignif")
+library(ggsignif)
 
 t_subsistence = read.table("metadata/populations_subsistence.tsv",header=T,sep="\t") %>% 
                 dplyr::select(type,p1)
@@ -118,6 +143,8 @@ t_subsistence = read.table("metadata/populations_subsistence.tsv",header=T,sep="
 exist = c("Yakut","Aleut","Tlingit","Mansi")
 t_subsistence %>% filter(p1 %in% exist)
 all_CAS = unique(t_gt %>% ungroup() %>% separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>% filter(p2=="CAS") %>% dplyr::select(p1))$p1
+
+#Biaka, Mbuti come from Perry
 
 additional_info_df = data.frame(p1=c("Tubular",
                                     "Altaian",
@@ -128,7 +155,9 @@ additional_info_df = data.frame(p1=c("Tubular",
                                     "EskimoNaukan",
                                     "Even",
                                     "Itelman",
-                                    "Mansi"),
+                                    "Mansi",
+                                    "Biaka",
+                                    "Mbuti"),
                                type=c("Hunting",
                                       "Pastoralism",
                                       "Fishing",
@@ -138,7 +167,9 @@ additional_info_df = data.frame(p1=c("Tubular",
                                       "Hunting",
                                       "Hunting",
                                       "Fishing",
-                                      "Fishing"))
+                                      "Fishing",
+                                      "Hunting",
+                                      "Hunting"))
 
 # "Tubular" Hunting https://en.wikipedia.org/wiki/Tubalars
 # "Altaian" Pastoralism https://en.wikipedia.org/wiki/Altai_people
@@ -179,15 +210,29 @@ t_plot_by_sub = t_data_by_sub %>%
           summarize(n=n()) %>%
           mutate(prop=n/n_total)
 
-t_sum_stats = t_plot_by_sub %>% 
-              ungroup() %>%
-              dplyr::select(type_label,mu,serr,type,label,simple_type) %>%
-              unique()
+# t_sum_stats = t_plot_by_sub %>% 
+#               ungroup() %>%
+#               dplyr::select(type_label,mu,serr,type,label,simple_type) %>%
+#               unique()
 
-p_A1 = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
-p_A2A = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
-p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
+t_sum_stats = t_data_by_sub %>%
+                ungroup() %>%
+                group_by(simple_type,label) %>%
+                summarize(n_total=n(),
+                    mu = mean(cp),
+                    sdev = sd(cp)) %>%
+          mutate(serr = sdev/sqrt(n_total)) %>%
+          mutate(x=ifelse(simple_type=="Agriculture",3,1.5))
 
+p_A1 = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
+p_A2A = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
+p_A2B = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
+# p_A1 = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
+# p_A2A = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
+# p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
+# p_A1 = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1",type!="Pastoralism"))$p.value
+# p_A2A = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A",type!="Pastoralism"))$p.value
+# p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B",type!="Pastoralism"))$p.value
 
 # mutate(p_adj = p.adjust(p.value)) %>%
 #               mutate(p2 = str_replace(contrast,"WEA_","")) %>%
@@ -197,7 +242,8 @@ p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
 
 df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
                      ps = c(p_A1, p_A2A,p_A2B),
-                     xs = c(16.1,4.1,4.05),
+                     #xs = c(16.1,4.1,4.05),
+                     xs = c(16.7,4.3,4.15),
                      #xs = c(16,4.5,3.75),
                      x_nudge = c(19,5,4.5)) %>%
             mutate(P_adj = p.adjust(ps)) %>%
@@ -206,23 +252,50 @@ df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
 t_plot_by_sub$type = factor(t_plot_by_sub$type,levels=rev(c("Agriculture","Pastoralism","Fishing/Hunting","Two or more sources")))
 t_plot_by_sub$type_label = factor(t_plot_by_sub$type_label,levels=rev(unique(t_plot_by_sub$type_label)))
 
+
+# my_comparisons <- list( c("0.5", "1"), c("1", "2"), c("0.5", "2") )
+# ggboxplot(ToothGrowth, x = "dose", y = "len",
+#           color = "dose", palette = "jco")+ 
+#   stat_compare_means(comparisons = my_comparisons)+ # Add pairwise comparisons p-value
+#   stat_compare_means(label.y = 50)     # Add global p-value
+
+#my_comparisons <- list( c("2", "1"), c("1", "2"), c("0.5", "2") )
+
+mult_1=1.05
+mult_2=1.07
+df_segs = data.frame(x_start = rep(c(mult_1, mult_2, mult_1, mult_1),3),
+                     x_end = rep(c(mult_1, mult_2, mult_2, mult_2),3),
+                     y_start = rep(c(1, 1.5, 1.5,3),3),
+                     y_end = rep(c(2, 3, 1.5,3),3),
+                     label=rep(c("AMY1","AMY2A","AMY2B"),each=4)) %>%
+  inner_join(data.frame(label=c("AMY1","AMY2A","AMY2B"),mult=c(15.8,4,3.9)),by="label")
+
 g=ggplot(t_plot_by_sub)
 g=g+geom_point(aes(x=type_label,y=cp,size=prop,color=type),alpha=0.8)+
-  geom_errorbar(aes(x=type_label,ymin=mu-serr,ymax=mu+serr),size=1,width=0,position=position_nudge(x=0.3),data=t_sum_stats)+
-  geom_point(aes(x=type_label,y=mu),shape=18,size=2,position=position_nudge(x=0.3),data=t_sum_stats)+
-  geom_point(aes(x=type_label,y=mu),color="white",shape=18,size=1,position=position_nudge(x=0.3),data=t_sum_stats)+
-  #geom_text(aes(x=0.25,y=xs,label=plabel),data=df_labs,parse=TRUE,size=2)+
-  geom_text(aes(x=1.5,y=xs,label=plabel),data=df_labs,parse=TRUE,size=2,hjust=0)+
+  #geom_errorbar(aes(x=type_label,ymin=mu-serr,ymax=mu+serr),size=1,width=0,position=position_nudge(x=0.3),data=t_sum_stats)+
+  #geom_point(aes(x=type_label,y=mu),shape=18,size=2,position=position_nudge(x=0.3),data=t_sum_stats)+
+  #geom_point(aes(x=type_label,y=mu),color="white",shape=18,size=1,position=position_nudge(x=0.3),data=t_sum_stats)+
+  geom_errorbar(aes(x=x,ymin=mu-serr,ymax=mu+serr),size=1,width=0,data=t_sum_stats)+
+  geom_point(aes(x=x,y=mu),shape=18,size=2,data=t_sum_stats)+
+  geom_point(aes(x=x,y=mu),color="white",shape=18,size=1,data=t_sum_stats)+
+  geom_text(aes(x=1.0,y=xs,label=plabel),data=df_labs,parse=TRUE,size=1.75,hjust=0)+
   theme_bw(base_size=10)+
   facet_wrap(~label,ncol=1,strip.position="right",scales="free_x")+
   scale_color_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
   theme(legend.position="None")+
   geom_blank(aes(y=x_nudge,x=1),data=df_labs)+
+  # geom_signif(
+  #   y_position = c(5.3), 
+  #   xmin = c(0), 
+  #   xmax = c(1)
+  # ) +
+  geom_segment(aes(y=x_start*mult,yend=x_end*mult,x=y_start,xend=y_end),data=df_segs,lineend = "round",size=.25)+
   coord_flip()+
   scale_x_discrete("")+
-  scale_y_continuous("",breaks=c(c(0,1,2,3,4,5),seq(6,18,2)))+
+  scale_y_continuous("",breaks=c(c(0,1,2,3,4,5),seq(6,28,2)))+
   theme(strip.background = element_blank())+
   scale_size(range=c(2,5))
+  
 
 fn_out = "./output_figures/main_figs/copy_by_sustinence.pdf"
 pdf(fn_out,width=4,height=2.25)
@@ -234,6 +307,22 @@ fn_out = "./output_figures/main_figs/copy_by_sustinence_wide.pdf"
 pdf(fn_out,width=8,height=1.25)
 print(g+facet_wrap(~label,nrow=1,strip.position="bottom",scales="free_x")+theme(strip.placement="outside"))
 dev.off()
+
+sus_pop_inf = t_data_by_sub %>% 
+  ungroup() %>% 
+  dplyr::select(p1,type,ID) %>% 
+  unique() %>%
+  group_by(p1,type) %>%
+  summarize(n=n()) %>%
+  arrange(type) 
+
+sus_pop_inf %>% 
+  ungroup() %>% 
+  group_by(type) %>% 
+  summarize(n=sum(n)) %>%
+  mutate(n_total=sum(n))
+
+
 
 ```
 
@@ -316,7 +405,7 @@ print(g)
 dev.off()
 
 g = plot_amy(t_plot_subset, "AMY2B", 6)
-fn_out = "./output_figures/main_figs/genotype_by_pop_2A.pdf"
+fn_out = "./output_figures/main_figs/genotype_by_pop_2B.pdf"
 pdf(fn_out,width=1.5,height=4)
 print(g)
 dev.off()
@@ -685,7 +774,7 @@ curr_gene = "AMY1"
 curr_gene = "AMY2A"
 #curr_gene = "AMY2B"
 inset_pos = data.frame(gene=c("AMY1","AMY2A","AMY2B"),y=c(18,8,8))
-dummy = data.frame(gene=c("AMY1","AMY2A","AMY2B"),y=c(2,2,-3))
+dummy = data.frame(gene=c("AMY1","AMY2A","AMY2B"),y=c(2,2,1.5))
 
 
 for (curr_gene in c("AMY1","AMY2A","AMY2B")){
@@ -714,18 +803,18 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
           plot.background=element_rect(fill='transparent', color=NA))
   
   inset_pos_y = (inset_pos %>% filter(gene==curr_gene))$y  
-  dummy_y = (dummy %>% filter(gene==curr_gene))$y  
+  dummy_y = data.frame(y=(dummy %>% filter(gene==curr_gene))$y,x=0)  
     
-  mn = min((t_gt_renamed_age %>% filter(label==curr_gene))$cp)
-  mx = max((t_gt_renamed_age %>% filter(label==curr_gene))$cp)
+  mn = min((t_gt_renamed_age %>% filter(label==curr_gene))$cp)-.1
+  mx = max((t_gt_renamed_age %>% filter(label==curr_gene))$cp)+.1
   
-  data.tb <- tibble(x = -13500, y = mx+mx/20, 
+  data.tb <- tibble(x = -13500, y = mx+mx/25, 
                   plot = list(g_i))
   
   
   pval = lmp(lm(age~cp,t_gt_renamed_age %>% filter(label == curr_gene)))
   df_p = data.frame(x=-6000,y=mx,label=paste("P==",signif(pval,2),sep=""))
-  
+  print(dummy_y)
   
   g=ggplot(t_gt_renamed_age %>% filter(label == curr_gene))
   g=g+geom_point(aes(x=-age,y=cp,color=p2),alpha=.5,position=position_jitter(width=0,height=.2),size=.5)+
@@ -734,10 +823,11 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
     scale_color_manual("",values=colors)+
     theme_bw(base_size=8)+
     theme(legend.position="None")+
-    scale_y_continuous(paste(curr_gene," copy",sep=""),breaks=seq(2,20,2))+
+    scale_y_continuous(paste(curr_gene," copy",sep=""),breaks=seq(0,20,2))+
     scale_x_continuous(label,breaks=breaks,labels=labels)+
+    #coord_cartesian(xlim=c(-12000,0))+
     coord_cartesian(xlim=c(-12000,0),ylim=c(mn,mx))+
-    #geom_blank(aes(x=0,y=dummy_y))+
+    geom_blank(aes(x=x,y=y),data=dummy_y)+
     geom_text(aes(x=x,y=y,label=label),data=df_p,parse=TRUE,size=2,hjust=0)
 
        

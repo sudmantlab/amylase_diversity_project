@@ -55,6 +55,9 @@ g+geom_histogram(aes(x=best_score))+
   theme_bw()+
   facet_wrap(~cohort,scales="free_y")
 
+
+t_grouped
+
 ```
 
 ```{r}
@@ -161,6 +164,9 @@ haplotype_pred_copy_ancient = t_grouped %>%
             pred_AMY2B = sum(AMY2B_cp))
 
 ```
+
+
+
 ```{r}
 library(ggforce)
 #install.packages("ggforce")
@@ -360,6 +366,7 @@ pdf(fout, width=1.5 ,height=4)
 print(g)
 dev.off()
 
+
 ```
 ```{r}
 
@@ -418,7 +425,55 @@ g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',al
 
 t_sum %>% filter(p1=="CEU")
 
+t_sum
+
 ```
+```{r}
+t_data = t_grouped %>%
+          inner_join(hap_names, by="cluster") %>%
+          dplyr::select(sample,cohort, p1, p2, best_score, hap, cluster, hap_names)
+
+t_data %>% filter(grepl("NA12146",sample))
+t_data %>% filter(grepl("NA12239",sample))
+t_data %>% filter(grepl("NA10847",sample))
+
+t_data %>% filter(grepl("NA07034",sample))
+t_data %>% filter(grepl("NA07055",sample))
+t_data %>% filter(grepl("NA07048",sample))
+
+t_data %>% filter(grepl("NA07357",sample))
+t_data %>% filter(grepl("NA07345",sample))
+t_data %>% filter(grepl("NA07348",sample))
+
+write.table(t_data, file="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output/haplotype_deconvolution.tsv",sep="\t",row.names=FALSE,quote=FALSE)
+
+
+usher_hap_freqs = data.frame(hap_names = c("H1^a",
+                                           "H3^r",
+                                           "H5",
+                                           "H7",
+                                           "H2A0",
+                                           "H4A2",
+                                           "H2A2B2",
+                                           "H4A2B2"),
+                             usher_freqs = c(0.16,0.4,0.23,0.1,0.04,0.01, 0.02,0.04))
+
+usher_vs_us = t_sum %>% filter(p1=="CEU") %>%
+     inner_join(usher_hap_freqs,by="hap_names")
+
+g=ggplot(usher_vs_us)
+g+geom_point(aes(x=proportion,y=usher_freqs))+
+  geom_text(aes(x=proportion,y=usher_freqs,label=hap_names))+
+  geom_abline(slope=1)+
+  theme_bw()
+
+summary(lm(usher_freqs~proportion,data=usher_vs_us))
+
+cor(usher_vs_us$usher_freqs,usher_vs_us$proportion)
+cor(usher_vs_us$usher_freqs,usher_vs_us$proportion,method='spearman')
+
+```
+
 
 
 ```{r}
@@ -577,7 +632,7 @@ t_sum = t_grouped %>%
           mutate(order=row_number())
 
 hap_order = (t_sum %>% group_by(hap_names) %>% summarize(max_freq = max(proportion)) %>% ungroup() %>% arrange(max_freq))$hap_names
-
+library(PNWColors)
 
 t_sum$p2 = factor(t_sum$p2, levels=c("modern-WEA", "Hunter-GathererE", "Hunter-GathererW", "EarlyFarmer","Yamnaya"))
 colors = c("#94B669", pnw_palette(name="Starfish",n=4,type="discrete"))
@@ -602,20 +657,21 @@ dev.off()
 
 
 subset = c("H5", "H3.2", "H4A2B2", "H1^a", "H2A0", "H3^r")
+subset = c("H5", "H4A2B2", "H1^a", "H3^r")
 g=ggplot(t_sum %>% filter(hap_names %in% subset))
 g=g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',alpha=0.7)+
   geom_text(aes(x=order,label=p2,y=ifelse(hap_names=="H3^r",0,proportion)),size=1,hjust=0,angle=90,position=position_nudge(y=0.001,x=0))+
   theme_bw(base_size=4)+
   scale_fill_manual(values=colors)+
   #scale_fill_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
-  facet_wrap(~hap_names,scales="free_x",nrow=2,strip.position = "bottom",labeller = label_parsed)+
+  facet_wrap(~hap_names,scales="free_x",nrow=1,strip.position = "bottom",labeller = label_parsed)+
   theme(strip.background = element_blank())+
   theme(legend.position="None")+
   scale_x_discrete("")+
   scale_y_continuous("allele frequency")
 
 fout = paste(outdir,"/ancient_hap_proportions_subset.pdf",sep="")
-pdf(fout, width=1 ,height=1.5)
+pdf(fout, width=1.2 ,height=.9)
 print(g)
 dev.off()
 
@@ -624,6 +680,9 @@ dev.off()
 ```
 
 ```{r}
+
+generation_time = 30
+
 t_hap_by_age = t_grouped %>%
        filter(best_score>0.6) %>%
         filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient","HGDP","SGDP")) %>%
@@ -638,12 +697,15 @@ t_hap_by_age = t_grouped %>%
 
 t_sum_hap_by_age = t_hap_by_age %>%
           group_by(time_bin) %>%
-          mutate(n_total = n()) %>%
-          group_by(time_bin, hap_names,n_total) %>%
+          mutate(gen_age = age/generation_time) %>%
+          mutate(n_total = n(),
+                 mu_gen = mean(gen_age)) %>%
+          group_by(time_bin, hap_names,n_total,mu_gen) %>%
           summarize(count = n()) %>%
           mutate(proportion=count/n_total) %>%
           group_by(hap_names) %>%
-          mutate(mu_freq = mean(proportion)) 
+          mutate(mu_freq = mean(proportion)) %>%
+  mutate(adjusted_gen = round(mu_gen-min(mu_gen))+1)
 
 g=ggplot(t_sum_hap_by_age %>% filter(mu_freq >0.05))
 g=g+geom_point(aes(x=time_bin,y=proportion),size=.1)+
@@ -659,6 +721,60 @@ pdf(fout, width=3 ,height=1)
 print(g)
 dev.off()
 
+t_sum_hap_by_age %>% filter(hap_names=="H5")
+
+
+t_hap_by_age = t_grouped %>%
+       filter(best_score>0.6) %>%
+        filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient","HGDP","SGDP")) %>%
+   filter(p2 %in% c("WEA","EarlyFarmer","Hunter-GathererW","Hunter-GathererE","Yamnaya","Europe")) %>%
+        left_join(ancient_info,by="sample") %>%
+        mutate(age=ifelse(!cohort %in% c("StoneAgeAncient","ExcoffierAncient"),0,as.numeric(age))) %>% 
+        filter(age<20000) %>%
+        inner_join(hap_names %>% dplyr::select(cluster,hap_names),by="cluster") %>%
+        mutate(age=-1*age) %>%
+        mutate(time_bin = cut(age,breaks=seq(-11000,0,2500),ordered_result = TRUE)) 
+        #mutate(time_bin = cut(age,breaks=seq(-11000,0,1000),ordered_result = TRUE)) 
+        #mutate(time_bin = cut(age,breaks=c(-11000, -10000,  -9000,  -8000,  -7000,  -6000,  -5000,  -4000,  -3000,   0),ordered_result = TRUE))
+        #mutate(time_bin = cut(age,breaks=c(-11000,-8000,-4000,-500,0),ordered_result = TRUE))
+
+
+t_sum_hap_by_age = t_hap_by_age %>%
+          group_by(time_bin) %>%
+          mutate(gen_age = age/generation_time) %>%
+          mutate(n_total = n(),
+                 mu_gen = mean(gen_age)) %>%
+          group_by(time_bin, hap_names,n_total,mu_gen) %>%
+          summarize(count = n()) %>%
+          mutate(proportion=count/n_total) %>%
+          group_by(hap_names) %>%
+          mutate(mu_freq = mean(proportion)) %>%
+          ungroup() %>%
+  mutate(adjusted_gen = round(mu_gen-min(mu_gen))+1)
+
+t_h5 = t_sum_hap_by_age %>% 
+  filter(hap_names%in%c("H5","H4A2B2")) %>% 
+  #filter(hap_names%in%c("H5")) %>% 
+  #filter(hap_names%in%c("H4A2B2")) %>% 
+  transmute(time=adjusted_gen,count=count,n_total=n_total,hap_names=hap_names) %>%
+  mutate(f=count/n_total)
+t_h5  
+
+t_h5_out = t_h5 %>% 
+  mutate(value = paste(count,"/",n_total,sep="")) %>%
+  dplyr::select(time,hap_names,value,n_total) %>%
+  pivot_wider(values_from=value,names_from=hap_names) %>%
+  pivot_longer(-c(time,n_total),names_to = "hap_names") %>%
+  mutate(value=ifelse(is.na(value),paste("0/",n_total,sep=""),value)) %>%
+  pivot_wider(values_from=value,names_from=hap_names) %>%
+  ungroup() %>%
+  dplyr::select(time,H5,H4A2B2)
+
+write.table(t_h5_out,"/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/approxWF/input/H5_t.txt",row.names=FALSE,sep="\t",quote=FALSE)
+
+g=ggplot(t_h5)
+g+geom_line(aes(x=time,y=count/n_total,color=hap_names))+
+  geom_point(aes(x=time,y=count/n_total,size=n_total))
 
 ```
 
@@ -668,8 +784,10 @@ dev.off()
 #https://stats.oarc.ucla.edu/r/dae/multinomial-logistic-regression/
 
 #This puts the reference hap first so all stat comparisons are against it (it is highest freq)
-m = nnet::multinom(hap_names~age,data=t_hap_by_age %>% mutate(hap_names=ifelse(hap_names=="H3^r","0H3^r",hap_names)))
-#m = nnet::multinom(hap_names~age,data=t_hap_by_age)
+#m = nnet::multinom(hap_names~age,data=t_hap_by_age %>% mutate(hap_names=ifelse(hap_names=="H3^r","0H3^r",hap_names)))
+#m = nnet::multinom(hap_names~age,data=t_hap_by_age %>% mutate(hap_names=ifelse(hap_names=="H5","0H5",hap_names)))
+#m = nnet::multinom(hap_names~age,data=t_hap_by_age %>% mutate(hap_names=ifelse(hap_names=="H4A2B2","0H4A2B2",hap_names)))
+m = nnet::multinom(hap_names~age,data=t_hap_by_age)
 summary(m)
 z = summary(m)$coefficients/summary(m)$standard.errors
 p = (1 - pnorm(abs(z), 0, 1)) * 2
@@ -680,8 +798,8 @@ p_vals = as.data.frame(p) %>%
   mutate(sig=padj<=0.05) %>%
   add_rownames(var="hap_names")
 
-#sig = c((p_vals %>% filter(sig))$hap_names,"H1^a")
-sig = c((p_vals %>% filter(sig))$hap_names,"H3^r")
+sig = c((p_vals %>% filter(sig))$hap_names,"H1^a")
+#sig = c((p_vals %>% filter(sig))$hap_names,"H3^r")
 
 unique(t_hap_by_age$hap_names)
 breaks = seq(-12000,0,100)
@@ -714,6 +832,7 @@ cols = pnw_palette("Sunset2",4)
 
 cols = pnw_palette("Sunset2",6)
 cols = pnw_palette("Bay",6)
+cols = pnw_palette("Bay",4)
 #cols = pnw_palette("Sunset2",5)
 g=ggplot(plot_df)
 g=g+geom_ribbon(aes(x=age,ymin=L.prob,ymax=U.prob,group=hap_names,fill=hap_names),data=conf_ints,alpha=.1)+
@@ -736,12 +855,194 @@ print(g)
 dev.off()
 
 
-p_vals %>% arrange(padj)
+
+```
+
+```{r}
+
+
+### s calc
+
+w_hat=1-.5*q*p*s-q*q*s
+d = (0.5*p*p*q*s+p*q*q*s)/(1-.5*q*p*s-q*q*s)
+
+g=30
+p_now = 0.3
+p_old = 0.04
+d=(p_now-p_old)/(12000/g)
+p=p_old
+q = 1-p_old
+
+s = 2*d / (q*(d+p)*(p+2*q))
+s
+
+```
+
+```{r}
+t_s= read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/approxWF/input/H5_t_10K.txt", header=T)
+
+t_s = t_s %>% 
+  filter(index>10000) %>%
+  dplyr::select(-LL) %>%
+  pivot_longer(-index, values_to = "s", names_to="hap_names")
+#plot(density(t$log10.N.), xlab="Log10(N)", ylab="Posterior Density", main="")
+
+t_s$hap_names = factor(t_s$hap_names,levels=c("s_H5","s_H4A2B2"))
+mus = t_s %>% 
+  mutate(hap_lab = str_replace(hap_names,"s_","")) %>%
+  group_by(hap_names,hap_lab) %>%
+  summarize(mu = mean(s),
+            serr = std.error(s)) %>%
+  mutate(label = paste("bar(s)[",hap_lab,"]==",signif(mu,2),sep="")) %>%
+  mutate(y=ifelse(hap_lab=="H5",88,75)) %>%
+  mutate(x=ifelse(hap_lab=="H5",.085,.085))
+
+g=ggplot(t_s)
+g=g+geom_density(aes(x=s,color=hap_names,fill=hap_names),alpha=0.5)+
+  #geom_vline(aes(xintercept=mu,color=hap_names),data=mus,size=.25,color='grey')+
+  geom_vline(aes(xintercept=mu,color=hap_names),data=mus,size=.25,color='black',linetype="dashed")+
+  geom_label(aes(x=x,
+                 y=y,
+                 label=label,
+                 fill=hap_names),
+             parse=TRUE,
+             data=mus,
+             size=2,
+             label.padding = unit(0.05,"cm"),alpha=.5,hjust=1)+
+  #geom_segment(aes(xintercept=mu,color=hap_names),data=mus,size=.25,color='black',linetype="dotted")+
+  scale_x_continuous("s")+
+  scale_y_continuous("density")+
+  scale_color_manual(values=cols[c(4,3)])+
+  scale_fill_manual(values=cols[c(4,3)])+
+  theme_bw(base_size=8)+
+  theme(panel.grid = element_blank(),
+        legend.position="None")+
+  theme(panel.background = element_rect(fill='transparent'),
+         plot.background = element_rect(fill='transparent', color=NA))
+  
+
+fout = paste(outdir,"/ancient_hap_selection_coeff.pdf",sep="")
+pdf(fout, width=1.5 ,height=1.5)
+print(g)
+dev.off()
+
+
+
+```
+```{r}
+# g=ggplot(t_s)
+# g+geom_density(aes(x=s_H4A2B2))+
+#   theme_bw()
+
+
+# g=ggplot(t_s)
+# g+geom_histogram(aes(x=s_H5))+
+#   theme_bw()
+# 
+# g=ggplot(t_s)
+# g+stat_summary(aes(x=1,y=s_H5))+
+#   theme_bw()
+
+
+# g=ggplot(t_s)
+# g+geom_line(aes(x=index,y=LL),size=0.1)+
+#   theme_bw()
+# 
+# dim(t_s)
+# 
+# t_s %>% 
+#   mutate(n_total=n()) %>%
+#   mutate(is0 = s_H5==0) %>%
+#   group_by(is0,n_total) %>%
+#   summarize(count=n()) %>%
+#   mutate(prop = count/n_total)
+# 
+# g=ggplot(t_s)
+# g+geom_point(aes(x=LL,y=s_H5),size=0.1)+
+#   theme_bw()
+# 
+# mean(t_s$s_H5)
+# 
+# g=ggplot(t_s)
+# g+geom_point(aes(x=index,y=s_H5),size=0.1)+
+#   theme_bw()
 
 
 ```
 
 ```{r}
+
+###IGNORE
+
+#install.packages("devtools")
+#require(devtools)
+#library(devtools)
+#install_github("mathii/slattice", build_vignettes=TRUE)
+library(slattice)
+vignette("slattice")
+vignette("timevar")
+
+
+set.seed(123456)
+s.true <- 0.02 #Selection coefficient
+f0=0.1 #initial frequency
+sample.size <- 100 #number of chromosomes samples
+sample.gens <- 10 #frequency of sampling (generations)
+gens <- 100 #Number of generations
+states <- 2 #Number of selection states
+Ne<-1000 #Effective population size
+initial.s<-c(-0.05,0.05) #Initial guess for selection coefficient
+f<-simulate.wright.fisher.change(Ne, 100, f0, s.true, -s.true, c(50))
+obs.pts <- rep(c(sample.size, rep(0,sample.gens-1)), times=gens/sample.gens)
+obs.pts[gens] <- sample.size
+obs <- generate.observations.from.path(f, obs.pts)
+
+#Run inference
+res.s<-s.estimate.soft.em.s2d(obs, Ne, initial.s, tol=0.001, verbose=FALSE, viterbi=TRUE)
+#Obtain posterior mode of the allele frequency trajectory 
+est.f <- res.s$call$params$states[apply(res.s$call$fb$f.fb, 2, which.max)]
+est.s <- apply(res.s$call$fb$s.fb, 2, which.max)
+
+res.s$s
+res.s$call
+
+cols<-c("#00BFC4", "#F8766D")
+g<-gens
+plot(obs$N.A/obs$N, pch=16, bty="n", ylab="Frequency", xlab="Generation", ylim=c(0.05, 0.5))
+segments(1:(g-1), f[1:(g-1)], 2:g, f[2:g], col=cols[rep(c(2,1),each=50)], lwd=2)
+segments(1:(g-1), est.f[1:(g-1)], 2:g, est.f[2:g], col="black", lwd=2, lty=1)
+segments(1:(g-1), est.f[1:(g-1)], 2:g, est.f[2:g], col=cols[est.s], lwd=2, lty=3)
+segments(1:(g-1), res.s$call$viterbi[1:(g-1)], 2:g, res.s$call$viterbi[2:g], col=cols[res.s$call$s.viterbi], lwd=2, lty=3)
+legend("topleft", c("True", "Posterior mode", "Viterbi", "Observed"), lwd=c(2,2,2,NA), lty=c(1,3,3,NA), pch=c(NA, NA, NA, 16), col=c(1, 1, 1, 1), bty="n")
+
+
+############
+
+Ne <- 1000                              #N_e
+g<-100                                  #Number of generations
+p0 <- 0.1                               #Initial freq
+s <- 0.05                               #Selection coefficient
+data<-generate.observations(Ne, g, p0, s, missing.p=0.8, size.params=list(N=100,p=0.5))
+#The data is a data frame with one row per generation, and two columns nam
+estimate <- estimate.s(data$obs, Ne, method="Soft EM", verbose=TRUE)
+
+ls(estimate)
+ls(estimate$call)
+estimate$call$emission.func
+estimate$iterations
+plot(estimate$posterior)
+estimate$viterbi
+estimate$iter.values
+estimate$posterior
+ls(estimate$call)
+estimate$params
+"#4DAF4A"
+"#CC5500"
+```
+
+```{r}
+
+
 #DUNNO
 t_sum_sub= t_grouped %>%
           group_by(p1) %>%

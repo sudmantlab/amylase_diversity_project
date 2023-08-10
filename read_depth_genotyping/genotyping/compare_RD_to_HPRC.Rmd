@@ -330,9 +330,8 @@ t_HPRC_copies_Y1Y2_merged_analysis = read.table("/Users/petersudmant/Documents/s
 n = t_HPRC_copies_Y1Y2_merged_analysis %>% 
   dplyr::select(sample) %>%
   unique() %>%
-  summarize(n=n()) %>%
+  ungroup() %>%
   summarize(n=n())
-
 
 
 ```
