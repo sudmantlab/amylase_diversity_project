@@ -216,7 +216,8 @@ I have selected for the sheet of Allentoft et al., only the 'usable' samples and
 - hg19 results in `/global/scratch/users/alessandroraveane/graph_geno_separated/graph_genotyper_aDNA_StoneAge_hg19` region used `1:103998686-104406594`
 
 
+## new chapter 
 
+- We used a new graph produced by davide, whic I pasted and copied in `/global/scratch/users/alessandroraveane/graph_ref` the name of the new graph is `selected_indivs_AMY_region.fa.gz.60ef634.68f91e8.f72a9ab.smooth.final.gfa`.
 
-## plot the results for these (everything)
-
+- created a small sh_script that helps me to make more easy the preparation of the input
