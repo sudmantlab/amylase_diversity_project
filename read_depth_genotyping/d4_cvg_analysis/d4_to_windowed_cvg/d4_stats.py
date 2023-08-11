@@ -48,12 +48,12 @@ def create(args):
     h5_out.close()
 
 
-def get_loci_by_contig(fn_loci):
+def get_loci_by_contig(fn_loci, locus_key):
 
     loci = json.load(open(fn_loci))
     loci_by_contig = {}
 
-    for locus, inf in loci['loci'].items():
+    for locus, inf in loci['loci'][locus_key].items():
         contig = inf['contig']
         if not contig in loci_by_contig:
             loci_by_contig[contig] = {}
@@ -70,7 +70,7 @@ def genotype(args):
     alt_corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
     corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
 
-    loci_by_contig = get_loci_by_contig(args.fn_loci)
+    loci_by_contig = get_loci_by_contig(args.fn_loci, args.locus_key)
     outrows = []
     for contig, loci in loci_by_contig.items():
 
@@ -113,8 +113,8 @@ def coverage(args):
     f = pyd4.D4File(args.d4_file)
     
     t_inf = pd.read_csv(args.fn_stats,sep="\t", header=0)
-    corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
-    alt_corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
+    corr_factor = t_inf.CTRL_region_mean[t_inf['sample']==args.sample].values[0]
+    alt_corr_factor = t_inf.qmax_filt_mu[t_inf['sample']==args.sample].values[0]
     d4depth = f.load_to_np(args.contig)
     w_starts, w_ends, windowed_mu = get_windowed_mu(d4depth, args.w, args.s)
     
@@ -129,7 +129,7 @@ def coverage(args):
                       "start":w_starts,
                       "end":w_ends,
                       "cp":windowed_cp,
-                      "cp_alt":windowed_cp,
+                      "cp_alt":windowed_cp_alt,
                       "raw":windowed_mu,
                       "sample":args.sample})
     
@@ -297,6 +297,7 @@ if __name__=="__main__":
     parser_create.add_argument("--fn_stats", required=True)
     parser_create.add_argument("--fn_out", required=True)
     parser_create.add_argument("--fn_loci", required=True)
+    parser_create.add_argument("--locus_key", required=True)
     parser_create.add_argument("-w", default=1000, type=int)
     parser_create.add_argument("-s", default=200, type=int)
     parser_create.set_defaults(func=genotype)

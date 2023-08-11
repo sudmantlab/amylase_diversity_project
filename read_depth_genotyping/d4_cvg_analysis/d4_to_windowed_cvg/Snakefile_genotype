@@ -8,29 +8,32 @@ import pdb
 configfile: "configs/allsamples_config.json"
 configfile: "./configs/genotype_loci.json"
 
-def get_all_inputs(wildcards):
-    inputs = []
-    for locus, inf in config['loci'].items():
-        inputs.append("output/genotype/amylase_genotypes.tsv".format(locus=locus))
-    return inputs
+#def get_all_inputs(wildcards):
+#    inputs = []
+#    for locus, inf in config['loci'].items():
+#        inputs.append("output/genotype/amylase_genotypes.tsv".format(locus=locus))
+#    return inputs
 
 rule all:
     input:
-        "output/genotype/genotypes.tsv"
+        "output/genotype/AMYLASE/genotypes.tsv",
+        "output/genotype/RHD/genotypes.tsv"
 
 def get_sample_inputs(wildcards):
     inputs = []
     for sample, path in config['sample_paths'].items():
-        inputs.append("output/genotype/by_indiv/{sample}.tsv".format(sample=sample))
+        inputs.append("output/genotype/{locus}/by_indiv/{sample}.tsv".format(sample=sample,
+                                                                             locus=wildcards.locus))
     return inputs
 
 rule combine:
     input:
         get_sample_inputs
     output:
-        "output/genotype/genotypes.tsv"
+        "output/genotype/{locus}/genotypes.tsv"
     run:
-        cmd = "cat output/genotype/by_indiv/* >{output}".format(output=output[0])
+        cmd = "cat output/genotype/{locus}/by_indiv/* >{output}".format(locus=wildcards.locus,
+                                                                        output=output[0])
         shell(cmd)
         t = pd.read_csv(output[0], 
                         sep="\t",
@@ -46,7 +49,7 @@ rule combine:
 
 rule get_copy_cvg:
     output:
-        "output/genotype/by_indiv/{sample}.tsv"
+        "output/genotype/{locus}/by_indiv/{sample}.tsv"
     run:
         fn_d4 = config['sample_paths'][wildcards.sample]
         
@@ -56,8 +59,10 @@ rule get_copy_cvg:
                "--sample {sample} "
                "--fn_stats output/correction_factors/correction_factors.tsv "
                "--fn_loci {fn_loci} "
+               "--locus_key {locus} "
                "--fn_out {fout}".format(fn_d4 = fn_d4,
                                         fn_loci = fn_loci,
+                                        locus = wildcards.locus,
                                         sample=wildcards.sample,
                                         fout = output[0]))
         shell(cmd)

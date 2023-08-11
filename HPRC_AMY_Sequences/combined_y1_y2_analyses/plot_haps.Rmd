@@ -129,6 +129,10 @@ contig_structs = t %>%
 
 fn_out = paste(outdir,"/haplotype_all_structures.tsv",sep="")
 write.table(contig_structs,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+
+fn_out = paste(outdir,"/haplotype_all_structures_plotinfo.tsv",sep="")
+write.table(t,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
+
 #```
 
 #```{r}
@@ -299,6 +303,21 @@ y2_gene_counts_per_hap = gene_counts_per_hap %>%
   dplyr::select(-c(filt,matpat,sample,hap))
 
 gene_counts_per_hap = rbind(y1_gene_counts_per_hap,y2_gene_counts_per_hap)  
+
+gene_counts_per_hap %>% ungroup() %>%dplyr::select(name,n) %>% arrange(name,n) %>% unique()
+
+#mutation rate
+0.4e-9*30
+
+0.5e-9*30
+
+5.13e-6/0.5e-9
+
+5.13e-6/2.27e-7
+
+1.54e-4/(0.4e-9*30)
+
+
   
 ```
 
@@ -416,6 +435,28 @@ write.table(bID_lens,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 #  unique()
 
 #t_rep %>% filter(contig %in% hg_19s$contig)
+
+representative_haps %>% arrange(n)
+representative_haps %>% summarize(sum(n))
+
+representative_haps %>% 
+  group_by(n) %>%
+  summarize(count = n()) %>%
+  mutate(x = count*n) %>%
+  mutate(s = sum(x))
+
+total = sum(representative_haps$n)
+
+#hg38_and_similar = 13+18+14
+hg38_and_similar = 13+18+1+14+1+1
+hg38_and_similar/total
+
+H5 = 3+1+3+2+1+1+1+1+1
+H5/total
+
+anc = 14
+anc/total
+
 ```
 
 
@@ -426,45 +467,45 @@ write.table(bID_lens,fn_out,sep="\t",row.names = FALSE,quote=FALSE)
 #install.packages("ggtree")
 #install.packages("ade4")
 #install.packages("treeio")
-library(ggtree)
-library(ade4)
-library(treeio)
-
-t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists.tsv",sep=""),header=TRUE,sep="\t")
-
-dmat = t_hap_dists %>% 
-  dplyr::select(hap1,hap2,edit_d) %>%
-  spread(hap2,edit_d) %>%
-  column_to_rownames(var="hap1") %>% 
-  as.matrix
-
-c=hclust(as.dist(dmat),method="average")
-#phylo = hclust2phylog(c)
-#phylo = as.dendrogram(c)
-struc_phy = as.phylo(c)
-
-fn_out = paste(outdir,"/haplotype_struct_clusters.pdf",sep="")
-pdf(fn_out,width=4,height=12)
-ggtree(struc_phy) + geom_tiplab() + 
-  geom_nodelab(geom='label') + hexpand(.05)
-dev.off()  
-
-#phylo2 <- root(phylo, outgroup = "Int5", edgelabel = TRUE)
-
-#plot_order = rownames(dmat)[c$order]
-#t_rep$hap_struc_d = factor(t_rep$hap_struc_d,levels=plot_order) 
-
-#t_rep$hap_struc_d = factor(t_rep$hap_struc_d,levels=plot_order) 
-
-
-#https://shaunpwilkinson.github.io/post/phylogram_blog/
-#nj_tree = ape::nj(as.dist(dmat))
-hap_counts = t %>% ungroup() %>%
-  dplyr::select(contig,hap_struc_d) %>%
-  unique() %>%
-  group_by(hap_struc_d) %>%
-  summarize(n=n())
-# 
+  library(ggtree)
+  library(ade4)
+  library(treeio)
+  
+  t_hap_dists = read.table(paste(outdir,"/haplotype_struc_dists.tsv",sep=""),header=TRUE,sep="\t")
+  
+  dmat = t_hap_dists %>% 
+    dplyr::select(hap1,hap2,edit_d) %>%
+    spread(hap2,edit_d) %>%
+    column_to_rownames(var="hap1") %>% 
+    as.matrix
+  
+  c=hclust(as.dist(dmat),method="average")
+  #phylo = hclust2phylog(c)
+  #phylo = as.dendrogram(c)
+  struc_phy = as.phylo(c)
+  
+  fn_out = paste(outdir,"/haplotype_struct_clusters.pdf",sep="")
+  pdf(fn_out,width=4,height=12)
+  ggtree(struc_phy) + geom_tiplab() + 
+    geom_nodelab(geom='label') + hexpand(.05)
+  dev.off()  
+  
+  #phylo2 <- root(phylo, outgroup = "Int5", edgelabel = TRUE)
+  
+  #plot_order = rownames(dmat)[c$order]
+  #t_rep$hap_struc_d = factor(t_rep$hap_struc_d,levels=plot_order) 
+  
+  #t_rep$hap_struc_d = factor(t_rep$hap_struc_d,levels=plot_order) 
+  
+  
+  #https://shaunpwilkinson.github.io/post/phylogram_blog/
+  #nj_tree = ape::nj(as.dist(dmat))
+  hap_counts = t %>% ungroup() %>%
+    dplyr::select(contig,hap_struc_d) %>%
+    unique() %>%
+    group_by(hap_struc_d) %>%
+    summarize(n=n())
+  # 
 # hap_order = data.frame(hap_struc_d=plot_order) %>% mutate(o = row_number()) 
 # t_rep= inner_join(t_rep,hap_order,on=hap_struc_d) 
 # 
@@ -594,8 +635,12 @@ dev.off()
 #### PLOT THE CLUSTERED haps used for graphing
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output"
 
-t_graph_clusters = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+# t_graph_clusters = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+#   mutate(contig=sample)
+
+t_graph_clusters = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
   mutate(contig=sample)
+
 
 t_clustered = inner_join(t_graph_clusters,t,by="contig")
 paf_plot_genes_clustered = inner_join(t_graph_clusters,paf_plot_genes,by="contig")
@@ -620,6 +665,26 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrow_body_height = unit(.5, "mm"),
                     position=position_nudge(x=0,y=-.2),
                     size=.1)+
+  geom_gene_arrow(aes(xmin=tstart,
+                        xmax=tend,
+                        y=contig,
+                        #fill=name,
+                        color=name,
+                        forward=strand=="+"),
+                    arrowhead_height = unit(.5, "mm"),
+                    arrowhead_width = unit(.5, "mm"),
+                    arrow_body_height = unit(.25, "mm"),
+                    position=position_nudge(x=0,y=.2),
+                    size=.1,
+                    data = paf_plot_genes_clustered)+
+  geom_text(aes(x=tstart,
+                y=contig,
+                label=name,
+                color=name),
+               data=paf_plot_genes_clustered,
+               hjust=1,
+               size=1,
+               position=position_nudge(x=-1000,y=.25))+
   geom_text(aes(x=rel_start2,
                         y=contig,
                 label=bID),
@@ -641,8 +706,7 @@ dev.off()
 
 
 t_clustered$cluster = factor(t_clustered$cluster,levels = c(1,3,4,0,7,10,8,6,2,5,9))
-
-
+paf_plot_genes_clustered$cluster = factor(paf_plot_genes_clustered$cluster,levels = rev(c(1,3,4,0,10,7,6,8,2,5,9)))
 
 
 
@@ -657,6 +721,26 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrow_body_height = unit(.5, "mm"),
                     position=position_nudge(x=0,y=-.2),
                     size=.1)+
+    geom_gene_arrow(aes(xmin=tstart,
+                        xmax=tend,
+                        y=contig,
+                        #fill=name,
+                        color=name,
+                        forward=strand=="+"),
+                    arrowhead_height = unit(.5, "mm"),
+                    arrowhead_width = unit(.5, "mm"),
+                    arrow_body_height = unit(.25, "mm"),
+                    position=position_nudge(x=0,y=.2),
+                    size=.1,
+                    data = paf_plot_genes_clustered %>% filter(contig %in% cluster_rep_indivs$contig))+
+  geom_text(aes(x=tstart,
+                y=contig,
+                label=name,
+                color=name),
+               data=paf_plot_genes_clustered %>% filter(contig %in% cluster_rep_indivs$contig),
+               hjust=1,
+               size=.75,
+               position=position_nudge(x=-1000,y=.25))+
   geom_text(aes(x=rel_start2,
                         y=contig,
                 label=bID),
@@ -672,16 +756,44 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
   
 
 fn_out = paste(outdir,"/graph_clusters/haplotype_structures_graph_clusters_representative.pdf",sep="")
-pdf(fn_out,width=2.5,height=1.5)
+pdf(fn_out,width=3.5,height=1.5)
 print(g+facet_grid(cluster~.,scales="free_y",space = "free"))
 dev.off()
 
+```
+```{r}
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output"
 
-
+t_ww_hap_freqs = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output/world_wide_cluster_freqs.tsv",header=T,sep="\t")
 
 mult = 1.5
+mult = 1.3
+nudge = 0.4
 
-t_clustered$cluster = factor(t_clustered$cluster,levels = rev(c(1,3,4,0,10,7,6,8,2,5,9)))
+
+hap_names = data.frame(cluster=seq(0,10),
+                       hap_names = c("H7", #0,
+                                     "H3^r", #1,
+                                     "H2A2B2", #2,
+                                     "H5", #3,
+                                     "H1^a", #4,
+                                     "H3A3B3", #5,
+                                     "H9", #6,
+                                     "H4A2B2", #7,
+                                     "H2A0", #8,
+                                     "H3.2", #9,
+                                     "H4A2" #10
+                       )) %>%
+  inner_join(t_ww_hap_freqs, on="cluster") %>%
+  mutate(label_hap = hap_names) %>%
+  mutate(label_freq = signif(proportion,2))
+
+
+order = rev(c(1,3,4,0,10,7,6,8,2,5,9))
+order = rev(c(4,1,9,3,0,6,8,2,5,10,7))
+t_clustered$cluster = factor(t_clustered$cluster,levels = order)
+paf_plot_genes_clustered$cluster = factor(paf_plot_genes_clustered$cluster,levels = order)
+hap_names$cluster = factor(hap_names$cluster,levels = order)
 
 paf_plot_genes_clustered = paf_plot_genes_clustered %>% filter(contig %in% cluster_rep_indivs$contig)
 
@@ -694,40 +806,59 @@ g=g+geom_gene_arrow(aes(xmin=rel_start2,
                     arrowhead_height = unit(1*mult, "mm"), 
                     arrowhead_width = unit(1*mult, "mm"),
                     arrow_body_height = unit(.5*mult, "mm"),
-                    #position=position_nudge(x=0,y=-.2),
                     position=position_nudge(x=0,y=0),
                     size=.06)+
-  # geom_gene_arrow(aes(xmin=tstart,
-  #                       xmax=tend,
-  #                       y=cluster,
-  #                       color=name,
-  #                       forward=strand=="+"),
-  #                   arrowhead_height = unit(.5, "mm"),
-  #                   arrowhead_width = unit(.5, "mm"),
-  #                   arrow_body_height = unit(.25, "mm"),
-  #                   position=position_nudge(x=0,y=1),
-  #                   size=.1,
-  #                   data = paf_plot_genes_clustered)+
-  # geom_text(aes(x=tstart,
-  #               y=cluster,
-  #               label=name,
-  #               color=name),
-  #              data=paf_plot_genes_clustered,
-  #              hjust=1,
-  #              size=1,
-  #              position=position_nudge(x=-1000,y=1.45))+
+ geom_gene_arrow(aes(xmin=tstart,
+                        xmax=tend,
+                        y=cluster,
+                        color=name,
+                        forward=strand=="+"),
+                    arrowhead_height = unit(.5*mult, "mm"),
+                    arrowhead_width = unit(.5*mult, "mm"),
+                    arrow_body_height = unit(.25*mult, "mm"),
+                    position=position_nudge(x=0,y=nudge),
+                    size=.1,
+                    data = paf_plot_genes_clustered %>% filter(contig %in% cluster_rep_indivs$contig))+
+  geom_text(aes(x=tstart,
+                y=cluster,
+                label=name,
+                color=name),
+               data=paf_plot_genes_clustered %>% filter(contig %in% cluster_rep_indivs$contig),
+               hjust=1,
+               size=.85,
+               position=position_nudge(x=-1000,y=nudge+0.05))+
+  geom_text(aes(x=0,
+                y=cluster,
+                label=label_hap),
+            data=hap_names,
+            size=1.5,
+            hjust=0,
+            position=position_nudge(x=-50000,y=nudge),
+            parse=TRUE)+
+  geom_text(aes(x=0,
+                y=cluster,
+                label=label_freq),
+            data=hap_names,
+            size=1,
+            hjust=0,
+            position=position_nudge(x=-50000,y=0),
+            parse=TRUE)+
   theme_bw(base_size=4)+
   theme(legend.position="None")+
   scale_fill_manual(values=colors)+
   scale_color_manual(values=colors_genes)+
-  #facet_grid(cluster~.,scales="free_y",space = "free")+
-  #facet_wrap(cluster~.,ncol=5)+
-  theme(panel.grid=element_blank())
-  #theme(axis.text.y=element_blank())
-  
+  scale_x_continuous("")+
+  scale_y_discrete("")+
+  theme(panel.grid=element_blank(),
+        panel.border = element_blank())
 
 fn_out = paste(outdir,"/graph_clusters/haplotype_structures_graph_clusters_representative_alt.pdf",sep="")
 pdf(fn_out,width=2.5,height=3)
+print(g)
+dev.off()
+
+fn_out = paste(outdir,"/graph_clusters/haplotype_structures_graph_clusters_representative_alt2.pdf",sep="")
+pdf(fn_out,width=3,height=1.7)
 print(g)
 dev.off()
 
@@ -763,7 +894,7 @@ dev.off()
 
   
   
-}
+
 ```
 
 ```

@@ -6,7 +6,8 @@ configfile: "config.json"
 
 rule all:
     input:
-        "output/pgrtk/AMY_48_56_4_1000.pmapg.csv"
+        "output/pgrtk/AMY_48_56_4_1000.pmapg.csv",
+        "output/pggb_input/selected_indivs_AMY_region.fa.gz"
 
 rule make_bundle_colors:
     input:
@@ -70,9 +71,29 @@ rule extract:
                          samples=" ".join(config['samples']),
                          fn_out = output[0])
         shell(cmd)
+
         cmd = "samtools faidx {fn} {samples} | bgzip -c > {fn_out}"
         bundle_build_samples = set(config['samples']).difference(set(config['bundle_build_exclude'])) 
         cmd = cmd.format(fn=input[0],                
                          samples=" ".join(bundle_build_samples),
                          fn_out = output[1])
         shell(cmd)
+
+rule extract_for_PGGB:
+    input:
+        "input/combined_input/AMY1A_region_seq.fa.gz"
+    output:
+        "output/pggb_input/selected_indivs_AMY_region.fa.gz"
+    run:
+        cmd = "samtools faidx {fn} {samples} | bgzip -c > {fn_out}"
+        cmd = cmd.format(fn=input[0],                
+                         samples=" ".join(config['samples']),
+                         fn_out = output[0])
+        shell(cmd)
+
+        #cmd = "samtools faidx {fn} {samples} | bgzip -c > {fn_out}"
+        #PGGB_genotype_samples = set(config['samples']).difference(set(config['PGGB_genotype_exclude'])) 
+        #cmd = cmd.format(fn=input[0],                
+        #                 samples=" ".join(PGGB_genotype_samples),
+        #                 fn_out = output[1])
+        #shell(cmd)
