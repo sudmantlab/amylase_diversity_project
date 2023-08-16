@@ -14,9 +14,9 @@ no more bad samples.
 
 - [Folder](./combos) of combos, it contains the folder for each dataset and in each folder you have:
 
-    - The sorted combos for each sample as `combos_sorted.tsv`.
-    - The top 10 combos for each sample as `combos_sorted_top10.tsv`.
-    - The symlink is as the `combos_sorted.tsv` but not sorted.
+    - The sorted combos for each sample as `<SAMPLE>combos_sorted.tsv`.
+    - The top 10 combos for each sample as `<SAMPLE>combos_sorted_top10.tsv`.
+    - The symlink with `<SAMPLE>` is as the `<SAMPLE>combos_sorted.tsv` but not sorted.
 
 
 Numbers of genotyped samples:
