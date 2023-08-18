@@ -15,14 +15,23 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 # t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
 #   transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
 
-t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+#t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+#  transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
+
+t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230817_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
   transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
 
 
 
+# t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/cosigt_results.bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
+#   filter(cohort!="SGDP") %>%
+#   mutate(cohort=ifelse(cohort=="SGDPv2","SGDP",cohort))
+
 t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/cosigt_results.bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
   filter(cohort!="SGDP") %>%
   mutate(cohort=ifelse(cohort=="SGDPv2","SGDP",cohort))
+
+
 
 t_samples = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",header=TRUE) %>% 
   dplyr::select(sample) %>% 
