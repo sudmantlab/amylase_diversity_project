@@ -18,16 +18,16 @@ outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/am
 #t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
 #  transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
 
-t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230817_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
+#t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230817_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
   transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
 
-
+t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/haplotype_assignments.txt",header=TRUE,sep="\t",comment="")
 
 # t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/cosigt_results.bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
 #   filter(cohort!="SGDP") %>%
 #   mutate(cohort=ifelse(cohort=="SGDPv2","SGDP",cohort))
 
-t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/cosigt_results.bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
+t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/new_results/best_geno/best_geno_tot.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
   filter(cohort!="SGDP") %>%
   mutate(cohort=ifelse(cohort=="SGDPv2","SGDP",cohort))
 
@@ -112,6 +112,16 @@ t_sum = t_sum %>% dplyr::select(p2,cluster,proportion) %>%
 
 #https://stackoverflow.com/questions/52214071/how-to-order-data-by-value-within-ggplot-facets
 
+# 1	H5			
+# 0	H3^r			
+# 4	H7			
+# 3	H1^a			
+# 9	H1^a			
+# 2	H4A2			
+# 7	H4A2B2			
+# 8	H2A0			
+# 6	H9			
+# 5	H2A2B2
 
 clust_to_copy = data.frame(cluster=seq(0,10),
                             AMY1_cp = c(7, #0
