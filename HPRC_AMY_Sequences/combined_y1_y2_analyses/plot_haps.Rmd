@@ -44,7 +44,7 @@ t=t %>%
   mutate(seg_len = bend-bstart) %>%
   mutate(rel_end = cumsum(seg_len)) %>%
   mutate(rel_start = lag(rel_end,default=0)) %>%
-  separate(contig,c("sample_id","sample_hap",'sample_contig'),sep="#",remove=FALSE) %>%
+  separate(contig,c("sample_id","sample_hap",'sample_contig'),sep="#|\\.",remove=FALSE) %>%
   dplyr::select(-c(sample_hap,sample_contig)) #%>%
   #mutate(collapsed_assembly = sample_id %in% bad_samples)
   
@@ -104,6 +104,9 @@ paf_genes %>%
   filter(name=="2Ap") %>%
   arrange(-dv) %>%
   filter(dv<0.01)
+
+t %>% filter(grepl("HG01099",contig)) #%>%
+  #separate(contig,c("sample_id","sample_hap",'sample_contig'),sep="#|\\.",remove=FALSE) 
 ```
 
 
