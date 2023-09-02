@@ -25,3 +25,6 @@ Numbers of genotyped samples:
 |----------|----------------------|
 | 2406     | 1K                 |
 | 698     | 1KGrel       |
+| 838     | GTEX       |
+| 828     | HGDP       |
+| 277     | SGDPv2       |
