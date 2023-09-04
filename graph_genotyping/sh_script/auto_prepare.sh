@@ -8,7 +8,7 @@ fi
 
 # Check if the -hg19 flag is present
 if [ "$3" == "-hg19" ]; then
-  ref="/global/scratch/users/alessandroraveane/ref_fasta/hg19_decoy/hs37d5.fa.gz"
+  ref="/global/scratch/users/alessandroraveane/ref_fasta/hg19_decoy/hs37d5.fa"
   pos="1:103998686-104406594"
 else
   ref="/global/scratch/users/alessandroraveane/ref_fasta/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz"

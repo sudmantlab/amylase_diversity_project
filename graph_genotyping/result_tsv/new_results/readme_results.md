@@ -21,10 +21,19 @@ no more bad samples.
 
 Numbers of genotyped samples:
 
-| N | Dataset            |
-|----------|----------------------|
-| 2406     | 1K                 |
-| 698     | 1KGrel       |
-| 838     | GTEX       |
-| 828     | HGDP       |
-| 277     | SGDPv2       |
+| N of genotyped samples | Dataset            | Number in the source folder  |
+|----------|----------------------|---| 
+| 2406     | 1K                 |  |
+| 698     | 1KGrel       |  698  |
+| 838     | GTEX       |  838  |
+| 828     | HGDP       |  828 |
+| 277     | SGDPv2*       | 279 |
+
+
+## Sample to check
+
+### SGDP
+* LP6005441_DNA_C06.bam does not exist
+* LP6005441_DNA_H08.bam cannot create the index  
+
+### 1KGP
