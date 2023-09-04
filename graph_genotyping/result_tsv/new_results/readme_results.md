@@ -21,7 +21,7 @@ no more bad samples.
 
 Numbers of genotyped samples:
 
-| N of genotyped samples | Dataset            | Number in the source folder  |
+| N of genotyped samples [MODERN] | Dataset            | Number in the source folder  |
 |----------|----------------------|---| 
 | 2406     | 1K                 |  |
 | 698     | 1KGrel       |  698  |
@@ -30,10 +30,26 @@ Numbers of genotyped samples:
 | 277     | SGDPv2*       | 279 |
 
 
-## Sample to check
+## Samples to check
 
 ### SGDP
 * LP6005441_DNA_C06.bam does not exist
 * LP6005441_DNA_H08.bam cannot create the index  
 
 ### 1KGP
+* HG02635
+* HG03366
+* HG03025
+
+
+| N of genotyped samples [ANCIENT] | Dataset            | Number in the source folder  |
+|----------|----------------------|---| 
+| 690     | Allentoft                 | 1668 |
+| 1673 | Allentofthg19       | 1673   |
+| 15     | Excoffier       |  15  |
+| 13     | Haak       |  13 |
+| 4     | NeanArcaic       | 4 |
+| 116     | PosthKrauseHG       | 116 |
+| 784     | Reich       | 784 |
+| 216     | aDNAhcovtesthg19 (ReichAncients_agdp_subset) | 216 |
+
