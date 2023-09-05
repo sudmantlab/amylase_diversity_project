@@ -30,13 +30,13 @@ Numbers of genotyped samples:
 | 277     | SGDPv2*       | 279 |
 
 
-## Samples to check
+### Samples to check
 
-### SGDP
+#### SGDP
 * LP6005441_DNA_C06.bam does not exist
 * LP6005441_DNA_H08.bam cannot create the index  
 
-### 1K
+#### 1K
 
 There are still some files that are corrupted or missing in `/global/scratch/p2p3/pl1_sudmant/alessandroraveane/re_dwn_1kgp/data/`.
 
@@ -54,9 +54,9 @@ The symlink used for all the files are in `/global/scratch/users/alessandroravea
 | 784     | Reich       | 784 |
 | 216     | aDNAhcovtesthg19 [`ReichAncients_agdp_subset`] | 216 |
 
-## Samples to check 
+### Samples to check 
 
-### Allentoft [`stoneage/hg38_bams`]
+#### Allentoft [`stoneage/hg38_bams`]
 
 * 27 bams to check `/global/scratch/users/alessandroraveane/bam_seq_ancient/hg38_bams/check_corr/bam_with_issue.tsv`
 
