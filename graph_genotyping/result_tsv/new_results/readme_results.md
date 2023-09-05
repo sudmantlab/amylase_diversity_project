@@ -12,7 +12,7 @@ no more bad samples.
     - `dataset` is the name of the dataset that the sample belongs to.
 
 
-- [Folder](./combos) of combos, it contains the folder for each dataset and in each folder you have:
+- [Folder](./combos) of combos, in each folder you have:
 
     - The sorted combos for each sample as `<SAMPLE>combos_sorted.tsv`.
     - The top 10 combos for each sample as `<SAMPLE>combos_sorted_top10.tsv`.
@@ -23,7 +23,7 @@ Numbers of genotyped samples:
 
 | N of genotyped samples [MODERN] | Dataset            | Number in the source folder  |
 |----------|----------------------|---| 
-| 2406     | 1K                 |  |
+| 2504     | 1K                 | 2504 |
 | 698     | 1KGrel       |  698  |
 | 838     | GTEX       |  838  |
 | 828     | HGDP       |  828 |
@@ -36,20 +36,28 @@ Numbers of genotyped samples:
 * LP6005441_DNA_C06.bam does not exist
 * LP6005441_DNA_H08.bam cannot create the index  
 
-### 1KGP
-* HG02635
-* HG03366
-* HG03025
+### 1K
+
+There are still some files that are corrupted or missing in `/global/scratch/p2p3/pl1_sudmant/alessandroraveane/re_dwn_1kgp/data/`.
+
+The symlink used for all the files are in `/global/scratch/users/alessandroraveane/input_cram_bam/cram_seq_1000G/all_of_them`.
 
 
 | N of genotyped samples [ANCIENT] | Dataset            | Number in the source folder  |
 |----------|----------------------|---| 
-| 690     | Allentoft                 | 1668 |
-| 1673 | Allentofthg19       | 1673   |
+| 1641     | Allentoft  [`stoneage/hg38_bams`]*               | 1668 |
+| 1673 | Allentofthg19 [`stoneage/hg19_bams`]      | 1673   |
 | 15     | Excoffier       |  15  |
 | 13     | Haak       |  13 |
 | 4     | NeanArcaic       | 4 |
 | 116     | PosthKrauseHG       | 116 |
 | 784     | Reich       | 784 |
-| 216     | aDNAhcovtesthg19 (ReichAncients_agdp_subset) | 216 |
+| 216     | aDNAhcovtesthg19 [`ReichAncients_agdp_subset`] | 216 |
 
+## Samples to check 
+
+### Allentoft [`stoneage/hg38_bams`]
+
+* 27 bams to check `/global/scratch/users/alessandroraveane/bam_seq_ancient/hg38_bams/check_corr/bam_with_issue.tsv`
+
+* RISE509 does not have index (created)
