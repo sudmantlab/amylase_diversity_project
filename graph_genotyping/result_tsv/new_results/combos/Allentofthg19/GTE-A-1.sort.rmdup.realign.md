@@ -1,1 +1,0 @@
-/global/scratch/users/alessandroraveane/graph_geno_separated/new_runs/graph_genotyper_Allentofthg19/cosigt_smk/results/cosigt_results/GTE-A-1.sort.rmdup.realign.md/combos.tsv

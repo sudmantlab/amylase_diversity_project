@@ -1,1 +1,0 @@
-/global/scratch/users/alessandroraveane/graph_geno_separated/new_runs/graph_genotyper_Allentofthg19/cosigt_smk/results/cosigt_results/Kolyma_River.sort.rmdup.realign.md/combos.tsv
