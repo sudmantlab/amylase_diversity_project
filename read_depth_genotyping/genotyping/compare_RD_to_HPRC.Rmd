@@ -99,6 +99,16 @@ print(g)
 t_comp %>% arrange(-cp)
 
 t_comp %>% group_by(label) %>% summarize(n=n())
+
+m_amy1 = lm(ddPCR_cp~cp,t_comp %>% filter(label=="AMY1"))
+summary(m_amy1)
+m_amy2a = lm(ddPCR_cp~cp,t_comp %>% filter(label=="AMY2A"))
+summary(m_amy2a)
+m_amy2B = lm(ddPCR_cp~cp,t_comp %>% filter(label=="AMY2B"))
+summary(m_amy2B)
+#96-99%
+
+
 ```
 
 ```{r}
