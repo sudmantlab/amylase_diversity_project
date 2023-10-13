@@ -654,9 +654,6 @@ cluster_rep_indivs = t_clustered %>%
                       filter(row_number()==1)
 
 
-
-
-
 g=ggplot(t_clustered)
 g=g+geom_gene_arrow(aes(xmin=rel_start2,
                         xmax=rel_end2,

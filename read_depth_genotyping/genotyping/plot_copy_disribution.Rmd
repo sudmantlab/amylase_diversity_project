@@ -787,7 +787,8 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
   
 
   g_i=ggplot(t_gt_renamed_age %>% filter(label == curr_gene))
-  g_i=g_i+geom_smooth(aes(x=-age,y=cp),alpha=.5,color="red",size=.5,)+
+  g_i=g_i+geom_smooth(aes(x=-age,y=cp),alpha=.5,color="blue",fill="lightblue",size=.5,method='lm')+
+    geom_smooth(aes(x=-age,y=cp),alpha=.5,color="red",fill="pink",size=.5,method='gam')+
     scale_color_manual("",values=colors)+
     theme_bw(base_size=4)+
     theme(legend.position="None")+
@@ -811,15 +812,25 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
   data.tb <- tibble(x = -13500, y = mx+mx/25, 
                   plot = list(g_i))
   
-  
   pval = lmp(lm(age~cp,t_gt_renamed_age %>% filter(label == curr_gene)))
+  m = lm(cp~age,t_gt_renamed_age %>% filter(label == curr_gene) %>% mutate(age=-age))
+  mu_pred = predict(m,data.frame(age=c(-12000,0)))
+  print(curr_gene)
+  delta = mu_pred[2]-mu_pred[1]
+  print(c(mu_pred,delta))
+  m2 = mgcv::gam(cp ~ s(age, bs = "cs"), data=t_gt_renamed_age %>% filter(label == curr_gene) %>% mutate(age=-age))
+  summary(m2)
+  mu_pred_m2 = predict(m2,data.frame(age=c(-12000,0)))
+  delta = mu_pred_m2[2]-mu_pred_m2[1]
+  print(c(mu_pred_m2,delta))
+  
   df_p = data.frame(x=-6000,y=mx,label=paste("P==",signif(pval,2),sep=""))
   print(dummy_y)
   
   g=ggplot(t_gt_renamed_age %>% filter(label == curr_gene))
   g=g+geom_point(aes(x=-age,y=cp,color=p2),alpha=.5,position=position_jitter(width=0,height=.2),size=.5)+
     geom_plot(data = data.tb, aes(x, y, label = plot)) +
-    geom_smooth(aes(x=-age,y=cp),alpha=.5,color="red",size=.5)+
+    geom_smooth(aes(x=-age,y=cp),alpha=.5,color="red",size=.5,method="gam")+
     scale_color_manual("",values=colors)+
     theme_bw(base_size=8)+
     theme(legend.position="None")+
@@ -834,6 +845,7 @@ for (curr_gene in c("AMY1","AMY2A","AMY2B")){
   pdf(fn_out,width=1.5,height=1.5)
   print(g)
   dev.off()
+  print(g)
 }
 
 ### NOTE THIS INDIVIDUAL
@@ -845,6 +857,16 @@ left_join(t_gt_renamed,ancient_info,by="ID") %>%
                mutate(age=ifelse(super_pop=="modern",0,age)) %>%
                filter(age>20000)
 
+
+g=ggplot(t_gt_renamed_age)
+g+geom_histogram(aes(x=age))
+
+t_gt_renamed_age %>% 
+  filter(age!=0) %>%
+  dplyr::select(age,ID,p1,p2) %>%
+  filter(age==min(age))
+#11627.5
+#250
 
 ```
 ```{r}
