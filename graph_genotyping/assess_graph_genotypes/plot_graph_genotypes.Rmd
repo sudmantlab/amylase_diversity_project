@@ -751,7 +751,6 @@ t_hap_by_gen = t_sum_hap_by_age %>%
   #filter(hap_names%in%c("H4A2B2")) %>% 
   transmute(time=adjusted_gen,count=count,n_total=n_total,hap_names=hap_names) %>%
   mutate(f=count/n_total)
-t_h5  
 
 t_hap_by_gen_out = t_hap_by_gen %>% 
   mutate(value = paste(count,"/",n_total,sep="")) %>%
@@ -766,9 +765,7 @@ t_hap_by_gen_out = t_hap_by_gen %>%
 
 write.table(t_hap_by_gen_out,"/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/approxWF/input/hap_freqs_t.txt",row.names=FALSE,sep="\t",quote=FALSE)
 
-
 #### GROUP TOGETHER THE DEL and DUP haps
-
 
 t_sum_hap_by_age_simple = t_hap_by_age %>%
           group_by(time_bin) %>%
@@ -785,11 +782,11 @@ t_sum_hap_by_age_simple = t_hap_by_age %>%
           mutate(mu_freq = mean(proportion)) %>%
           ungroup() %>%
   mutate(adjusted_gen = round(mu_gen-min(mu_gen))+1) %>%
-  transmute(time=adjusted_gen,count=count,n_total=n_total,hap_names=hap_names) %>%
+  transmute(time=adjusted_gen,count=count,n_total=n_total,hap_names=hap_names,t_yrs=mu_gen*generation_time) %>%
   mutate(f=count/n_total)
 
-
 t_hap_by_gen_out_simple = t_sum_hap_by_age_simple %>% 
+  dplyr::select(-t_yrs) %>%
   mutate(value = paste(count,"/",n_total,sep="")) %>%
   dplyr::select(time,hap_names,value,n_total) %>%
   pivot_wider(values_from=value,names_from=hap_names) %>%
@@ -947,38 +944,48 @@ t_s = t_s %>%
   pivot_longer(-index, values_to = "s", names_to="hap_names") %>%
   #filter(hap_names %in% c("s_H5","s_H7","s_H4A2B2"))
   filter(hap_names %in% c("s_H1.a")) %>% mutate(s=-s) %>% mutate(hap_names = "H[dup]")
-#plot(density(t$log10.N.), xlab="Log10(N)", ylab="Posterior Density", main="")
 
-#t_s$hap_names = factor(t_s$hap_names,levels=c("s_H5","s_H4A2B2"))
 mus = t_s %>% 
   mutate(hap_lab = str_replace(hap_names,"s_","")) %>%
   group_by(hap_names,hap_lab) %>%
   summarize(mu = mean(s)) %>%
-  #mutate(label = paste("bar(s)[",hap_lab,"]==",signif(mu,2),sep="")) %>%
   mutate(label = paste("bar(s)==",signif(mu,2),sep="")) %>%
   ungroup() %>%
-  mutate(y=row_number()*12+55) %>%
-  mutate(x=0.045)
-  #mutate(y=ifelse(hap_lab=="H5",88,75)) %>%
-  #mutate(x=ifelse(hap_lab=="H5",.085,.085))
+  #mutate(y=row_number()*12+55) %>%
+  mutate(y=5) %>%
+  mutate(x=0.025)
+
+g_inset=ggplot(t_sum_hap_by_age_simple)
+g_inset = g_inset+geom_line(aes(x=t_yrs/1000,y=count/n_total,color=hap_names),alpha=0.8)+
+  theme_bw(base_size=4)+
+  geom_point(aes(x=t_yrs/1000,y=count/n_total,size=n_total,color=hap_names),alpha=1)+
+  theme(legend.position="None")+
+  scale_x_continuous("kyr BP", breaks=c(-10,-5,0))+
+  scale_y_continuous("")+
+  theme(panel.grid=element_blank())+
+  scale_color_manual(values=cols[c(1,7)])+
+  scale_size_continuous(range=c(0.25,1))+
+  theme(panel.background = element_rect(fill="transparent",color = NA),
+        plot.background = element_rect(fill="transparent",color = NA))
+
+
+data.tb <- tibble(x = 0.07, y = 100, 
+                  plot = list(g_inset))
 
 g=ggplot(t_s)
 g=g+geom_density(aes(x=s,color=hap_names,fill=hap_names),alpha=0.25)+
-  #geom_vline(aes(xintercept=mu,color=hap_names),data=mus,size=.25,color='grey')+
   geom_vline(aes(xintercept=mu,color=hap_names),data=mus,size=.25,color='black',linetype="dashed")+
-  geom_label(aes(x=x,
-                 y=y,
-                 label=label,
-                 fill=hap_names),
-             parse=TRUE,
-             data=mus,
-             size=2,
-             label.padding = unit(0.05,"cm"),alpha=.5,hjust=1)+
-  #geom_segment(aes(xintercept=mu,color=hap_names),data=mus,size=.25,color='black',linetype="dotted")+
+  geom_plot(data=data.tb, aes(x,y,label=plot),vp.width=(3/5)*1.1,vp.height=(1/2)*1.1)+
+  # geom_label(aes(x=x,
+  #                y=y,
+  #                label=label,
+  #                fill=hap_names),
+  #            parse=TRUE,
+  #            data=mus,
+  #            size=2,
+  #            label.padding = unit(0.05,"cm"),alpha=.5,hjust=1)+
   scale_x_continuous(expression(s[dup]))+
-  scale_y_continuous("density")+
-  #scale_color_manual(values=cols[c(6,5,4)])+
-  #scale_fill_manual(values=cols[c(6,5,4)])+
+  scale_y_continuous("posterier density")+
   theme_bw(base_size=8)+
   theme(panel.grid = element_blank(),
         legend.position="None")+
@@ -997,7 +1004,7 @@ t_s %>%
             gt0=sum(s>0)) %>%
   mutate(p = 1-(gt0/n))
 
-
+1/90000
 ```
 ```{r}
 #plot simple
