@@ -192,8 +192,9 @@ t_data_by_sub = t_gt %>%
           inner_join(t_subsistence, on="p1") %>%
           #left_join(t_subsistence, on="p1") %>%
           #mutate(type = ifelse(is.na(type),"other",type)) %>%
-          mutate(type=case_when(type=="Fishing" ~ "Fishing/Hunting",
-                                type=="Hunting" ~ "Fishing/Hunting",
+          mutate(type=case_when(type=="Fishing" ~ "Fishing/Hunting/Pastoralism",
+                                type=="Hunting" ~ "Fishing/Hunting/Pastoralism",
+                                type=="Pastoralism" ~ "Fishing/Hunting/Pastoralism",
                                 TRUE ~ type)) %>%
           mutate(simple_type = ifelse(type=="Agriculture",type,"other")) %>%
           filter(type!="Two or more sources")
@@ -222,23 +223,11 @@ t_sum_stats = t_data_by_sub %>%
                     mu = mean(cp),
                     sdev = sd(cp)) %>%
           mutate(serr = sdev/sqrt(n_total)) %>%
-          mutate(x=ifelse(simple_type=="Agriculture",3,1.5))
+          mutate(x=ifelse(simple_type=="Agriculture",2,1))
 
 p_A1 = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
 p_A2A = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
 p_A2B = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
-# p_A1 = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
-# p_A2A = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
-# p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
-# p_A1 = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1",type!="Pastoralism"))$p.value
-# p_A2A = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A",type!="Pastoralism"))$p.value
-# p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B",type!="Pastoralism"))$p.value
-
-# mutate(p_adj = p.adjust(p.value)) %>%
-#               mutate(p2 = str_replace(contrast,"WEA_","")) %>%
-#               mutate(p2 = str_replace(p2,"_WEA","")) %>%
-#               mutate(label = ifelse(p_adj>0.05,"N.S",
-#                                     paste("P[adjusted]==",signif(p_adj,2)))) %>%
 
 df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
                      ps = c(p_A1, p_A2A,p_A2B),
@@ -249,17 +238,8 @@ df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
             mutate(P_adj = p.adjust(ps)) %>%
             mutate(plabel=paste("P[adj]==",signif(P_adj,2)))
 
-t_plot_by_sub$type = factor(t_plot_by_sub$type,levels=rev(c("Agriculture","Pastoralism","Fishing/Hunting","Two or more sources")))
+t_plot_by_sub$type = factor(t_plot_by_sub$type,levels=rev(c("Agriculture","Fishing/Hunting/Pastoralism")))
 t_plot_by_sub$type_label = factor(t_plot_by_sub$type_label,levels=rev(unique(t_plot_by_sub$type_label)))
-
-
-# my_comparisons <- list( c("0.5", "1"), c("1", "2"), c("0.5", "2") )
-# ggboxplot(ToothGrowth, x = "dose", y = "len",
-#           color = "dose", palette = "jco")+ 
-#   stat_compare_means(comparisons = my_comparisons)+ # Add pairwise comparisons p-value
-#   stat_compare_means(label.y = 50)     # Add global p-value
-
-#my_comparisons <- list( c("2", "1"), c("1", "2"), c("0.5", "2") )
 
 mult_1=1.05
 mult_2=1.07
@@ -272,33 +252,26 @@ df_segs = data.frame(x_start = rep(c(mult_1, mult_2, mult_1, mult_1),3),
 
 g=ggplot(t_plot_by_sub)
 g=g+geom_point(aes(x=type_label,y=cp,size=prop,color=type),alpha=0.8)+
-  #geom_errorbar(aes(x=type_label,ymin=mu-serr,ymax=mu+serr),size=1,width=0,position=position_nudge(x=0.3),data=t_sum_stats)+
-  #geom_point(aes(x=type_label,y=mu),shape=18,size=2,position=position_nudge(x=0.3),data=t_sum_stats)+
-  #geom_point(aes(x=type_label,y=mu),color="white",shape=18,size=1,position=position_nudge(x=0.3),data=t_sum_stats)+
   geom_errorbar(aes(x=x,ymin=mu-serr,ymax=mu+serr),size=1,width=0,data=t_sum_stats)+
   geom_point(aes(x=x,y=mu),shape=18,size=2,data=t_sum_stats)+
   geom_point(aes(x=x,y=mu),color="white",shape=18,size=1,data=t_sum_stats)+
-  geom_text(aes(x=1.0,y=xs,label=plabel),data=df_labs,parse=TRUE,size=1.75,hjust=0)+
-  theme_bw(base_size=10)+
+  geom_text(aes(x=1.5,y=xs,label=plabel),data=df_labs,parse=TRUE,size=1.75,hjust=0)+
+  theme_bw(base_size=8)+
   facet_wrap(~label,ncol=1,strip.position="right",scales="free_x")+
   scale_color_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
   theme(legend.position="None")+
   geom_blank(aes(y=x_nudge,x=1),data=df_labs)+
-  # geom_signif(
-  #   y_position = c(5.3), 
-  #   xmin = c(0), 
-  #   xmax = c(1)
-  # ) +
-  geom_segment(aes(y=x_start*mult,yend=x_end*mult,x=y_start,xend=y_end),data=df_segs,lineend = "round",size=.25)+
   coord_flip()+
   scale_x_discrete("")+
-  scale_y_continuous("",breaks=c(c(0,1,2,3,4,5),seq(6,28,2)))+
+  scale_y_continuous("",breaks=c(c(0,1,2,3,4,5,6,7,8,9),seq(10,28,2)))+
   theme(strip.background = element_blank())+
-  scale_size(range=c(2,5))
+  scale_size(range=c(.5,6))+
+  theme(axis.text.y=element_text(size=6))
+  
   
 
 fn_out = "./output_figures/main_figs/copy_by_sustinence.pdf"
-pdf(fn_out,width=4,height=2.25)
+pdf(fn_out,width=4,height=2)
 print(g)
 dev.off()
 
@@ -453,20 +426,21 @@ plot_amy_super = function(data, curr_label){
   colors = c("black", "#EDB829", "#94B669", "#E97C07", "#00496F", "#0C7996","purple", "#DD4124")
   
   g=ggplot(t_data)
-  g=g+geom_point(aes(x=cp,y=reorder(p2_label,mu),size=prop,color=p2),alpha=.5)+
+  g=g+geom_point(aes(y=cp,x=reorder(p2_label,mu),size=prop,color=p2),alpha=.5)+
      #facet_wrap(~label,shrink = TRUE)+
-      geom_point(aes(x=mu,y=reorder(p2_label,mu)),shape=18,data=t_sum,size=1.5,position=position_nudge(x=0,y=0))+
-      geom_point(aes(x=mu,y=reorder(p2_label,mu),color=p2),shape=18,data=t_sum,size=.5,position=position_nudge(x=0,y=0),color='white')+
-      theme_bw(base_size=8)+
+      geom_point(aes(y=mu,x=reorder(p2_label,mu)),shape=18,data=t_sum,size=1.5)+
+      geom_point(aes(y=mu,x=reorder(p2_label,mu),color=p2),shape=18,data=t_sum,size=.5,color='white')+
+      theme_bw(base_size=6)+
       scale_color_manual("",values=colors)+
       theme(legend.key.size=unit(0.5,"cm"))+
       scale_size(range=c(0.01,3.5))+
-      scale_x_continuous("",breaks=seq(0,20,2))+
+      scale_y_continuous("",breaks=seq(0,20,2))+
       theme(strip.background = element_blank(),
             strip.text = element_text(size=3),
             legend.position="None",
             panel.grid=element_blank())+
-      scale_y_discrete("")
+      scale_x_discrete("")+
+      theme(axis.text.x=element_text(angle=45,hjust=1,vjust=1))
   
    return(g)
 }
@@ -475,20 +449,20 @@ plot_amy_super = function(data, curr_label){
 g = plot_amy_super(t_plot_by_superpop, "AMY1")
   
 fn_out = "./output_figures/main_figs/genotype_by_superpop_AMY1.pdf"
-pdf(fn_out,width=2,height=1.5)
+pdf(fn_out,width=1,height=2)
 print(g)
 dev.off()
 
 g = plot_amy_super(t_plot_by_superpop, "AMY2A")
   
 fn_out = "./output_figures/main_figs/genotype_by_superpop_AMY2A.pdf"
-pdf(fn_out,width=1.5,height=1.5)
+pdf(fn_out,width=1,height=2)
 print(g)
 dev.off()
 
 g = plot_amy_super(t_plot_by_superpop, "AMY2B")
 fn_out = "./output_figures/main_figs/genotype_by_superpop_AMY2B.pdf"
-pdf(fn_out,width=1.5,height=1.5)
+pdf(fn_out,width=1,height=2)
 print(g)
 dev.off()
 

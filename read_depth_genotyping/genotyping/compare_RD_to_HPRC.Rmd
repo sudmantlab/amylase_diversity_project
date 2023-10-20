@@ -337,13 +337,6 @@ t_HPRC_copies_Y1Y2_merged_analysis = read.table("/Users/petersudmant/Documents/s
   mutate(sample=ifelse(grepl("AV_HG",sample),str_replace(sample,"AV_",""),sample))
 
 
-n = t_HPRC_copies_Y1Y2_merged_analysis %>% 
-  dplyr::select(sample) %>%
-  unique() %>%
-  ungroup() %>%
-  summarize(n=n())
-
-
 ```
 ```{r}
 
@@ -358,7 +351,10 @@ t_max_likelihood_HPRC_y1y2_merged = t_copy_likelihoods %>%
 
 t_merge = inner_join(t_HPRC_copies_Y1Y2_merged_analysis,t_max_likelihood_HPRC_y1y2_merged,by=c("sample","label"))
 
-label = paste("n=",n$n," (",2*n$n,")",sep="")
+
+n=length(unique(t_merge$sample))
+
+label = paste("n=",n," (",2*n,")",sep="")
 df_lab = data.frame(label=label,x=12,y=2)
 
 g=ggplot(t_merge)
@@ -391,11 +387,26 @@ print(g)
 dev.off()  
 
 
+t_merge %>% filter(cp==7)
+t_merge %>% filter(sample=="HG02723")
+
 ```
 ```{r}
-3e9/1000
 
-(4000*3e6*32)/8/1024/1024/1024
+
+HG02722 HG02721 HG02723
+1 1 child: ['H3^r', 'H3A3B3'] father: ['H3^r', 'H3^r'] mother: ['H3A3B3', 'H5'] HG02723 HG02721 HG02722
+
+t_copy_likelihoods %>% 
+  group_by(sample,label) %>%
+  filter(r==max(r)) %>%
+  separate(sample,c("source","sample",'p1','p2'),sep="\\.") %>%
+  dplyr::select(sample,cp,label,X) %>%
+  filter(sample %in% c("HG02722", "HG02721", "HG02723")) %>%
+  arrange(label)
+  
+
+
 
 
 ```
