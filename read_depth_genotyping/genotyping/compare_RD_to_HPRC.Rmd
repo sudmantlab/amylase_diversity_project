@@ -367,7 +367,7 @@ g=g+geom_abline(slope=1,intercept=0,alpha=0.75)+
                                       height=.25),
              alpha=.5,
              shape=21)+
-  geom_text(aes(x=x,y=y,label=label),data=df_lab)+
+  #geom_text(aes(x=x,y=y,label=label),data=df_lab)+
   theme_bw()+
   #facet_wrap(~label,scales="free")+
   scale_color_brewer(palette="Set1")+
