@@ -367,16 +367,16 @@ g=g+geom_abline(slope=1,intercept=0,alpha=0.75)+
                                       height=.25),
              alpha=.5,
              shape=21)+
-  #geom_text(aes(x=x,y=y,label=label),data=df_lab)+
   theme_bw()+
-  #facet_wrap(~label,scales="free")+
-  scale_color_brewer(palette="Set1")+
-  scale_fill_brewer(palette="Set1")+
-  theme(legend.position="None")+
+  scale_color_brewer("",palette="Set1")+
+  scale_fill_brewer("",palette="Set1")+
+  theme(legend.position=c(.75,.3))+
   scale_x_continuous("read depth copy number", breaks=seq(0,16,2),lim=c(0,15))+
   scale_y_continuous("assembly copy number", breaks=seq(0,16,2),lim=c(0,15))+
   theme(strip.background = element_blank())+
-  theme(panel.grid.minor  = element_blank())
+  theme(panel.grid.minor  = element_blank())+
+  theme(legend.background = element_blank(),
+        legend.key.size=unit(.25,"cm"))
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output_figures/HPRC_comparison"
 
