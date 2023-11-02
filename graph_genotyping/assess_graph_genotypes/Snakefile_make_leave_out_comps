@@ -1,0 +1,22 @@
+#!vim synax=python
+
+import pandas as pd
+import pdb
+
+rule all:
+    input: 
+        HPRC_assignments = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/haplotype_assignments.txt",
+    output:
+        "output/HPRC_leave_out_comps.txt"
+    run:
+        t_HPRC = pd.read_csv(input.HPRC_assignments, sep="\t", header=0)
+        
+        outrows = [] 
+        for struc_hap, haps in t_HPRC.groupby("haplotype"):
+            if len(haps)>1:
+                for i, row in haps.iterrows():
+                    outrows.append({"chrom":row["chrom"], "hapotype":struc_hap})
+
+        t = pd.DataFrame(outrows)
+        t.to_csv(output[0], sep="\t", index=False)
+
