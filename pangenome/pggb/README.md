@@ -67,16 +67,13 @@ done
 
 # Be careful with the graph made with "selected_indivs_AMY_region.HG02004.verkko_filt_pat.fa_haplotype2_0000813_139386576_140076845_1.fa.gz", because "HG02004.verkko_filt_pat.fa:haplotype2-0000813_139386576_140076845_1" (removed in such a set) is the only H9 haplotype
 
+OUT_DIR=$DIR_BASE/amylase_diversity_project/pangenome/pggb/leave-one-out
 ls *fa.gz | while read FASTA; do
   echo $FASTA;
 
   NAME=$(basename $FASTA .fa.gz)
-
-  $PGGB \
-    -i $FASTA \
-    -o pggb.$NAME \
-    -n 94 -c 2 -t 48 \
-    -D /scratch
+  
+  sbatch -c 48 -p workers --job-name $NAME --wrap "$PGGB -i $OUT_DIR/$FASTA -o $OUT_DIR/pggb.$NAME -n 94 -c 2 -t 48 -D /scratch"
 done
 ```
 
