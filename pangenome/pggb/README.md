@@ -42,6 +42,44 @@ odgi view -i $PREFIX.sort.extract.og -g > $PREFIX.sort.extract.gfa
 odgi viz -i $PREFIX.sort.extract.og -o $PREFIX.sort.extract.1D.png -m # To verify that it worked correctly
 ```
 
+## Leave-One-Out
+
+```shell
+mkdir -p $DIR_BASE/amylase_diversity_project/pangenome/pggb/leave-one-out
+cd $DIR_BASE/amylase_diversity_project/pangenome/pggb/leave-one-out
+
+FASTA=$DIR_BASE/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/pggb_input/selected_indivs_AMY_region.fa.gz
+
+SEQ_NAMES=($(cut -f1 "${FASTA}.fai"))
+
+for SEQ_TO_REMOVE in "${SEQ_NAMES[@]}"; do
+  echo $SEQ_TO_REMOVE
+
+  # Create a new array without the current sequence.
+  SEQS=("${SEQ_NAMES[@]/$SEQ_TO_REMOVE}")
+
+  NAME=$(echo $SEQ_TO_REMOVE | tr '#\-:' '_')
+
+  # Use samtools faidx to fetch the remaining sequences and write them to a new FASTA file.
+  samtools faidx $FASTA $(echo $SEQS) | bgzip -@ 48 -l 9 > selected_indivs_AMY_region.${NAME}.fa.gz
+  samtools faidx selected_indivs_AMY_region.${NAME}.fa.gz
+done
+
+# Be careful with the graph made with "selected_indivs_AMY_region.HG02004.verkko_filt_pat.fa_haplotype2_0000813_139386576_140076845_1.fa.gz", because "HG02004.verkko_filt_pat.fa:haplotype2-0000813_139386576_140076845_1" (removed in such a set) is the only H9 haplotype
+
+ls *fa.gz | while read FASTA; do
+  echo $FASTA;
+
+  NAME=$(basename $FASTA .fa.gz)
+
+  $PGGB \
+    -i $FASTA \
+    -o pggb.$NAME \
+    -n 94 -c 2 -t 48 \
+    -D /scratch
+done
+```
+
 
 # Pangenome Year 1 + Year 2 with `AMY1A_region_seq.fa.gz`
 
