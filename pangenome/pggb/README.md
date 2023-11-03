@@ -22,7 +22,7 @@ cd $DIR_BASE/amylase_diversity_project/pangenome/pggb/
 $PGGB \
   -i $DIR_BASE/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/pggb_input/selected_indivs_AMY_region.fa.gz \
   -o amy_y1y2.selected_indivs.1 \
-  -n 90 -c 2 -t 48 \
+  -n 94 -c 2 -t 48 \
   -D /scratch
 ```
 
