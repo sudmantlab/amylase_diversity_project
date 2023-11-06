@@ -406,6 +406,8 @@ dev.off()
 print(g)
 
 
+t_sum %>% ungroup() %>% summarize(n=sum(count))
+
 ```
 ```{r}
 

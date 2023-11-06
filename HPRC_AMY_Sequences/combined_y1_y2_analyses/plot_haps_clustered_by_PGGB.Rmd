@@ -11,7 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 #t_dists = read.table("graph_genotyping_clusters/input/PGGB_amy_graph_haplotype_jaccard_dists.tsv",header=T,sep="\t",comment.char="") # now moved to OLD subdir
-t_dists = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/pangenome/pggb/20230817_graph/AMY.dissmtx.tsv",header=T,sep="\t",comment.char="")
+#t_dists = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/pangenome/pggb/20230817_graph/AMY.dissmtx.tsv",header=T,sep="\t",comment.char="")
+t_dists = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/pangenome/pggb/20231102_graph/selected_indivs_AMY_region.fa.gz.42c7330.417fcdf.8bc4b72.smooth.final.dissimilarity.tsv",header=T,sep="\t",comment.char="",check.names=FALSE)
 
 
 #these dataframes are created in plot_haps
@@ -39,14 +40,18 @@ library(aplot)
 library(gggenes)
 
 
-dmat = t_dists %>% 
-  mutate(hap1 = group.a, hap2 = group.b) %>%
-  filter(hap1 %in% all_haplotypes, hap2 %in% all_haplotypes) %>%
-  mutate(dist = 1-jaccard.similarity) %>%
-  dplyr::select(group.a,group.b,dist) %>%
-  spread(group.b,dist) %>%
-  column_to_rownames(var="group.a") %>% 
-  as.matrix
+# dmat = t_dists %>% 
+#   mutate(hap1 = group.a, hap2 = group.b) %>%
+#   filter(hap1 %in% all_haplotypes, hap2 %in% all_haplotypes) %>%
+#   mutate(dist = 1-jaccard.similarity) %>%
+#   dplyr::select(group.a,group.b,dist) %>%
+#   spread(group.b,dist) %>%
+#   column_to_rownames(var="group.a") %>% 
+#   as.matrix
+
+dmat = as.matrix(t_dists %>% column_to_rownames(var="group.a"))
+
+
 dim(dmat)
 c=hclust(as.dist(dmat),method="average")
 
@@ -164,17 +169,24 @@ t_rep = t_struct_plot_inf %>% filter(contig %in% representative_haps$contig)
 
 paf_genes_rep = paf_plot_genes %>% filter(tname %in% representative_haps$contig)
 
-dmat = t_dists %>% 
-  mutate(hap1 = group.a, hap2 = group.b) %>%
+dmat_subset = t_dists %>% melt %>%
+  transmute(hap1=group.a,hap2=variable,dist=value) %>%
   filter(hap1 %in% representative_haps$contig, hap2 %in% representative_haps$contig) %>%
-  mutate(dist = 1-jaccard.similarity) %>%
-  dplyr::select(group.a,group.b,dist) %>%
-  spread(group.b,dist) %>%
-  column_to_rownames(var="group.a") %>% 
+  spread(hap2,dist) %>%
+  column_to_rownames(var="hap1") %>% 
   as.matrix
 
+# dmat = t_dists %>% 
+#   mutate(hap1 = group.a, hap2 = group.b) %>%
+#   filter(hap1 %in% representative_haps$contig, hap2 %in% representative_haps$contig) %>%
+#   mutate(dist = 1-jaccard.similarity) %>%
+#   dplyr::select(group.a,group.b,dist) %>%
+#   spread(group.b,dist) %>%
+#   column_to_rownames(var="group.a") %>% 
+#   as.matrix
 
-c=hclust(as.dist(dmat),method="average")
+
+c=hclust(as.dist(dmat_subset),method="average")
 struc_phy = as.phylo(c)
 
 struc_phy = as.phylo(c)
