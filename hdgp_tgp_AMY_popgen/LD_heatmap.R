@@ -1,5 +1,6 @@
 setwd("~/Desktop/AMYLASE/AMY_LDmatrix/")
 library(devtools)
+library(dplyr)
 library(reticulate)
 library(LDheatmap)
 library(Matrix)
@@ -12,11 +13,13 @@ library(ggplot2)
 library(ggpubr)
 library(gridExtra)
 library(cowplot)
+library(rehh)
+library(tidyverse)
 plot_vcf2LDheatmap<-function(popvcf,metadata,popname,mytitle){
   snp <- read.vcfR(popvcf)
   position<-as.data.frame(snp@fix)
   sample_info <- read.delim(metadata)
-  pop <- sample_info[sample_info$hgdp_tgp_meta.Genetic.region %in% popname,-c(2,4)]
+  pop <- sample_info[sample_info$p2 %in% popname,-c(2,4)]
   pop_gt <- snp@gt[,colnames(snp@gt) %in% pop[,1]]
   pop_snpMat <- t(pop_gt)
   convertToNumeric <- function(x){
@@ -39,27 +42,26 @@ plot_vcf2LDheatmap<-function(popvcf,metadata,popname,mytitle){
   gdat_pop <-as(gdat_pop,"SnpMatrix")
   viridis.palette <- rev(viridis(n = 100, alpha = 1))
   MyHeatmap<-LDheatmap(gdat_pop, genetic.distances=snpNames, distances="physical",
-                   LDmeasure="r", title=mytitle, color=viridis.palette, SNP.name = c("103458352", "103572395", "103761240", "103863961"))
-  }
+                    LDmeasure="r", title=mytitle, color=viridis.palette)
+                   #LDmeasure="r", title=mytitle, color=viridis.palette, SNP.name = c("103458352", "103572395", "103761240", "103863961"))
+}
 
-AFR<-plot_vcf2LDheatmap("hgdp.tgp.gwaspy.merged.chr1.merged.AFR.recode.vcf", "METADATA_4099.tsv", "AFR", "Pairwise LD AFR")
-AMR<-plot_vcf2LDheatmap("hgdp.tgp.gwaspy.merged.chr1.merged.AMR.recode.vcf", "METADATA_4099.tsv", "AMR", "Pairwise LD AMR")
-CSA<-plot_vcf2LDheatmap("hgdp.tgp.gwaspy.merged.chr1.merged.CSA.recode.vcf", "METADATA_4099.tsv", "CSA", "Pairwise LD CSA")
-EAS<-plot_vcf2LDheatmap("hgdp.tgp.gwaspy.merged.chr1.merged.EAS.recode.vcf", "METADATA_4099.tsv", "EAS", "Pairwise LD EAS")
-MID<-plot_vcf2LDheatmap("hgdp.tgp.gwaspy.merged.chr1.merged.MID.recode.vcf", "METADATA_4099.tsv", "MID", "Pairwise LD MID")
-EUR<-plot_vcf2LDheatmap("hgdp.tgp.gwaspy.merged.chr1.merged.EUR.recode.vcf", "METADATA_4099.tsv", "EUR", "Pairwise LD EUR")
-OCE<-plot_vcf2LDheatmap("hgdp.tgp.gwaspy.merged.chr1.merged.OCE.recode.vcf", "METADATA_4099.tsv", "OCE", "Pairwise LD OCE")
+OCN<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.OCN.recode.vcf", "CN_metadata_filtered.tsv", "OCN", "OCN (n=18)")
+CAS<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.CAS.recode.vcf", "CN_metadata_filtered.tsv", "CAS", "CAS (n=35)")
+AFR<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.AFR.recode.vcf", "CN_metadata_filtered.tsv", "AFR", "AFR (n=609)")
+AMR<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.AMR.recode.vcf", "CN_metadata_filtered.tsv", "AMR", "AMR (n=561)")
+EA<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.EA.recode.vcf", "CN_metadata_filtered.tsv", "EA", "EA (n=699)")
+SA<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.SA.recode.vcf", "CN_metadata_filtered.tsv", "SA", "SA (n=671)")
+WEA<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.WEA.recode.vcf", "CN_metadata_filtered.tsv", "WEA", "WEA (n=609)")
 
-ldmatrix<-ggarrange(EUR$LDheatmapGrob, MID$LDheatmapGrob, CSA$LDheatmapGrob, EAS$LDheatmapGrob, AMR$LDheatmapGrob, OCE$LDheatmapGrob, AFR$LDheatmapGrob, ncol = 7, nrow=1)
+ldmatrix<-ggarrange(AFR$LDheatmapGrob,
+                    AMR$LDheatmapGrob, 
+                    CAS$LDheatmapGrob,
+                    EA$LDheatmapGrob, 
+                    OCN$LDheatmapGrob, 
+                    SA$LDheatmapGrob,
+                    WEA$LDheatmapGrob, 
+                    ncol = 7, nrow=1)
 
-LDheatmap.highlight(EUR, i = as.integer(which(colnames(EUR$LDmatrix) == "103458352")), j = as.integer(which(colnames(EUR$LDmatrix) == "103572395")), col = "red", fill = NA,flipOutline = FALSE, crissCross = FALSE)
-LDheatmap.highlight(EUR, i = as.integer(which(colnames(EUR$LDmatrix) == "103761240")), j = as.integer(which(colnames(EUR$LDmatrix) == "103863961")), col = "red", fill = NA,flipOutline = FALSE, crissCross = FALSE)
-grid.edit("symbols", pch = 20, gp = gpar(cex = 1, col = "red"))
-
-
-
-
-ggsave("ldmatrix.pdf", ldmatrix, "tiff", width = 20, height = 10, dpi = 300)
-
-
-
+ggsave("ldmatrix2_no_trios.pdf", ldmatrix, "pdf", width = 15, height = 5, dpi = 300)
+ggsave("WEA_v2.pdf", WEA$LDheatmapGrob, "pdf", width = 5, height = 3, dpi = 300)
