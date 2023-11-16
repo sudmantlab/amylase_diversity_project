@@ -1,3 +1,13 @@
+---
+title: "LD_heatmap"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE)
+```
+
+```{r}
 setwd("~./LDmatrix/")
 library(devtools)
 library(dplyr)
@@ -15,6 +25,9 @@ library(gridExtra)
 library(cowplot)
 library(rehh)
 library(tidyverse)
+```
+
+```{r}
 plot_vcf2LDheatmap<-function(popvcf,metadata,popname,mytitle){
   snp <- read.vcfR(popvcf)
   position<-as.data.frame(snp@fix)
@@ -63,5 +76,6 @@ ldmatrix<-ggarrange(AFR$LDheatmapGrob,
                     WEA$LDheatmapGrob, 
                     ncol = 7, nrow=1)
 
-ggsave("ldmatrix2_no_trios.pdf", ldmatrix, "pdf", width = 15, height = 5, dpi = 300)
+ggsave("ldmatrix_v2_no_trios.pdf", ldmatrix, "pdf", width = 15, height = 5, dpi = 300)
 ggsave("WEA_v2.pdf", WEA$LDheatmapGrob, "pdf", width = 5, height = 3, dpi = 300)
+```
