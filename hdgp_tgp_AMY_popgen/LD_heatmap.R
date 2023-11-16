@@ -1,14 +1,4 @@
----
-title: "LD_heatmap"
-output: github_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=FALSE)
-```
-
-```{r}
-setwd("~./LDmatrix/")
+setwd("~./path/to/AMY_LDmatrix/")
 library(devtools)
 library(dplyr)
 library(reticulate)
@@ -25,9 +15,7 @@ library(gridExtra)
 library(cowplot)
 library(rehh)
 library(tidyverse)
-```
 
-```{r}
 plot_vcf2LDheatmap<-function(popvcf,metadata,popname,mytitle){
   snp <- read.vcfR(popvcf)
   position<-as.data.frame(snp@fix)
