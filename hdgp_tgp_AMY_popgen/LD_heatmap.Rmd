@@ -1,4 +1,4 @@
-setwd("~/Desktop/AMYLASE/AMY_LDmatrix/")
+setwd("~./LDmatrix/")
 library(devtools)
 library(dplyr)
 library(reticulate)
