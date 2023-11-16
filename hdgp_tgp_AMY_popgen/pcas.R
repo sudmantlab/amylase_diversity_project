@@ -1,151 +1,158 @@
-setwd("/Users/joanocha/Desktop/AMYLASE/AMY_PCA_LD/")
+setwd("/path/to/AMY_PCA/")
 library(tidyverse)
 library(ggplot2)
 library(ggpubr)
 library(ggrepel)
 library(RColorBrewer)
 library(dplyr)
+library(cowplot)
+library(scico)
 
-#b0st and b0end - 103456163-103571526
-#b1st and b1end - 103760698-103863980 
-#b1st and b1a - 10376069-103826698 (=103760698+66000))
-
-plot_pca_alltogether<-function(eigenvector, eigenvalue, mytitle, pdfname){
+###  NON-DUPLICATED REGIONS ADJACENT TO THE SVR - COLORED BY COPY NUMBER
+plot_pca_final<-function(eigenvector, eigenvalue, metadata, pdfname){
   pca <- read_table(eigenvector, col_names = FALSE)
   eigenval <- scan(eigenvalue,)
   pca <- pca[,-1]
   names(pca)[1] <- "ID"
   names(pca)[2:ncol(pca)] <- paste0("PC", 1:(ncol(pca)-1))
-  dataset<-read.delim2("CN_metadata.tsv", sep="\t", header=TRUE)
+  dataset<-read.delim2(metadata, sep="\t", header=TRUE)
   pca <- merge(dataset,pca,by="ID")
   pve <- data.frame(PC = 1:20, pve = eigenval/sum(eigenval)*100)
   var_explained <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity")+ ylab("Percentage variance explained") + theme_light()
   cumsum(pve$pve)
-  colors1 <- c("black","orange", "#377EB8", "#E41A1C", "#A65628","#984EA3", "#999999", "#4DAF4A")
-  pop_pca1<-ggplot(pca, aes(PC1, PC2, col =p2, shape=p2)) + geom_point(size = 1) +  
+  data_to_hide <- filter(pca, sample == 'HPRC')
+  AMY1_pca1<-pca %>% filter(sample != 'HPRC') %>% 
+    arrange(AMY1) %>% 
+    ggplot(aes(PC1, PC2, col=AMY1)) + geom_point(size = 1) +  
     scale_shape_manual(values=c(0:25)) +  # Specify shape values
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) +
-    scale_color_manual(values = colors1)  + ggtitle(mytitle) +
-    theme_test()
-  AMY1_pca1<-ggplot(pca, aes(PC1, PC2, col=AMY1, shape=p2)) + geom_point(size = 1) +  
+    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + 
+    ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + 
+    scico::scale_color_scico(palette = "bilbao", begin = 1, end = 0.05, limits=c(0, NA), midpoint = NA, direction = 1) +
+    geom_point(data = data_to_hide, alpha=0) + 
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = c(0.05, 0.82),
+          legend.title = element_blank())
+  AMY2A_pca1<-pca %>% filter(sample != 'HPRC') %>% 
+    arrange(AMY2A) %>% 
+    ggplot(aes(PC1, PC2, col=AMY2A)) + geom_point(size = 1) +  
     scale_shape_manual(values=c(0:25)) +  # Specify shape values
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + ggtitle(mytitle) +
-    scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    theme_test()
- # AMY1_pca2<-ggplot(pca, aes(PC3, PC4, col =AMY1)) + geom_point(size = 1) +  
-  #  xlab(paste0("PC3 (", signif(pve$pve[3], 3), "%)")) + ylab(paste0("PC4 (", signif(pve$pve[4], 3), "%)")) + ggtitle(mytitle) +
-   # scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    #theme_test()
-  AMY2A_pca1<-ggplot(pca, aes(PC1, PC2, col=AMY2A, shape=p2)) + geom_point(size = 1) +  
+    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + 
+    ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + 
+    scico::scale_color_scico(palette = "bilbao", begin = 1, end = 0.05, limits=c(0, NA), midpoint = NA, direction = 1) +
+    geom_point(data = data_to_hide, alpha=0) + 
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = c(0.05, 0.82),
+          legend.title = element_blank())
+  AMY2B_pca1<-pca %>% filter(sample != 'HPRC') %>% 
+    arrange(AMY2B) %>% 
+    ggplot(aes(PC1, PC2, col=AMY2B)) + geom_point(size = 1) +  
     scale_shape_manual(values=c(0:25)) +  # Specify shape values
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + ggtitle(mytitle) +
-    scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    theme_test()
-  #AMY2A_pca2<-ggplot(pca, aes(PC3, PC4, col =AMY2A)) + geom_point(size = 1) +  
-   # xlab(paste0("PC3 (", signif(pve$pve[3], 3), "%)")) + ylab(paste0("PC4 (", signif(pve$pve[4], 3), "%)")) + ggtitle(mytitle) +
-  #  scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-   # theme_test()
-  AMY2B_pca1<-ggplot(pca, aes(PC1, PC2, col=AMY2B, shape=p2)) + geom_point(size = 1) +  
-    scale_shape_manual(values=c(0:25)) +  # Specify shape values
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + ggtitle(mytitle) +
-    scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    theme_test()
-  #AMY2B_pca2<-ggplot(pca, aes(PC3, PC4, col =AMY2B)) + geom_point(size = 1) +  
-  #  xlab(paste0("PC3 (", signif(pve$pve[3], 3), "%)")) + ylab(paste0("PC4 (", signif(pve$pve[4], 3), "%)")) + ggtitle(mytitle) +
-    #scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    #theme_test()
-  #pop_pca1_pca2<-ggarrange(pop_pca1,pop_pca2, common.legend = TRUE) 
-  #AMY1_pca1_pca2<-ggarrange(AMY1_pca1,AMY1_pca2, common.legend = TRUE) 
-  #AMY2A_pca1_pca2<-ggarrange(AMY2A_pca1,AMY2A_pca2, common.legend = TRUE) 
-  #AMY2B_pca1_pca2<-ggarrange(AMY2B_pca1,AMY2B_pca2, common.legend = TRUE) 
-  mypca1<-ggarrange(pop_pca1, AMY1_pca1,AMY2A_pca1, AMY2B_pca1, nrow=4)
-  ggsave(pdfname, mypca1, width = 5, height =15, dpi=300)
-}
-#AMY_b0b1<-plot_pca("b0st_b1end.eigenvec", "b0st_b1end.eigenval", "PCA B0 start to B1 end", "amy_b0st_b1end_region_AMY1_AMY2A_AMY2Bv2.pdf")
-#chr1_control<-plot_pca("chr1_control.eigenvec", "chr1_control.eigenval", "PCA chr1", "amy_chr1.pdf")
-
-AMY_b0<-plot_pca_alltogether("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "PCA B0 chr1:103456163-103571526", "amy_b0_AMY1_AMY2A_AMY2B_alltogether.pdf")
-AMY_b1<-plot_pca_alltogether("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "PCA B1 chr1:103760698-103826698", "amy_b1_AMY1_AMY2A_AMY2B_alltogether.pdf")
-
-
-plot_pca_facets<-function(eigenvector, eigenvalue, mytitle, pdfname){
-  pca <- read_table(eigenvector, col_names = FALSE)
-  eigenval <- scan(eigenvalue,)
-  pca <- pca[,-1]
-  names(pca)[1] <- "ID"
-  names(pca)[2:ncol(pca)] <- paste0("PC", 1:(ncol(pca)-1))
-  dataset<-read.delim2("CN_metadata.tsv", sep="\t", header=TRUE)
-  pca <- merge(dataset,pca,by="ID")
-  pve <- data.frame(PC = 1:20, pve = eigenval/sum(eigenval)*100)
-  var_explained <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity")+ ylab("Percentage variance explained") + theme_light()
-  cumsum(pve$pve)
-  colors1 <- c("orange", "#377EB8", "#E41A1C", "#A65628","#984EA3", "#999999", "#4DAF4A")
-  AMY1_pca1<-ggplot(pca, aes(PC1, PC2, col=AMY1)) + geom_point(size = 1) +  
-    facet_grid(p2 ~. )  +
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) +
-    scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    theme_test()
-  AMY2A_pca1<-ggplot(pca, aes(PC1, PC2, col=AMY2A)) + geom_point(size = 1) +  
-    facet_grid(p2 ~. )  +  
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + ggtitle(mytitle) +
-    scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    theme_test()
-  AMY2B_pca1<-ggplot(pca, aes(PC1, PC2, col=AMY2B)) + geom_point(size = 1) +  
-    facet_grid(p2 ~. )  + 
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + ggtitle(mytitle) +
-    scale_colour_gradientn(colours = c("lightblue", "#377EB8", "orange", "#E41A1C", "darkred")) +
-    theme_test()
+    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + 
+    ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + 
+    scico::scale_color_scico(palette = "bilbao", begin = 1, end = 0.05, limits=c(0, NA), midpoint = NA, direction = 1) +
+    geom_point(data = data_to_hide, alpha=0) + 
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = c(0.05, 0.82),
+          legend.title = element_blank())
   mypca1<-ggarrange(AMY1_pca1,AMY2A_pca1, AMY2B_pca1, nrow=3)
-  ggsave(pdfname, mypca1, width = 4, height =15, dpi=300)
+  ggsave(pdfname, mypca1, width = 5, height = 12)
 }
-AMY_b0_facets<-plot_pca_facets("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "PCA B0 chr1:103456163-103571526", "amy_b0_AMY1_AMY2A_AMY2B_facets.pdf")
-AMY_b1_facets<-plot_pca_facets("combined_bundle1a.eigenvec", "combined_bundle1a.eigenval", "PCA B1 chr1:103760698-103826698", "amy_b1_AMY1_AMY2A_AMY2B_facets.pdf")
+plot_pca_final("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "CN_metadata_combined.tsv","pca_bundle0_JR.pdf")
+plot_pca_final("combined_bundle1a.eigenvec", "combined_bundle1a.eigenval", "CN_metadata_combined.tsv", "pca_bundle1a_JR.pdf")
 
-### PLOT PC1, PC2 correlations
-plot_pca_correlations<-function(vec1, vec2, val1, val2, plotname){
-pca1 <- read_table(vec1, col_names = FALSE)
-pca2 <- read_table(vec2, col_names = FALSE)
-eigenval1 <- scan(val1,)
-eigenval2 <- scan(val2,)
-pca1 <- pca1[,-1]
-pca2 <- pca2[,-1]
-names(pca1)[1] <- "ID"
-names(pca2)[1] <- "ID"
-names(pca1)[2:ncol(pca1)] <- paste0("PC", 1:(ncol(pca1)-1))
-names(pca2)[2:ncol(pca2)] <- paste0("PC", 1:(ncol(pca2)-1))
-dataset<-read.delim2("CN_metadata.tsv", sep="\t", header=TRUE)
-merged_pca <- merge(dataset,pca1,by="ID")
-pca <- merge(merged_pca,pca2,by="ID")
-pc1b0b1_facet<-ggscatter(pca, x = "PC1.x", y = "PC1.y", size = 1, shape=3,
-          add = "reg.line", conf.int = TRUE, 
-          cor.coef = TRUE, cor.method = "spearman",
-          xlab = "PC1 bundle 0", ylab = "PC1 bundle 1") +  facet_grid(p2 ~. ) 
-pc2b0b1_facet<-ggscatter(pca, x = "PC2.x", y = "PC2.y", size = 1, shape = 3,
-                   add = "reg.line", conf.int = TRUE, 
-                   cor.coef = TRUE, cor.method = "spearman",
-                   xlab = "PC2 bundle 0", ylab = "PC2 bundle 1") +  facet_grid(p2 ~. )
-pc_facets<-ggarrange(pc1b0b1_facet, pc2b0b1_facet)
-ggsave(plotname, pc_facets, width = 6, height =10, dpi=300)  
-}
-plot_pca_correlations("combined_bundle0.eigenvec", "combined_bundle1a.eigenvec", "combined_bundle0.eigenval","combined_bundle1a.eigenval", "pc1_pc2_b0b1_facets.pdf")
-
-### EXPORT CHR1 with PCA
-pca <-read.table("hgdp.tgp.gwaspy.merged.chr1.merged.EUR.eigenvec", header = FALSE)
-eigenval <- scan("hgdp.tgp.gwaspy.merged.chr1.merged.EUR.eigenval",)
+###  NON-DUPLICATED REGIONS ADJACENT TO THE SVR - GEOGRAPHY
+plot_pca_POPULATIONS_final<-function(eigenvector, eigenvalue, metadata, mytitle){
+pca <- read_table(eigenvector, col_names = FALSE)
+eigenval <- scan(eigenvalue,)
 pca <- pca[,-1]
 names(pca)[1] <- "ID"
 names(pca)[2:ncol(pca)] <- paste0("PC", 1:(ncol(pca)-1))
-dataset<-read.delim2("CN_metadata.tsv", sep="\t", header=TRUE)
+dataset<-read.delim2(metadata, sep="\t", header=TRUE)
 pca <- merge(dataset,pca,by="ID")
 pve <- data.frame(PC = 1:20, pve = eigenval/sum(eigenval)*100)
 var_explained <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity")+ ylab("Percentage variance explained") + theme_light()
 cumsum(pve$pve)
-pop_pca1<-ggplot(pca, aes(PC1, PC2, col =p1)) + geom_point(size = 1) +  
-  xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) +
-  theme_test()
-pop_pca2<-ggplot(pca, aes(PC3, PC4, col =p1)) + geom_point(size = 1) +  
-  xlab(paste0("PC3 (", signif(pve$pve[3], 3), "%)")) + ylab(paste0("PC2 (", signif(pve$pve[4], 3), "%)")) +
-  theme_test()
-ggarrange(pop_pca1, pop_pca2)
-colors1 <- c("orange", "#377EB8", "#E41A1C", "#A65628","#984EA3", "#999999", "#4DAF4A")
-write.table(pca, file='CN_metadata_EUR_PCs.tsv', sep = "\t", quote = FALSE, row.names = FALSE)
+data_to_hide <- filter(pca,  sample == 'HPRC')
+colors1 <- c("#EDB829", "#DD4124", "#00496F","#0C7996","purple","#E97C07","#94B669")
+pop_pca_bundle <- pca %>% 
+  filter(sample != 'HPRC') %>% 
+  ggplot(aes(PC1, PC2, col=p2)) +  # Keep the coloring by 'p2'
+  geom_point(size = 1) +
+  scale_color_manual(values = colors1, name = "Superpopulation") +  # Use your predefined colors
+  #facet_wrap(~p2, scales = "fixed", ncol = 1) +  # One column for facets
+  facet_grid(p2 ~ ., scales = "fixed", switch = "x") +  # Facets in a single column with labels on the side
+  scale_shape_manual(values=c(0:25)) +  # Specify shape values
+  xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + 
+  ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + 
+  theme_cowplot() + 
+  ggtitle(mytitle) +
+  theme_cowplot() +
+  theme(legend.position = "none",  # Optionally remove the legend
+        strip.placement = "outside",  # Place the strips outside of the axes
+        #strip.background = element_blank(),
+        strip.background = element_rect(colour = "black", fill = NA, size = 0.5), 
+        panel.spacing = unit(0.1, "lines"),  # Reduce the space between facets
+        panel.border = element_rect(colour = "black", fill=NA, size=0.5)  # Add a border around each facet
+        
+  )
+pop_pca_bundle <- pop_pca_bundle + theme(legend.position = "none")
+}
+b0<-plot_pca_POPULATIONS_final("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "CN_metadata_combined.tsv", "AMY left flank (bundle 0)")
+b1a<-plot_pca_POPULATIONS_final("combined_bundle1a.eigenvec", "combined_bundle1a.eigenval", "CN_metadata_combined.tsv","AMY right flank (bundle 1a)")
+test<-ggarrange(b0, b1a, labels = c("A", "B"), ncol = 2, nrow = 1)
+print(test)
+ggsave("FigS6_sup_pop_pca_b0b1a.pdf", test, width=10, height=10, dpi=300) 
+ggsave("FigS6_sup_pop_pca_b0b1a.png", test, width=10, height=10, dpi=300) 
+
+plot_pca_POPULATIONS_finalv2 <- function(eigenvector, eigenvalue, metadata, mytitle){
+  
+  pca <- read_table(eigenvector, col_names = FALSE)
+  eigenval <- scan(eigenvalue,)
+  pca <- pca[,-1]
+  names(pca)[1] <- "ID"
+  names(pca)[2:ncol(pca)] <- paste0("PC", 1:(ncol(pca)-1))
+  dataset <- read.delim2(metadata, sep="\t", header=TRUE)
+  pca <- merge(dataset, pca, by="ID")
+  
+  # Make sure p1 and p2 are factors and their levels are ordered
+  pca$p1 <- factor(pca$p1, levels = unique(pca$p1[order(pca$p2, pca$p1)]))
+  pca$p2 <- factor(pca$p2)
+  
+  # Plot preparation
+  pve <- data.frame(PC = 1:20, pve = eigenval/sum(eigenval)*100)
+  cumsum(pve$pve)
+  colors1 <- c("#EDB829", "#DD4124", "#00496F","#0C7996","purple","#E97C07","#94B669")
+  
+  # Main plotting code
+  pop_pca_bundle <- pca %>%
+    filter(sample != 'HPRC') %>%
+    ggplot(aes(PC1, PC2, col=p2)) +  # Keep the coloring by 'p2'
+    geom_point(size = 1) +
+    scale_color_manual(values = colors1, name = "Superpopulation") +  # Use predefined colors
+    facet_grid(p1 ~ ., scales = "fixed", space = "free_x") + 
+    scale_shape_manual(values=c(0:25)) +  # Specify shape values
+    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + 
+    ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + 
+    ggtitle(mytitle) +
+    theme_cowplot() +
+    theme(legend.position = "none",  # Remove the legend
+          strip.placement = "outside",  # Place strips outside of axes
+          strip.background = element_blank(), 
+          panel.spacing = unit(0.1, "lines"),  # Reduce space between facets
+          panel.border = element_rect(colour = "black", fill=NA, size=0.1),  # Add border around each facet
+          strip.text.y = element_text(angle = 0, hjust = 0, vjust = 0, size = 8),  # Horizontal facet labels for p1
+          axis.text.y = element_text(size = 8),  # Smaller y-axis tick labels
+          axis.text.x = element_text(size = 8)  # Smaller y-axis tick labels
+    )
+  
+  return(pop_pca_bundle)
+}
+b0<-plot_pca_POPULATIONS_finalv2("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "CN_metadata_combined.tsv", "AMY left flank (bundle 0)")
+b0<-plot_pca_POPULATIONS_finalv2("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "CN_metadata_combined.tsv", "AMY left flank (bundle 0)")
+b1a<-plot_pca_POPULATIONS_finalv2("combined_bundle1a.eigenvec", "combined_bundle1a.eigenval", "CN_metadata_combined.tsv","AMY right flank (bundle 1a)")
+test<-ggarrange(b0, b1a, labels = c("A", "B"), ncol = 2, nrow = 1)
+print(test)
+ggsave("FigS6_sup_pop_pca_b0b1a_V2.pdf", test, width=7, height=32, dpi=300) 
