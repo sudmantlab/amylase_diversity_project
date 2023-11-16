@@ -104,55 +104,6 @@ b0<-plot_pca_POPULATIONS_final("combined_bundle0.eigenvec", "combined_bundle0.ei
 b1a<-plot_pca_POPULATIONS_final("combined_bundle1a.eigenvec", "combined_bundle1a.eigenval", "CN_metadata_combined.tsv","AMY right flank (bundle 1a)")
 test<-ggarrange(b0, b1a, labels = c("A", "B"), ncol = 2, nrow = 1)
 print(test)
-ggsave("FigS6_sup_pop_pca_b0b1a.pdf", test, width=10, height=10, dpi=300) 
-ggsave("FigS6_sup_pop_pca_b0b1a.png", test, width=10, height=10, dpi=300) 
 
-plot_pca_POPULATIONS_finalv2 <- function(eigenvector, eigenvalue, metadata, mytitle){
-  
-  pca <- read_table(eigenvector, col_names = FALSE)
-  eigenval <- scan(eigenvalue,)
-  pca <- pca[,-1]
-  names(pca)[1] <- "ID"
-  names(pca)[2:ncol(pca)] <- paste0("PC", 1:(ncol(pca)-1))
-  dataset <- read.delim2(metadata, sep="\t", header=TRUE)
-  pca <- merge(dataset, pca, by="ID")
-  
-  # Make sure p1 and p2 are factors and their levels are ordered
-  pca$p1 <- factor(pca$p1, levels = unique(pca$p1[order(pca$p2, pca$p1)]))
-  pca$p2 <- factor(pca$p2)
-  
-  # Plot preparation
-  pve <- data.frame(PC = 1:20, pve = eigenval/sum(eigenval)*100)
-  cumsum(pve$pve)
-  colors1 <- c("#EDB829", "#DD4124", "#00496F","#0C7996","purple","#E97C07","#94B669")
-  
-  # Main plotting code
-  pop_pca_bundle <- pca %>%
-    filter(sample != 'HPRC') %>%
-    ggplot(aes(PC1, PC2, col=p2)) +  # Keep the coloring by 'p2'
-    geom_point(size = 1) +
-    scale_color_manual(values = colors1, name = "Superpopulation") +  # Use predefined colors
-    facet_grid(p1 ~ ., scales = "fixed", space = "free_x") + 
-    scale_shape_manual(values=c(0:25)) +  # Specify shape values
-    xlab(paste0("PC1 (", signif(pve$pve[1], 3), "%)")) + 
-    ylab(paste0("PC2 (", signif(pve$pve[2], 3), "%)")) + 
-    ggtitle(mytitle) +
-    theme_cowplot() +
-    theme(legend.position = "none",  # Remove the legend
-          strip.placement = "outside",  # Place strips outside of axes
-          strip.background = element_blank(), 
-          panel.spacing = unit(0.1, "lines"),  # Reduce space between facets
-          panel.border = element_rect(colour = "black", fill=NA, size=0.1),  # Add border around each facet
-          strip.text.y = element_text(angle = 0, hjust = 0, vjust = 0, size = 8),  # Horizontal facet labels for p1
-          axis.text.y = element_text(size = 8),  # Smaller y-axis tick labels
-          axis.text.x = element_text(size = 8)  # Smaller y-axis tick labels
-    )
-  
-  return(pop_pca_bundle)
-}
-b0<-plot_pca_POPULATIONS_finalv2("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "CN_metadata_combined.tsv", "AMY left flank (bundle 0)")
-b0<-plot_pca_POPULATIONS_finalv2("combined_bundle0.eigenvec", "combined_bundle0.eigenval", "CN_metadata_combined.tsv", "AMY left flank (bundle 0)")
-b1a<-plot_pca_POPULATIONS_finalv2("combined_bundle1a.eigenvec", "combined_bundle1a.eigenval", "CN_metadata_combined.tsv","AMY right flank (bundle 1a)")
-test<-ggarrange(b0, b1a, labels = c("A", "B"), ncol = 2, nrow = 1)
-print(test)
-ggsave("FigS6_sup_pop_pca_b0b1a_V2.pdf", test, width=7, height=32, dpi=300) 
+ggsave("FigS6_sup_pop_pca_b0b1a.pdf", test, width=10, height=10, dpi=300) 
+ggsave("FigS6_sup_pop_pca_b0b1a.png", test, width=10, height=10, dpi=800) 
