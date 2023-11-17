@@ -29,7 +29,6 @@ rule all:
         expand('maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.{superpopulation}.recode.vcf', superpopulation=superpopulations), ### filtered for minmaf 0.05  with CN estimates not trios
         "chr1_combined.ld2.tsv.gz",
         "chr1_combined.PI.tsv.gz",
-        "chr1_combined.Tajima.D.tsv.gz",
         "chr1_combined.iHs.tsv",
        
 rule make_CN_table_from_likelihoods_metadata:
