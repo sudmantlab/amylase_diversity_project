@@ -58,20 +58,11 @@ custom_palette_b <- c("AFR" = "#EDB829",
                       #"CAS" = "#00496F",
                       "SA" =  "#E97C07")
 
-ordered_levels <- c("AFR AMY region", "AFR chr1",
-                    "WEA AMY region", "WEA chr1",
-                    "AMR AMY region", "AMR chr1",
-                    "EA AMY region", "EA chr1",
-                    "SA AMY region", "SA chr1")
 
-
-
-
-
-#df$Superpopulation_Region <- factor(df$Superpopulation_Region, levels = ordered_levels)
 average_R2 <- df %>%
   group_by(region, Superpopulation, binned_distance) %>%
   summarise(R2 = mean(R2, na.rm = TRUE))
+
 line <- ggplot(average_R2, aes(x=binned_distance, y=R2, color=Superpopulation, linetype=region, size=region)) +
   geom_line() +
   labs(title="",
@@ -105,7 +96,6 @@ df_summary_box <- df %>%
     lower_whisker = max(R2_min, R2_Q1 - 1.5 * IQR),
     upper_whisker = min(R2_max, R2_Q3 + 1.5 * IQR)
   )
-
 
 box <- ggplot(df_summary_box , aes(x = region)) +
   geom_boxplot(aes(fill = Superpopulation_Region, color = Superpopulation_Region, lower=R2_Q1, upper=R2_Q3, middle=R2_median, ymin=lower_whisker, ymax=upper_whisker), 
