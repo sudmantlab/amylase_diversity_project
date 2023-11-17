@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 sample_table = pd.read_csv('CN_metadata_filtered.tsv', sep='\t') #has the correspondence between sample names and all other details
-superpopulations = sample_table['p2'].unique()
+#superpopulations = sample_table['p2'].unique() 
 superpopulations = ['AFR', 'AMR', 'CAS', 'EA', 'OCN', 'SA', 'WEA']
 
 region_mapping = {
