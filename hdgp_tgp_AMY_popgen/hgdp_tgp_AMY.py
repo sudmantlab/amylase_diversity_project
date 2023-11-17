@@ -35,9 +35,8 @@ rule all:
 rule make_CN_table_from_likelihoods_metadata:
     input: 
         'genotypes.likelihoods.tsv',
-        '/global/scratch/users/joana_rocha/AMY/METADATAsubset_4099.tsv',
+        'METADATA.tsv',
     output: 
-        'METADATA_4099_p1p2.tsv',
         temp('CN_metadata.tsv'),
     run:
         CN_likelihood = pd.read_csv(input[0], sep='\t')
@@ -57,7 +56,6 @@ rule make_CN_table_from_likelihoods_metadata:
         #CN.to_csv('CN.tsv', sep='\t', index=False)
         metadata = pd.read_csv(input[1], sep='\t')   
         merged_metadata = metadata.merge(CN, on="ID", how="left")
-        merged_metadata.to_csv(output[0], sep='\t', index=False)
         #metadata = metadata.rename(columns={'project_meta.sample_id': 'ID'})
         metadata = metadata[['ID', 'hgdp_tgp_meta.Population', 'hgdp_tgp_meta.Genetic.region', 'hgdp_tgp_meta.Study.region','hgdp_tgp_meta.Latitude', 'hgdp_tgp_meta.Longitude','hgdp_tgp_meta.Continent.colors','hgdp_tgp_meta.n','hgdp_tgp_meta.Pop.colors','project_meta.sex','sex_imputation.is_female']]
         metadata_CN = metadata.merge(CN, on=["ID"], how='left') #left if to keep ancients
@@ -68,22 +66,7 @@ rule make_CN_table_from_likelihoods_metadata:
                 'hgdp_tgp_meta.n', 'hgdp_tgp_meta.Pop.colors', 'project_meta.sex',
                 'sex_imputation.is_female']
         metadata_CN = metadata_CN[column_order]
-        metadata_CN.to_csv(output[1], sep='\t', index=False)
-
-rule filter_4099_p1p2_trio_samples_and_list_trios:
-    input:
-        metadata='METADATA_4099_p1p2.tsv'
-    output:
-        filtered_metadata='METADATA_4099_p1p2_no_trios.tsv',
-        trios_list='METADATA_4099_p1p2_trio_samples_list.tsv'
-    run:
-        df = pd.read_csv(input.metadata, sep='\t')
-        trio_samples = df[df['sample'].str.contains('1KG_trio', na=False)]['sample'].tolist()
-        with open(output.trios_list, 'w') as f:
-            for sample in trio_samples:
-                f.write(sample + '\n')
-        df_filtered = df[~df['sample'].str.contains('1KG_trio', na=False)]
-        df_filtered.to_csv(output.filtered_metadata, sep='\t', index=False)
+        metadata_CN.to_csv(output[0], sep='\t', index=False)
 
 rule filter_1KGtrios_absentCN_and_list:
     input:
