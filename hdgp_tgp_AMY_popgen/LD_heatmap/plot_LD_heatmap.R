@@ -1,4 +1,3 @@
-setwd("~./path/to/AMY_LDmatrix/")
 library(devtools)
 library(dplyr)
 library(reticulate)
