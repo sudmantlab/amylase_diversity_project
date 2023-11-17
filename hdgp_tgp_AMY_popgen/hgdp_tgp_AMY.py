@@ -1,18 +1,9 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import scipy.sparse as sp_sparse
-import seaborn as sns
-import os
-import sgkit as sg
-import xarray as xr
-from sgkit.io.vcf import vcf_to_zarr
-from dask.diagnostics import ProgressBar
-import math
+
 sample_table = pd.read_csv('CN_metadata_filtered.tsv', sep='\t') #has the correspondence between sample names and all other details
 superpopulations = sample_table['p2'].unique()
 superpopulations = ['AFR', 'AMR', 'CAS', 'EA', 'OCN', 'SA', 'WEA']
-### CAS AND OCN not a must for LD plots
 
 region_mapping = {
     "chr1:103456163-103863980": "b0_start_to_b1_end", # b0 start to b1 end = chr1:103456163-103863980 
@@ -23,7 +14,6 @@ region_mapping = {
 }
 
 name_to_region = {v: k for k, v in region_mapping.items()}
-#recombination hotspot spans ~7kb, and 103833698 is approximately where it ends (where b1b starts).
 
 rule all:
     input: 
@@ -42,17 +32,6 @@ rule all:
         "chr1_combined.Tajima.D.tsv.gz",
         "chr1_combined.iHs.tsv",
        
-    
-#rule make_phenotype_table_from_raw:
-#    input: 'genotypes.raw.txt'
-#    output: 'CN_from_raw.tsv'
-#    run:
-#        CN = pd.read_csv(input[0], sep='\t')
-#        print(CN)
-#        CN = CN.pivot(index=['ID'], columns='name', values='gt')
-#        print(CN)
-#        CN.to_csv(output[0], sep='\t', columns=["AMY2A", "AMY2B", "amy1_sum"])
-
 rule make_CN_table_from_likelihoods_metadata:
     input: 
         'genotypes.likelihoods.tsv',
