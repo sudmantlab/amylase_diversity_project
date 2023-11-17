@@ -1,4 +1,4 @@
-setwd("/path/to/AMY_PCA/")
+setwd("/path/to/PCA/")
 library(tidyverse)
 library(ggplot2)
 library(ggpubr)
