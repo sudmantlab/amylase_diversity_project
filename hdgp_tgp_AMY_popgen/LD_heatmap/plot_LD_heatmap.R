@@ -52,7 +52,7 @@ AFR<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.
 AMR<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.AMR.recode.vcf", "CN_metadata_filtered.tsv", "AMR", "AMR (n=561)")
 EA<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.EA.recode.vcf", "CN_metadata_filtered.tsv", "EA", "EA (n=699)")
 SA<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.SA.recode.vcf", "CN_metadata_filtered.tsv", "SA", "SA (n=671)")
-WEA<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.WEA.recode.vcf", "CN_metadata_filtered.tsv", "WEA", "WEA (n=609)")
+WEA<-plot_vcf2LDheatmap("maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.WEA.recode.vcf", "CN_metadata_filtered.tsv", "WEA", "WEA (n=802)")
 
 ldmatrix<-ggarrange(AFR$LDheatmapGrob,
                     AMR$LDheatmapGrob, 
