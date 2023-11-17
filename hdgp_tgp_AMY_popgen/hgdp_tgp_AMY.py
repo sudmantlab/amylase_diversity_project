@@ -1,10 +1,6 @@
 import numpy as np
 import pandas as pd
 
-sample_table = pd.read_csv('CN_metadata_filtered.tsv', sep='\t') #has the correspondence between sample names and all other details
-#superpopulations = sample_table['p2'].unique() 
-superpopulations = ['AFR', 'AMR', 'CAS', 'EA', 'OCN', 'SA', 'WEA']
-
 region_mapping = {
     "chr1:103456163-103863980": "b0_start_to_b1_end", # b0 start to b1 end = chr1:103456163-103863980 
     "chr1:103456163-103571526": "b0_start_to_b0_end", # b0 start to b0 end = chr1:103456163-103571526
@@ -93,6 +89,12 @@ rule filter_1KGtrios_absentCN_and_list:
         with open(output.all_genotyped_individuals, 'w') as f:
             for individual in all_genotyped_individuals:
                 f.write(individual + '\n')
+
+
+sample_table = pd.read_csv('CN_metadata_filtered.tsv', sep='\t') #has the correspondence between sample names and all other details
+#superpopulations = sample_table['p2'].unique() 
+superpopulations = ['AFR', 'AMR', 'CAS', 'EA', 'OCN', 'SA', 'WEA']
+
 
 rule split_by_superpopulation_with_CN_estimates:
     output: 'groups/{superpopulation}.txt'
