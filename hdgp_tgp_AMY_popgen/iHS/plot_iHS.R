@@ -27,8 +27,8 @@ my_data$Superpopulation_Region <- paste(my_data$superpop,my_data$region, sep=" "
 
 stat<-ggplot(my_data, aes(x = abs(IHS), y = reorder(region, abs(IHS), FUN = mean), color = Superpopulation_Region)) +
   stat_summary(aes(fill = Superpopulation_Region, color = Superpopulation_Region)) +
-  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
-  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  scale_fill_manual(values = custom_palette) +  
+  scale_color_manual(values = custom_palette) +  
   xlab("|iHS|") + ylab("") +
   facet_grid(rows = vars(superpop), scales = "free_y", space = "free_y", switch = "y") + # Facet by Superpopulation
   theme_cowplot() +
@@ -44,15 +44,15 @@ stat<-ggplot(my_data, aes(x = abs(IHS), y = reorder(region, abs(IHS), FUN = mean
 print(stat)
 
 density_plot <- ggplot(my_data, aes(x = abs(IHS), fill = Superpopulation_Region)) +  geom_density() + 
-  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
-  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  scale_fill_manual(values = custom_palette) +  
+  scale_color_manual(values = custom_palette) +  
   xlab("|iHS|") + ylab("Density") +
   facet_wrap(~ superpop, nrow = 7, strip.position = "right") + # Facet by Superpopulation
   theme_cowplot() +
   theme(panel.border = element_rect(color="black"),
         legend.position = "none",  # Hide the legend
-        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
-        legend.text = element_text(size = 6),  # Adjust size of legend text
+        legend.key.size = unit(0.6, "cm"),  
+        legend.text = element_text(size = 6),  
         strip.background = element_blank(),
         strip.placement = "outside",
         axis.text.y = element_text(size = 8),
