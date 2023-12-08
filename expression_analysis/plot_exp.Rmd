@@ -1,0 +1,220 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-07-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+
+
+#FOR LATER
+# hap_names = data.frame(cluster=seq(0,10),
+#                        hap_names = c("H7", #0,
+#                                      "H3^r", #1,
+#                                      "H2A2B2", #2,
+#                                      "H5", #3,
+#                                      "H1^a", #4,
+#                                      "H3A3B3", #5,
+#                                      "H9", #6,
+#                                      "H4A2B2", #7,
+#                                      "H2A0", #8,
+#                                      "H3.2", #9,
+#                                      "H4A2" #10
+#                        )) %>%
+#   inner_join(t_sum_ww,by="cluster") %>%
+#   mutate(ww_prop = proportion) %>%
+#   dplyr::select(-proportion)
+
+#ENSG00000237763.9 AMY1A
+#ENSG00000174876.16 AMY1B
+#ENSG00000187733.6 AMY1C
+#ENSG00000243480.7 AMY2A
+#ENSG00000240038.6 AMY2B
+
+
+gene_mappings = data.frame(gene_id=c("ENSG00000237763.9",
+                                     "ENSG00000174876.16",
+                                     "ENSG00000187733.6",
+                                     "ENSG00000243480.7",
+                                     "ENSG00000240038.6"),
+                           name=c("AMY1A", 
+                                  "AMY1B",
+                                  "AMY1C",
+                                  "AMY2A",
+                                  "AMY2B"))
+
+
+t_exp = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/expression_analysis/data/Pancreas.csv",header=T, sep="\t",comment="") %>%
+  pivot_longer(-c(X.chr,start,end,gene_id)) %>%
+  mutate(sample=name,exp=value) %>%
+  dplyr::select(gene_id,sample,value) %>%
+  inner_join(gene_mappings,on="gene_id") %>%
+  separate(sample,c("dataset","sample"),sep="\\.",remove=TRUE) %>%
+  dplyr::select(gene_id,sample,value, name) %>%
+  dplyr::select(-gene_id) %>%
+  pivot_wider(names_from=name,values_from=value) %>%
+  mutate(AMY1 = AMY1A+AMY1B+AMY1C) %>%
+  pivot_longer(-(sample))
+
+  #mutate(name=ifelse(name=="AMY1C","AMY1",name))
+
+t_exp
+
+unique(t_exp$gene_id)
+
+#t_exp 
+
+t_gt=read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/read_depth_genotyping/genotyping/output/genotypes.likelihoods.tsv",header=T,sep="\t") %>%
+      group_by(sample,label) %>% 
+      filter(r==max(r)) %>%
+      filter(!grepl("trio",sample)) %>%
+      separate(sample,c("dataset","ID","p1","p2"),sep="\\.",remove=FALSE) %>%
+      mutate(sample=ID) %>%
+      filter(dataset=="GTEx") %>%
+      separate(sample,c("dataset","sample","ig","ig2","ig3"),sep="-",remove=FALSE) %>%
+      mutate(name=label) %>%
+      dplyr::select(ID,sample,r,cp,name)
+      
+
+t_data = inner_join(t_exp, t_gt, by=c("sample","name")) %>%
+  dplyr::select(sample,value,name,cp,label)
+
+length(unique(t_data$sample))
+
+```
+
+
+
+```{r}
+
+
+# g=ggplot(t_data %>% filter(label=="AMY1"))
+# g+geom_point(aes(x=cp,y=value),position=position_jitter(width=.1,height=0))+
+#   geom_smooth(aes(x=cp,y=value),method='lm')+
+#   theme_bw()
+
+# g=ggplot(t_data)
+# g+geom_boxplot(aes(x=factor(cp),y=value))+
+#   facet_wrap(~label)+
+#   theme_bw()
+# 
+# g=ggplot(t_data %>% filter(label=="AMY2A"))
+# g+geom_point(aes(x=cp,y=value),position=position_jitter(width=.1,height=0))+
+#   geom_smooth(aes(x=cp,y=value),method='lm')+
+#   theme_bw()
+
+g=ggplot(t_data %>% 
+          filter(label%in%c("AMY2B","AMY2A","AMY1")) %>%
+          dplyr::select(sample,value,label) %>%
+          pivot_wider(names_from=label,values_from=value))
+g+geom_point(aes(x=AMY2B,y=AMY2A))
+
+g=ggplot(t_data %>% 
+          filter(label%in%c("AMY2B","AMY2A","AMY1")) %>%
+          dplyr::select(sample,cp,label) %>%
+          pivot_wider(names_from=label,values_from=cp))
+g+geom_point(aes(AMY2B,AMY2A),position=position_jitter(width=.2,height=.2))+theme_bw()
+
+
+g=ggplot(t_data)
+g+geom_point(aes(x=cp,y=value),position=position_jitter(width=.1,height=0))+
+  geom_smooth(aes(x=cp,y=value),method='lm')+
+  theme_bw()
+
+cp_spread = t_data %>% 
+          filter(label%in%c("AMY2B","AMY2A","AMY1")) %>%
+          dplyr::select(sample,cp,label) %>%
+          pivot_wider(names_from=label,values_from=cp)
+
+val_spread = t_data %>% 
+          filter(label%in%c("AMY2B","AMY2A","AMY1")) %>%
+          dplyr::select(sample,value,label) %>%
+          pivot_wider(names_from=label,values_from=value) %>%
+          transmute(sample=sample,AMY2B_e=AMY2B,AMY2A_e=AMY2A,AMY1_e=AMY1)
+
+full_df = inner_join(cp_spread,val_spread,by="sample")
+
+g=ggplot(full_df)
+g+geom_point(aes(x=AMY2A,y=AMY2A_e),position=position_jitter(width=.2))+
+  geom_boxplot(aes(x=AMY2A,y=AMY2A_e,group=as.factor(AMY2A)))+
+  geom_smooth(aes(x=AMY2A,y=AMY2A_e))+
+  facet_wrap(~AMY2B)+
+  theme_bw()
+
+g=ggplot(full_df)
+g+geom_point(aes(x=AMY2B,y=AMY2B_e),position=position_jitter(width=.2))+
+  geom_boxplot(aes(x=AMY2B,y=AMY2B_e,group=as.factor(AMY2B)))+
+  geom_smooth(aes(x=AMY2B,y=AMY2B_e))+
+  facet_wrap(~AMY2A)+
+  theme_bw()
+
+
+g=ggplot(t_data %>% filter(label=="AMY2A"))
+g+geom_point(aes(x=cp,y=value),position=position_jitter(width=.1,height=0))+
+  geom_boxplot(aes(x=cp,y=value,group=cp))+
+  geom_smooth(aes(x=cp,y=value),method='lm')+
+  theme_bw()
+
+g=ggplot(t_data %>% filter(label=="AMY2B"))
+g+geom_point(aes(x=cp,y=value),position=position_jitter(width=.1,height=0))+
+  geom_boxplot(aes(x=cp,y=value,group=cp))+
+  geom_smooth(aes(x=cp,y=value),method='lm')+
+  theme_bw()
+
+```
+```{r}
+#nice plot
+
+outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/expression_analysis/output"
+
+lmp <- function (modelobject) {
+    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(modelobject)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+}
+
+m = lm(cp~value,data=t_data %>% filter(label=="AMY2A"))
+lmp(m)
+df_label = data.frame(x=0,y=2,label=paste("p==",signif(lmp(m),2)))
+
+g=ggplot(t_data %>% filter(label=="AMY2A"))
+g=g+geom_point(aes(x=cp,y=value),position=position_jitter(width=.1,height=0),size=0.1,alpha=0.5)+
+  #geom_boxplot(aes(x=cp,y=value,group=cp))+
+  geom_text(aes(x=x,y=y,label=label),data=df_label,parse=TRUE,hjust=0,size=2)+
+  geom_smooth(aes(x=cp,y=value),method='lm')+
+  theme_bw(base_size=8)+
+  scale_y_continuous("normalized AMY2A\nexpression")+
+  scale_x_continuous("AMY2A copy")
+fn_out = paste(outdir,"/AMY2A.pdf",sep="")
+pdf(fn_out,width=2,height=1.5)
+print(g)
+dev.off()
+
+m = lm(cp~value,data=t_data %>% filter(label=="AMY2B"))
+lmp(m)
+df_label = data.frame(x=4,y=-2,label=paste("p==",signif(lmp(m),2)))
+
+g=ggplot(t_data %>% filter(label=="AMY2B"))
+g=g+geom_point(aes(x=cp,y=value),position=position_jitter(width=.1,height=0),size=.1,alpha=0.5)+
+  #geom_boxplot(aes(x=cp,y=value,group=cp))+
+  geom_smooth(aes(x=cp,y=value),method='lm')+
+  geom_text(aes(x=x,y=y,label=label),data=df_label,parse=TRUE,hjust=0,size=2)+
+  theme_bw(base_size=8)+
+  scale_y_continuous("normalized AMY2B\nexpression")+
+  scale_x_continuous("AMY2B copy")
+
+fn_out = paste(outdir,"/AMY2B.pdf",sep="")
+pdf(fn_out,width=2,height=1.5)
+print(g)
+dev.off()
+
+```
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
