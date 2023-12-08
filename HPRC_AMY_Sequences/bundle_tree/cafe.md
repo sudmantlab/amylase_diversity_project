@@ -260,22 +260,22 @@ ggsave("figures/bundle1a_ace_tree.pdf", amy_ace_plot_bundle1a, width = 6, height
 ```
 
 ``` r
-bundle <- "0"
-gene <- "AMY1"
-time_combined <- NULL
-for (bundle in c("0", "1a")){
+# bundle <- "0"
+# gene <- "AMY1"
+for (bundle_id in c("0", "1a")){
+  time_combined <- NULL
   for (gene in c("AMY1", "AMY2A", "AMY2B")){
-    tree_data <- str_c("cafe/bundle", bundle, "_", gene, "_results/Base_asr.tre") %>%
+    tree_data <- str_c("cafe/bundle", bundle_id, "_", gene, "_results/Base_asr.tre") %>%
       read.nexus() %>%
       ggtree() %>%
       .$data %>%
       as_tibble() %>%
       mutate(label=str_replace(label, ">.*$", ">"),
              x=x-max(x))
-    change <- read_tsv(str_c("cafe/bundle", bundle, "_", gene, "_results/Base_clade_results.txt")) %>%
+    change <- read_tsv(str_c("cafe/bundle", bundle_id, "_", gene, "_results/Base_clade_results.txt")) %>%
       rename("Taxon_ID"="#Taxon_ID") %>%
       janitor::clean_names() %>%
-      mutate(type=ifelse(increase>decrease, "expansion", "contraction")) %>%
+      mutate(type=ifelse(increase>decrease, "duplication", "deletion")) %>%
       dplyr::select(taxon_id, type)
     time_lower_bound  <- change %>%
       left_join(tree_data, by=c("taxon_id"="label")) %>%
@@ -289,13 +289,12 @@ for (bundle in c("0", "1a")){
       left_join(time_upper_bound, by = join_by(taxon_id, type)) %>%
       arrange(-xend) %>%
       mutate(index=row_number(),
-             bundle=bundle, gene=gene)
+             bundle=bundle_id, gene=gene)
     time_combined <- bind_rows(time_combined, time_combined_tmp)
   }
-}
-time_combined_plot <- time_combined %>%
-  mutate(type=fct_relevel(type, c("expansion", "contraction"))) %>%
-  filter(bundle=="0") %>%
+  time_combined_plot_tmp <- time_combined %>%
+  mutate(type=fct_relevel(type, c("deletion", "duplication"))) %>%
+  filter(bundle==bundle_id) %>%
   ggplot(aes(xmin=x, xmax=xend, color=type, y=index)) +
   geom_errorbar() +
   scale_color_manual(values=MetBrewer::met.brewer(name="Egypt", type = "discrete")) +
@@ -310,15 +309,19 @@ time_combined_plot <- time_combined %>%
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         strip.text.y = element_text(angle=0),
-        legend.position = c(0.065, 0.8),
+        legend.position = c(0.16, 0.8),
         legend.title = element_blank(),
         legend.text = element_text(size=12),
         legend.background = element_rect(fill = "transparent", color = NULL))
+  assign(str_c("time_combined_plot_", bundle_id), time_combined_plot_tmp)
+}
+time_combined_plot <- plot_grid(time_combined_plot_0, time_combined_plot_1a, labels = c("A", "B"), scale = 0.92, nrow = 1)
 time_combined_plot
 ```
 
 ![](cafe_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
-ggsave(filename = "figures/mutation_time_estimates.pdf", plot = time_combined_plot, width = 10, height = 4, units = "in")
+ggsave(filename = "figures/mutation_time_estimates.pdf", plot = time_combined_plot, width = 10, height = 8, units = "in")
+ggsave(filename = "figures/mutation_time_estimates.png", plot = time_combined_plot, width = 10, height = 8, units = "in")
 ```
