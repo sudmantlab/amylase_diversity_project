@@ -13,3 +13,5 @@ A repo for code and methods related to analyses and figures. This code is deposi
 [PCA with the flanking sequence](https://github.com/sudmantlab/amylase_diversity_project/blob/main/HPRC_AMY_Sequences/pca/pca.md)
 
 [Read depth genotyping](https://github.com/sudmantlab/amylase_diversity_project/tree/main/read_depth_genotyping)
+
+[Graph genotyping](https://github.com/raveancic/graph_genotyper/tree/master)
