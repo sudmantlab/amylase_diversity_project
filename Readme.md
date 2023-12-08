@@ -1,6 +1,6 @@
 # Diversity and recent selection on Amylase structural haplotypes in human populations
 
-A repo for code and methods related to analyses as well as for a manuscript
+A repo for code and methods related to analyses and figures. This code is deposited under the [GNU General Public License, version 3.0 (GPL-3.0)](https://web.archive.org/web/20160316065455/https://opensource.org/licenses/gpl-3.0)
 
 ## Table of content
 
