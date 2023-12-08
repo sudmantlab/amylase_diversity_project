@@ -11,3 +11,5 @@ A repo for code and methods related to analyses and figures. This code is deposi
 [Ancestral state reconstruction](https://github.com/sudmantlab/amylase_diversity_project/blob/main/HPRC_AMY_Sequences/bundle_tree/cafe.md)
 
 [PCA with the flanking sequence](https://github.com/sudmantlab/amylase_diversity_project/blob/main/HPRC_AMY_Sequences/pca/pca.md)
+
+[Read depth genotyping](https://github.com/sudmantlab/amylase_diversity_project/tree/main/read_depth_genotyping)
