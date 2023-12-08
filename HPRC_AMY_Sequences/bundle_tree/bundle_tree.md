@@ -67,9 +67,9 @@ structure_tree <- read.newick("../combined_y1_y2_analyses/output/pggb_clusters/h
     # treeio::drop.tip(tip = c("HG002.verkko_filt_pat.fa-haplotype2-0000649_147937390_148315979_1"))
 amy_color <- MetBrewer::met.brewer("Klimt", 4, "discrete")
 group_color <- viridis::viridis(n = 12, direction = -1)
-haplotype_fct_order <- c("H5", "H4A2", "H3 (ref)", "H3A2", "H3A3B3", "H4A2B2", "H2A2B2", "H7", "H9", "H2A0", "H1 (anc)")
+haplotype_fct_order <- c("H5", "H4A2", "H3 (ref)", "H3A2", "H2A2B2", "H3A3B3", "H4A2B2", "H7", "H9", "H2A0", "H1 (anc)")
 cladelab_df <- tibble(name=haplotype_fct_order %>% as_factor(),
-                      node=c(40, 37, 50, 20, 55, 26, 25, 33, 3, 2, 1))
+                      node=c(42, 39, 53, 24, 23, 36, 6, 33, 3, 2, 1))
 structure_ggtree <- structure_tree %>%
   as_tibble() %>%
   mutate(label=str_replace_all(label, "-", "_"),
@@ -498,6 +498,18 @@ bundle0_tree +
 ![](bundle_tree_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
+## TMRCA
+bundle0_tree$data %>%
+  filter(node %in% c(100)) %>%
+  transmute(node, ky_before_present=(650000-x)/1000)
+```
+
+    ## # A tibble: 1 × 2
+    ##    node ky_before_present
+    ##   <int>             <dbl>
+    ## 1   100              279.
+
+``` r
 ## amy2a+amy2b expansion time range
 bundle0_tree$data %>%
   filter(node %in% c(161, 162, 163, 166, 167)) %>%
@@ -765,6 +777,7 @@ bundle0_vs_bundle1_opposing_trees
 
 ``` r
 ggsave("figures/bundle0_vs_bundle1_opposing_trees.pdf", bundle0_vs_bundle1_opposing_trees, width = 10, height = 12, unit="in")
+ggsave("figures/bundle0_vs_bundle1_opposing_trees.png", bundle0_vs_bundle1_opposing_trees, width = 10, height = 12, unit="in")
 ```
 
 #### Plot with 3 trees
