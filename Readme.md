@@ -24,6 +24,8 @@ A repo for code and methods related to analyses and figures. This code is deposi
 
 [PGGB variation graph](https://github.com/sudmantlab/amylase_diversity_project/tree/main/pangenome/pggb)
 
+[Assess AMY structures](https://github.com/sudmantlab/amylase_diversity_project/tree/main/HPRC_AMY_Sequences/combined_y1_y2_analyses)
+
 
 
 
