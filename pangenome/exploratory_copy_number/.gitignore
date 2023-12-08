@@ -1,7 +1,0 @@
-results/*
-.snakemake/*
-logs/*
-resources/*
-!.gitignore
-!*/.gitignore
-
