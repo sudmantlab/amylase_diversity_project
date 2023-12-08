@@ -30,6 +30,11 @@ all_haplotypes = unique(t_struct_plot_inf$contig)
 
 
 t_struct_plot_inf
+
+t_dists %>% dplyr::select(group.a) %>% unique() %>% filter(grepl("AV_",group.a))
+
+
+
 ```
 ```{r}
 
@@ -93,6 +98,8 @@ spec_cols = c("#D53E4F", "#FC8D59", "#FEE08B",  "#99D594","#E6F598","#3288BD","#
 colors =  c("#CCCCCC","#666666",spec_cols)
 colors_genes = c("#D53E4F","#088000","#87d97c","#FC8D59")
 
+
+###COLORS
 # ##NOTE THE y aesethetic needs to be in ggplot for the aplot to work
 # g=ggplot(t_rep, aes(y=hap_struc_d))
 # g=g+geom_gene_arrow(aes(xmin=rel_start2,
@@ -150,9 +157,16 @@ g  %>% insert_left(p, width=.25)
 dev.off()  
 
 ```
+```{r}
+#info for Erik
 
+bundle_colors = c("#CCCCCC", "#666666", "#D53E4F", "#FC8D59", "#FEE08B", "#99D594", "#E6F598", "#3288BD", "#FFFFBF")
+
+t_struct_plot_inf %>% filter(grepl("chm13",sample_id))
+```
 
 ```{r}
+library(reshape2)
 representative_haps = t_struct_plot_inf %>% group_by(contig) %>%
                         filter(row_number()==1) %>% 
                         ungroup() %>%
@@ -342,13 +356,13 @@ representative_contigs = haplotype_assignments %>%
                             dplyr::select(chrom,haplotype) %>% 
                             group_by(haplotype) %>%
                             filter(row_number()==1) %>%
-                            mutate(contig=chrom) %>%
-                            filter(!haplotype %in% c("H3A2","H9","H1.2")) #filter out ultra rare haplotypes
+                            mutate(contig=chrom) #%>%
+                            #filter(!haplotype %in% c("H3A2","H9","H1.2")) #filter out ultra rare haplotypes
 
 plot_example_rep = t_rep %>% filter(contig %in% representative_contigs$chrom)
 paf_genes_example_rep = paf_genes_rep %>% filter(contig %in% representative_contigs$chrom)
 
-order = rev(c("H1^a","H3^r","H5","H7","H2A0","H4A2","H2A2B2","H3A3B3","H4A2B2"))
+order = rev(c("H1^a","H3^r","H5","H7","H9","H2A0","H3A2","H4A2","H2A2B2","H3A3B3","H4A2B2"))
 contig_order = representative_contigs$contig[match(order,representative_contigs$haplotype)]
 plot_example_rep$contig = factor(plot_example_rep$contig, levels=contig_order)
 
@@ -423,13 +437,14 @@ representative_contigs = haplotype_assignments %>%
                             group_by(haplotype) %>%
                             filter(row_number()==1) %>%
                             mutate(contig=chrom) %>%
-                            filter(!haplotype %in% c("H3A2","H9","H1.2","H4A2","H3A3B3")) #filter out ultra rare haplotypes
-
+                            filter(haplotype %in% c("H1^a", "H3^r", "H5","H4A2B2","H7","H2A0")) #filter out ultra rare haplotypes
+                                                    
 
 plot_example_rep = t_rep %>% filter(contig %in% representative_contigs$chrom)
 paf_genes_example_rep = paf_genes_rep %>% filter(contig %in% representative_contigs$chrom)
 
-order = rev(c("H1^a","H2A0","H3^r","H5","H7","H2A2B2","H4A2B2"))
+order = rev(c("H1^a","H2A0","H3^r","H5","H7","H4A2B2"))
+
 contig_order = representative_contigs$contig[match(order,representative_contigs$haplotype)]
 plot_example_rep$contig = factor(plot_example_rep$contig, levels=contig_order)
 

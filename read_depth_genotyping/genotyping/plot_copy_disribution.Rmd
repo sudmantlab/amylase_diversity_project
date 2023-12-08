@@ -157,7 +157,8 @@ additional_info_df = data.frame(p1=c("Tubular",
                                     "Itelman",
                                     "Mansi",
                                     "Biaka",
-                                    "Mbuti"),
+                                    "Mbuti",
+                                    "Tubalar"),
                                type=c("Hunting",
                                       "Pastoralism",
                                       "Fishing",
@@ -168,6 +169,7 @@ additional_info_df = data.frame(p1=c("Tubular",
                                       "Hunting",
                                       "Fishing",
                                       "Fishing",
+                                      "Hunting",
                                       "Hunting",
                                       "Hunting"))
 
@@ -232,7 +234,7 @@ p_A2B = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.
 df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
                      ps = c(p_A1, p_A2A,p_A2B),
                      #xs = c(16.1,4.1,4.05),
-                     xs = c(16.7,4.3,4.15),
+                     xs = c(16.5,4.3,4.15),
                      #xs = c(16,4.5,3.75),
                      x_nudge = c(19,5,4.5)) %>%
             mutate(P_adj = p.adjust(ps)) %>%
@@ -296,6 +298,7 @@ sus_pop_inf %>%
   mutate(n_total=sum(n))
 
 
+length(unique(t_data_by_sub$p1))
 
 ```
 
