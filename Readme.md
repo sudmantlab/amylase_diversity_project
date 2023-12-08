@@ -22,6 +22,8 @@ A repo for code and methods related to analyses and figures. This code is deposi
 
 [Expression analyses](https://github.com/sudmantlab/amylase_diversity_project/tree/main/expression_analysis/)
 
+[PGGB variation graph](https://github.com/sudmantlab/amylase_diversity_project/tree/main/pangenome/pggb)
+
 
 
 
