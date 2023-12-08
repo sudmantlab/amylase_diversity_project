@@ -1,0 +1,150 @@
+#!vim synax=python
+
+import pandas as pd
+import pdb
+import numpy as np
+
+def parse_haps(haps_str):
+    
+    if haps_str in ["Unknown Haplotype","Incompatible"]:
+        return []
+
+    hap_dict = {"3":"H3^r",
+                "1":"H1^a",
+                "5":"H5",
+                "7":"H7",
+                "2":"H2A0",
+                "4":"H4A2",
+                "2B2":"H2A2B2",
+                "3B3":"H3A3B3",
+                "4B2":"H4A2B2",
+                "4B4":"H4A4B4"}
+    haps = []
+    for h_str in haps_str.split(","):
+        parsed_haps = [hap_dict[h] for h in h_str.split("+")]
+        haps.append(parsed_haps)
+
+    return haps
+
+def parse_trios(t_fam):
+    
+    fam_by_offspring = {}
+    for i, fam in t_fam.iterrows():
+
+        fam_by_offspring[fam.SampleID] = {"F":fam.FatherID, 
+                                          "M":fam.MotherID}
+    return fam_by_offspring
+                                          
+
+rule all:
+    input: 
+        haplotypes = "output/haplotype_deconvolution.tsv",
+        usher = "../../Usher_et_al/Table_S3.txt",
+        S1 = "../../SupTables/output/Table_S1_genotypes.tsv",
+        family_data = "20130606_g1k_3202_samples_ped_population.txt"
+    output:
+        "output/USHER_hap_comparisons.txt"
+    run:
+        
+        t_S1 = pd.read_csv(input.S1, sep="\t", header=0)
+        t_fam = pd.read_csv(input.family_data, sep=" ", header=0)
+        t_fam = t_fam[t_fam.FatherID!="0"]
+        
+        parents = t_S1[t_S1["source"]=="1KG"]["sample"].unique()
+        
+        fam_by_offspring = parse_trios(t_fam)
+
+        t_genotypes = pd.read_csv(input.haplotypes, sep="\t", header=0)
+        
+        haps_by_indiv = {}
+        n_families = 0
+        for i, row in t_genotypes.iterrows():
+            if not row["sample"] in haps_by_indiv:
+                haps_by_indiv[row['sample']] = []
+            haps_by_indiv[row["sample"]].append(row.hap_names)
+
+        t_usher = pd.read_csv(input.usher, sep="\t", header=0)
+        
+        usher_one_hap = 0
+        usher_one_hap_match = 0
+        
+        usher_one_hap_exH4B4 = 0
+        usher_one_hap_match_exH4B4 = 0
+        
+        usher_all = 0
+        usher_all_match = 0
+        
+        n_H2A0 = 0
+        n_total_called = 0
+        
+        n_haps_match = 0
+
+        haplotype_counts = {}
+
+        for i, row in t_usher.iterrows():
+            ID = row['ID']
+            if not ID in haps_by_indiv:
+                continue
+
+            usher_haps = parse_haps(row['Haplotypes'])
+            
+            if len(usher_haps)==1:
+                n_total_called +=1
+                if "H2A0" in haps_by_indiv[ID]:
+                    n_H2A0 +=1
+            print(ID, usher_haps, haps_by_indiv[ID])
+            
+            if len(usher_haps)==1:
+                usher_one_hap+=1
+
+                if set(usher_haps[0]) == set(haps_by_indiv[ID]):
+                    usher_one_hap_match+=1
+
+                if not "H4A4B4" in usher_haps[0]:
+
+                    if ID in fam_by_offspring:
+                        n_families +=1
+                    else:
+                        for h in usher_haps[0]:
+                            if not h in haplotype_counts:
+                                haplotype_counts[h]=0
+                            haplotype_counts[h]+=1
+
+                    usher_one_hap_exH4B4 +=1
+                    if set(usher_haps[0]) == set(haps_by_indiv[ID]):
+                        usher_one_hap_match_exH4B4 += 1
+                        n_haps_match +=2
+                    else:
+                        n_haps_match += len(set(usher_haps[0]).intersection(set(haps_by_indiv[ID])))
+                        print("error indiv")
+
+            if len(usher_haps)>=1:
+                if "H4A4B4" in usher_haps[0]: continue
+                usher_all +=1
+                if set(haps_by_indiv[ID]) in [set(x) for x in usher_haps]:
+                    usher_all_match +=1
+
+        print("{match} / {total} perfect ({d}%)".format(match=usher_one_hap_match, 
+                                                        total=usher_one_hap,
+                                                        d=usher_one_hap_match/usher_one_hap))
+        print("{match} / {total} perfect ({d}%) excluding H4B4".format(match=usher_one_hap_match_exH4B4, 
+                                                        total=usher_one_hap_exH4B4,
+                                                        d=usher_one_hap_match_exH4B4/usher_one_hap_exH4B4))
+        print("haps match",n_haps_match, 2*usher_one_hap_exH4B4)
+        print("{match} / {total} all ({d}%) excluding H4B4".format(match=usher_all_match, 
+                                                        total=usher_all,
+                                                        d=usher_all_match/usher_all))
+        print(n_H2A0, n_total_called, n_H2A0/(2*n_total_called))
+        print("total families", n_families)
+        
+        total = 0
+        for hap, count in haplotype_counts.items():
+            total +=count
+        s=0
+        for hap, count in haplotype_counts.items():
+            print(hap, count, total, count/total)
+
+
+
+
+

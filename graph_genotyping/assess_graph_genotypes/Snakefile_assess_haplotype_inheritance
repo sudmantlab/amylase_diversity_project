@@ -1,0 +1,61 @@
+#!vim synax=python
+import numpy as np
+import pandas as pd
+import pdb
+import random
+
+rule all:
+    input: 
+        family_data = "20130606_g1k_3202_samples_ped_population.txt",
+        haplotypes = "output/haplotype_deconvolution.tsv"
+    output:
+        "output/haplotype_inheritance.txt"
+    run:
+        print(input)
+        t_genotypes = pd.read_csv(input.haplotypes, sep="\t", header=0)
+        
+        haps_by_indiv = {}
+        for i, row in t_genotypes.iterrows():
+            if not row["sample"] in haps_by_indiv:
+                haps_by_indiv[row['sample']] = []
+            haps_by_indiv[row["sample"]].append(row.hap_names)
+
+        t_fam = pd.read_csv(input.family_data, sep=" ", header=0)
+        t_fam = t_fam[t_fam.FatherID!="0"]
+        n_fam = 0
+        n = 0
+        correct = 0
+        fam_correct = 0
+        
+        random_parent_correct = 0
+
+        for i, fam in t_fam.iterrows():
+            if not (fam.SampleID in haps_by_indiv and fam.FatherID in haps_by_indiv and fam.MotherID in haps_by_indiv):
+                continue
+            sample_haps = set(haps_by_indiv[fam.SampleID])
+            father_haps = set(haps_by_indiv[fam.FatherID])
+            mother_haps = set(haps_by_indiv[fam.MotherID])
+            
+            mother_int = len(sample_haps.intersection(mother_haps))
+            father_int = len(sample_haps.intersection(father_haps))
+            print(mother_int, father_int, "child:", haps_by_indiv[fam.SampleID], "father:", haps_by_indiv[fam.FatherID], "mother:", haps_by_indiv[fam.MotherID], 
+                    fam.SampleID,
+                    fam.FatherID, 
+                    fam.MotherID)
+            n+=2
+            n_fam +=1
+            if mother_int>0:
+                correct+=1
+            if father_int>0:
+                correct+=1
+            if mother_int>0 and father_int>0:
+                fam_correct +=1
+
+            if random.choice([mother_int>0, father_int>0]):
+                random_parent_correct +=1
+
+        print(correct, n, correct/n)
+        print("n families",fam_correct, n_fam, fam_correct/n_fam)
+        print("n families rand parent",random_parent_correct, n_fam, random_parent_correct/n_fam, np.sqrt(random_parent_correct/n_fam))
+        print("corrected accuracy", np.sqrt(random_parent_correct/n_fam))
+

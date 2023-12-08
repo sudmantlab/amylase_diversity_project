@@ -1,0 +1,60 @@
+#!vim synax=python
+
+import pandas as pd
+import pdb
+
+rule all:
+    input: 
+        HPRC_assignments = "/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/haplotype_assignments.txt",
+        haplotypes = "output/haplotype_deconvolution.tsv"
+    output:
+        "output/HPRC_assignments.txt"
+    run:
+        t_genotypes = pd.read_csv(input.haplotypes, sep="\t", header=0)
+        
+        haps_by_indiv = {}
+        for i, row in t_genotypes.iterrows():
+            if not row["sample"] in haps_by_indiv:
+                haps_by_indiv[row['sample']] = []
+            haps_by_indiv[row["sample"]].append(row.hap_names)
+
+        t_HPRC = pd.read_csv(input.HPRC_assignments, sep="\t", header=0)
+        
+        HPRC_inf = {}
+        for i, row in t_HPRC.iterrows():
+
+            if not row.sample_id in HPRC_inf:
+                HPRC_inf[row.sample_id] = []
+            
+            HPRC_inf[row.sample_id].append(row.haplotype)
+        
+        n_indiv = 0
+        corr_indiv = 0
+        corr_haps = 0
+        n_two = 0
+        for sample, hap_inf in HPRC_inf.items():
+            #print(sample, hap_inf)
+            if "AV_" in sample:
+                sample = sample.split("_")[1]
+            if len(hap_inf)==2:
+                n_two+=1
+            #if not sample in haps_by_indiv and len(hap_inf)==2:
+            #    print("not in genotypes",sample)
+            if sample in haps_by_indiv and len(hap_inf)==2:
+                n_indiv+=1
+                print(sample)
+                if set(haps_by_indiv[sample])==set(hap_inf):
+                    corr_indiv+=1
+                    corr_haps += 2
+                else:
+                    print("predicted", sample, haps_by_indiv[sample])
+                    print("actual", hap_inf)
+                    corr_haps += len( set(haps_by_indiv[sample]).intersection(set(hap_inf)) )
+
+        print(corr_indiv,n_indiv,corr_indiv/n_indiv) 
+        print(corr_haps,2*n_indiv,corr_haps/(2*n_indiv)) 
+        print(n_two)
+
+
+
+#HG04228|HG01123|HG02109|HG02486|HG02559|HG02647|HG02809|HG03710|HG03927|HG04228
