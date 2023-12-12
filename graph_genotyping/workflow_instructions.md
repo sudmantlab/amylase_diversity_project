@@ -89,13 +89,13 @@ We provide a minimal input examples which includes:
 1. Clone the [GitHub repo](https://github.com/raveancic/graph_genotyper) in which the Snakemake pipeline is stored 
 
 ```
-git clone https://github.com/raveancic/graph_genotyper.git graph_genotype_<TEST>
+git clone https://github.com/raveancic/graph_genotyper.git graph_genotyper_<TEST>
 ```
 
 If you want to genotype ancient DNAs import the branch ancient_dna by using 
 
 ```
-git clone --branch ancient_dna https://github.com/raveancic/graph_genotyper.git graph_genotype_<TEST>_aDNA
+git clone --branch ancient_dna https://github.com/raveancic/graph_genotyper.git graph_genotyper_<TEST>_aDNA
 ```
 
 
@@ -121,10 +121,36 @@ The flags for the script include a `bad_samples.txt` (empty atm) which can be in
 4. Run the pipeline
 
 ```
-cd cd graph_genotyper_test/cosigt_smk/
+cd graph_genotyper_test/cosigt_smk/
 
+./cosigt_run
+```
 
+5. Parse the results
 
 ```
+cd ../../sh_script/
+
+wget https://raw.githubusercontent.com/sudmantlab/amylase_diversity_project/main/graph_genotyping/sh_script/auto_sort_results_1v2.sh
+
+wget https://raw.githubusercontent.com/sudmantlab/amylase_diversity_project/main/graph_genotyping/sh_script/auto_sort_results_2v2.sh
+
+chmod +x auto_sort_results_1v2.sh
+
+chmod +x auto_sort_results_1v2.sh
+
+cd ..
+
+sh_script/./auto_sort_results_1v2.sh
+
+sh_script/./auto_sort_results_2v2.sh
+```
+
+The script `auto_sort_results_1v2.sh` gives you the best genotype and collect them in a new folder.
+
+The script `auto_sort_results_1v2.sh` gives you the best genotype and collect them in a new folder.
+
+
+## Output
 
 
