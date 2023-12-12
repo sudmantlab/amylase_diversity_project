@@ -70,7 +70,7 @@ cd ../..
 ```
 
 3. Graph:
-- 
+
 ```
 mkdir graph
 
