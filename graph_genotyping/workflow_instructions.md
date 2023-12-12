@@ -8,11 +8,14 @@ This guide provides step-by-step instructions on how to set up and execute the w
 
 Ensure that the following prerequisites are installed on your system and in `$PATH`
 
-1. Snakemake:
+1. Conda:
+
+
+2. Snakemake:
  - The genotyping is implemented as a Snakemake pipeline. You can find installation instructions for Snakemake [here](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html). 
 
 
-2. Singularity:
+3. Singularity:
 - The Snakemake pipeline utilizes Singularity for containerization. Installation instructions for Singularity can be found [here](https://apptainer.org/admin-docs/master/installation.html#install-from-source). 
 
 
@@ -101,18 +104,27 @@ git clone --branch ancient_dna https://github.com/raveancic/graph_genotyper.git 
 ```
 mkdir sh_script 
 
-wget 
+cd sh_script
 
-chmod +x sh_script/auto_prepare.sh
+wget https://raw.githubusercontent.com/sudmantlab/amylase_diversity_project/main/graph_genotyping/sh_script/auto_prepare.sh
 
-sh_script/autoprepare
+chmod +x auto_prepare.sh
 
+cd ..
+
+sh_script/./auto_prepare.sh graph_genotyper_test/ input/cram/
 ```
 
-The flags for the script include 
+The flags for the script include a `bad_samples.txt` (empty atm) which can be integrated w/ samples that can be excluded from the analyses
+
+
+4. Run the pipeline
+
+```
+cd cd graph_genotyper_test/cosigt_smk/
 
 
 
-3. Run wrapper for sort the results
+```
 
 
