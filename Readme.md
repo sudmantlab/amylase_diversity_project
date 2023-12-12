@@ -16,7 +16,7 @@ A repo for code and methods related to analyses and figures. This code is deposi
 
 [Read depth genotyping](https://github.com/sudmantlab/amylase_diversity_project/tree/main/read_depth_genotyping)
 
-[Graph genotyping](https://github.com/raveancic/graph_genotyper/tree/master)
+[Graph genotyping](https://github.com/sudmantlab/amylase_diversity_project/tree/main/graph_genotyping)
 
 [Assess Graph genotypes](https://github.com/sudmantlab/amylase_diversity_project/tree/main/graph_genotyping/assess_graph_genotypes)
 
