@@ -16,3 +16,5 @@ HPRC_AMY_Sequences/bundle_tree/muscle
 
 
 graph_genotyping/*.sh
+*.cra*
+*.fa

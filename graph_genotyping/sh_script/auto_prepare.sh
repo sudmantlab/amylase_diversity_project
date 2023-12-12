@@ -8,10 +8,10 @@ fi
 
 # Check if the -hg19 flag is present
 if [ "$3" == "-hg19" ]; then
-  ref="/global/scratch/users/alessandroraveane/ref_fasta/hg19_decoy/hs37d5.fa"
+  ref="ref/hg19/hs37d5.fa"
   pos="1:103998686-104406594"
 else
-  ref="/global/scratch/users/alessandroraveane/ref_fasta/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz"
+  ref="ref/hg38/GRCh38_full_analysis_set_plus_decoy_hla.fa"
   pos="chr1:103456064-103863972"    
 
 fi
@@ -20,14 +20,11 @@ genotyper=$1
 bam_cram_folder_tmp=$2
 bam_cram_folder=$(readlink -f ${bam_cram_folder_tmp})
 
-graph="/global/scratch/users/alessandroraveane/graph_ref/selected_indivs_AMY_region.fa.gz.60ef634.68f91e8.f72a9ab.smooth.final.gfa"
-
-# load python
-module load python
-
-# load the conda env 
-source activate /global/home/users/alessandroraveane/micromamba/envs/snakemake_latestsnakemake_latest_py310_nosing
+graph="graph/selected_indivs_AMY_region.fa.gz.42c7330.417fcdf.8bc4b72.smooth.final.gfa"
 
 cd ${genotyper}cosigt_smk/
 
 ./cosigt_prepare.sh ${bam_cram_folder} ${ref} ${graph} ${pos} resources/extra/bad_samples.txt
+
+# if you do not want bad samples
+# ./cosigt_prepare.sh ${bam_cram_folder} ${ref} ${graph} ${pos} resources/extra/bad_samples.txt
