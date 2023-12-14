@@ -12,7 +12,7 @@ Ensure that the following prerequisites are installed on your system and in `$PA
 - The Snakemake pipeline utilizes conda for some rules. Installation instructions for conda can be found [here](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).  
 
 2. Snakemake:
- - The genotyping is implemented as a Snakemake pipeline. You can find installation instructions for Snakemake [here](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html). 
+ - The genotyping pipeline is implemented using Snakemake. You can find installation instructions for Snakemake [here](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html). 
 
 
 3. Singularity:
