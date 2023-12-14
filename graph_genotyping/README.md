@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides step-by-step instructions on how to set up and execute the workflow for genotyping graphs used on the paper. 
+Minimal instructions on how to set up and execute the workflow for genotyping graphs used on the paper. Details [here](extensive_example).
 
 ## Prerequisites
 
@@ -19,138 +19,68 @@ Ensure that the following prerequisites are installed on your system and in `$PA
 - The Snakemake pipeline utilizes Singularity for containerization. Installation instructions for Singularity can be found [here](https://apptainer.org/admin-docs/master/installation.html#install-from-source). 
 
 
-## Input files
+## Minimal example
 
-1. CRAM/BAM files:
+### 1. Clone the pipeline
 
-Download the sample for the minimal example
-
+```bash
+#git clone the pipeline and move to working directory
+git clone https://github.com/raveancic/graph_genotyper.git
+cd graph_genotyper/cosigt_smk
 ```
-mkdir cram
 
-cd cram
+### 2. Get minimal input data
 
-wget https://1000genomes.s3.amazonaws.com/1000G_2504_high_coverage/additional_698_related/data/ERR3988768/
-HG00438.final.cram
+##### 2.1 HG00438 short-read alignment
 
+```bash
+mkdir -p resources/cram && cd resources/cram
+#these folder can have many different .cram/.bam 
+wget https://1000genomes.s3.amazonaws.com/1000G_2504_high_coverage/additional_698_related/data/ERR3988768/HG00438.final.cram
 wget https://1000genomes.s3.amazonaws.com/1000G_2504_high_coverage/additional_698_related/data/ERR3988768/HG00438.final.cram.crai
-
 cd ../../
-
 ```
 
-2. Reference genomes:
+##### 2.2 GRCh38 reference genome
 
-- HG38
-
-Download using:
-```
-mkdir -p ref/hg38
-
-cd ref/hg38
-
+```bash
+mkdir -p resources/ref && cd resources/ref
 wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa
-
-cd ../..
+cd ../../
 ```
 
-- hg19 (in case your BAM/CRAM are aligned to hg19)
+##### 2.3 PGGB graph
 
-```
-mkdir ref/hg19
-
-cd ref/hg19
-
-ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz
-
-zcat hs37d5.fa.gz > hs37d5.fa
-
-cd ../.. 
-
-```
-
-3. Graph:
-
-```
-mkdir graph
-
-cd graph
-
+```bash
+mkdir -p resources/graph && cd resources/graph
 wget https://raw.githubusercontent.com/sudmantlab/amylase_diversity_project/main/pangenome/pggb/20231102_graph/selected_indivs_AMY_region.fa.gz.42c7330.417fcdf.8bc4b72.smooth.final.gfa
-
-cd ../
+cd ../../
 ```
 
-## Instructions
+##### 2.4 Build Snakemake input files
 
-We provide a minimal input examples which includes:
+```bash
+#create config/samples.tsv
+echo -e "sample_id\tcram" > config/samples.tsv
+echo -e "HG00438\tresources/cram/HG00438.final.cram" >> config/samples.tsv
 
-
-1. Clone the [GitHub repo](https://github.com/raveancic/graph_genotyper) in which the Snakemake pipeline is stored 
-
-```
-git clone https://github.com/raveancic/graph_genotyper.git graph_genotyper_<TEST>
-```
-
-If you want to genotype ancient DNAs import the branch ancient_dna by using 
-
-```
-git clone --branch ancient_dna https://github.com/raveancic/graph_genotyper.git graph_genotyper_<TEST>_aDNA
+#create config/config.yaml
+echo -e "samples: config/samples.tsv"> config/config.yaml
+echo -e "reference: resources/ref/GRCh38_full_analysis_set_plus_decoy_hla.fa" >> config/config.yaml
+echo -e "graph: resources/graph/selected_indivs_AMY_region.fa.gz.42c7330.417fcdf.8bc4b72.smooth.final.gfa" >> config/config.yaml
+#AMY region, hg38 coords
+echo -e "region: \"chr1:103456064-103863972\"" >> config/config.yaml
 ```
 
+### 3. Run
 
-2. Download and run the wrapper for creating the symlinks used as input in the pipeline.
-
-```
-mkdir sh_script 
-
-cd sh_script
-
-wget https://raw.githubusercontent.com/sudmantlab/amylase_diversity_project/main/graph_genotyping/sh_script/auto_prepare.sh
-
-chmod +x auto_prepare.sh
-
-cd ..
-
-sh_script/./auto_prepare.sh graph_genotyper_test/ input/cram/
+```bash
+snakemake --use-singularity --singularity-args "-B $PWD" -j 5 cosigt
 ```
 
-The flags for the script include a `bad_samples.txt` (empty atm) which can be integrated w/ samples that can be excluded from the analyses
+### 4. Check assigned genotype
 
-
-4. Run the pipeline
-
+```bash
+#assigned genotype matches expected
+cat results/cosigt_results/HG00438/best_genotype.tsv
 ```
-cd graph_genotyper_test/cosigt_smk/
-
-./cosigt_run
-```
-
-5. Parse the results
-
-```
-cd ../../sh_script/
-
-wget https://raw.githubusercontent.com/sudmantlab/amylase_diversity_project/main/graph_genotyping/sh_script/auto_sort_results_1v2.sh
-
-wget https://raw.githubusercontent.com/sudmantlab/amylase_diversity_project/main/graph_genotyping/sh_script/auto_sort_results_2v2.sh
-
-chmod +x auto_sort_results_1v2.sh
-
-chmod +x auto_sort_results_1v2.sh
-
-cd ..
-
-sh_script/./auto_sort_results_1v2.sh
-
-sh_script/./auto_sort_results_2v2.sh
-```
-
-The script `auto_sort_results_1v2.sh` gives you the best genotype and collect them in a new folder.
-
-The script `auto_sort_results_1v2.sh` gives you the best genotype and collect them in a new folder.
-
-
-## Output
-
-
