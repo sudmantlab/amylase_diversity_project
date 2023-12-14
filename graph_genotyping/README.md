@@ -9,7 +9,7 @@ This guide provides step-by-step instructions on how to set up and execute the w
 Ensure that the following prerequisites are installed on your system and in `$PATH`
 
 1. Conda:
-- The Snakemake pipeline utilizes conda for some rules. Installation instructions for conda can be found [here]([https://apptainer.org/admin-docs/master/installation.html#install-from-source](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).  
+- The Snakemake pipeline utilizes conda for some rules. Installation instructions for conda can be found [here](https://apptainer.org/admin-docs/master/installation.html#install-from-source](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).  
 
 2. Snakemake:
  - The genotyping is implemented as a Snakemake pipeline. You can find installation instructions for Snakemake [here](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html). 
