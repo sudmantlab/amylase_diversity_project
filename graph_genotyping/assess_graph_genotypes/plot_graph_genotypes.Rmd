@@ -88,6 +88,7 @@ dev.off()
 
 
 t %>% 
+  filter(best_score>0.75) %>%
   group_by(cohort) %>%
   summarize(n=n())
 
@@ -114,8 +115,6 @@ library(ggbreak)
 #unique(t$hap1)
 
 #### PLOT SORTED BY HAPLOTYPE copy number
-
-
 
 
 clust_to_copy = t_clusts %>% 
