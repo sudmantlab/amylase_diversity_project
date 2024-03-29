@@ -89,6 +89,23 @@ t_plot = t_gt %>%
           filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
           separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
           filter(!dataset %in% c("StoneAgeAncient", "ExcoffierAncient","GTEx")) %>%
+          mutate(p1 = case_when(p1=="BEB" ~ "Bengali",
+                                p1=="CLM" ~ "Colombian",
+                                p1=="JPT" ~ "Japanese",
+                                p1=="CDX" ~ "Dai",
+                                p1=="CHB" ~ "Han",
+                                p1=="MSL" ~ "Mende",
+                                p1=="ESN" ~ "Esan",
+                                p1=="FIN" ~ "Finnish",
+                                p1=="GWD" ~ "Gambian",
+                                p1=="KHV" ~ "Kinh",
+                                p1=="LWK" ~ "Luhya",
+                                p1=="Maya" ~ "Mayan",
+                                p1=="PJL" ~ "Punjabi",
+                                p1=="TSI" ~ "Tuscan",
+                                p1=="Toscani" ~ "Tuscan",
+                                p1=="YRI" ~ "Yoruba",
+                                TRUE ~ p1)) %>%
           group_by(p2,label) %>%
           mutate(p2_mu = mean(cp)) %>%
           ungroup() %>%
@@ -136,6 +153,15 @@ library(RColorBrewer)
 #install.packages("ggsignif")
 library(ggsignif)
 
+
+lmp <- function (modelobject) {
+    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(modelobject)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+}
+
 t_subsistence = read.table("metadata/populations_subsistence.tsv",header=T,sep="\t") %>% 
                 dplyr::select(type,p1)
 
@@ -158,7 +184,9 @@ additional_info_df = data.frame(p1=c("Tubular",
                                     "Mansi",
                                     "Biaka",
                                     "Mbuti",
-                                    "Tubalar"),
+                                    "Tubalar",
+                                    "JuhoanNorth",
+                                    "KhomaniSan"),
                                type=c("Hunting",
                                       "Pastoralism",
                                       "Fishing",
@@ -171,35 +199,53 @@ additional_info_df = data.frame(p1=c("Tubular",
                                       "Fishing",
                                       "Hunting",
                                       "Hunting",
+                                      "Hunting",
+                                      "Hunting",
                                       "Hunting"))
 
-# "Tubular" Hunting https://en.wikipedia.org/wiki/Tubalars
-# "Altaian" Pastoralism https://en.wikipedia.org/wiki/Altai_people
-#"Ulchi" Fishing https://en.wikipedia.org/wiki/Ulch_people 
-#"Chukchi" Hunting https://en.wikipedia.org/wiki/Chukchi_people
-#"EskimoSireniki" Hunting https://scholarworks.alaska.edu/handle/11122/8302 https://www.erudit.org/en/journals/etudinuit/2007-v31-n1-2-etudinuit2570/019717ar/
-#"EskimoChaplin" Hunting https://www.erudit.org/en/journals/etudinuit/2007-v31-n1-2-etudinuit2570/019717ar/
-#"EskimoNaukan" Hunting https://en.wikipedia.org/wiki/Naukan_people
-#"Even" Hunting https://www.jstor.org/stable/3773857?seq=4
-#"Itelman"Fishing #https://www.jstor.org/stable/3773857?seq=4
-#"Mansi" Fishing https://www.jstor.org/stable/3773857?seq=4
-#"Kyrgyz"        
-#"Mongolian" N/A
 
-t_subsistence = rbind(t_subsistence,additional_info_df)
+t_subsistence = rbind(t_subsistence,additional_info_df) %>% unique()
 
 t_data_by_sub = t_gt %>% 
           filter(label%in% c("AMY1","AMY2A","AMY2B")) %>% 
           separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>%
+            mutate(p1 = case_when(p1=="BEB" ~ "Bengali",
+                                p1=="CLM" ~ "Colombian",
+                                p1=="JPT" ~ "Japanese",
+                                p1=="CDX" ~ "Dai",
+                                p1=="CHB" ~ "Han",
+                                p1=="MSL" ~ "Mende",
+                                p1=="ESN" ~ "Esan",
+                                p1=="FIN" ~ "Finnish",
+                                p1=="GWD" ~ "Gambian",
+                                p1=="KHV" ~ "Kinh",
+                                p1=="LWK" ~ "Luhya",
+                                p1=="Maya" ~ "Mayan",
+                                p1=="PJL" ~ "Punjabi",
+                                p1=="TSI" ~ "Tuscan",
+                                p1=="Toscani" ~ "Tuscan",
+                                p1=="YRI" ~ "Yoruba",
+                                TRUE ~ p1)) %>%
           inner_join(t_subsistence, on="p1") %>%
-          #left_join(t_subsistence, on="p1") %>%
-          #mutate(type = ifelse(is.na(type),"other",type)) %>%
           mutate(type=case_when(type=="Fishing" ~ "Fishing/Hunting/Pastoralism",
                                 type=="Hunting" ~ "Fishing/Hunting/Pastoralism",
                                 type=="Pastoralism" ~ "Fishing/Hunting/Pastoralism",
                                 TRUE ~ type)) %>%
           mutate(simple_type = ifelse(type=="Agriculture",type,"other")) %>%
           filter(type!="Two or more sources")
+
+#Cap the maximum number of individuals per population to 50
+filtered_samples = t_data_by_sub %>% 
+  dplyr::select(p1,ID) %>% 
+  unique() %>%
+  group_by(p1) %>%
+  mutate(k = row_number()) %>%
+  filter(k<=50) %>%
+  ungroup() %>%
+  dplyr::select(ID)
+
+t_data_by_sub = inner_join(t_data_by_sub, filtered_samples, by="ID") %>% unique()
+
           
 t_plot_by_sub = t_data_by_sub %>%
                 ungroup() %>%
@@ -213,11 +259,6 @@ t_plot_by_sub = t_data_by_sub %>%
           summarize(n=n()) %>%
           mutate(prop=n/n_total)
 
-# t_sum_stats = t_plot_by_sub %>% 
-#               ungroup() %>%
-#               dplyr::select(type_label,mu,serr,type,label,simple_type) %>%
-#               unique()
-
 t_sum_stats = t_data_by_sub %>%
                 ungroup() %>%
                 group_by(simple_type,label) %>%
@@ -227,18 +268,17 @@ t_sum_stats = t_data_by_sub %>%
           mutate(serr = sdev/sqrt(n_total)) %>%
           mutate(x=ifelse(simple_type=="Agriculture",2,1))
 
-p_A1 = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
-p_A2A = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
-p_A2B = wilcox.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
+p_A1 = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
+p_A2A = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
+p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
+
+p.adjust(c(lmp(m1),lmp(m2A),lmp(m2B)))
 
 df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
-                     ps = c(p_A1, p_A2A,p_A2B),
-                     #xs = c(16.1,4.1,4.05),
+                     ps = c(p_A1, p_A2A, p_A2B),
                      xs = c(16.5,4.3,4.15),
-                     #xs = c(16,4.5,3.75),
                      x_nudge = c(19,5,4.5)) %>%
-            mutate(P_adj = p.adjust(ps)) %>%
-            mutate(plabel=paste("P[adj]==",signif(P_adj,2)))
+            mutate(plabel=paste("P==",signif(ps,2)))
 
 t_plot_by_sub$type = factor(t_plot_by_sub$type,levels=rev(c("Agriculture","Fishing/Hunting/Pastoralism")))
 t_plot_by_sub$type_label = factor(t_plot_by_sub$type_label,levels=rev(unique(t_plot_by_sub$type_label)))
@@ -260,28 +300,43 @@ g=g+geom_point(aes(x=type_label,y=cp,size=prop,color=type),alpha=0.8)+
   geom_text(aes(x=1.5,y=xs,label=plabel),data=df_labs,parse=TRUE,size=1.75,hjust=0)+
   theme_bw(base_size=8)+
   facet_wrap(~label,ncol=1,strip.position="right",scales="free_x")+
-  scale_color_manual(values=brewer.pal(7,"Spectral")[c(1,2,7)])+
-  theme(legend.position="None")+
+  scale_color_manual(values=brewer.pal(7,"Spectral")[c(1,2)],guide="none")+
+  theme(legend.position="bottom",
+        legend.spacing.y = unit(0, "mm"),
+        legend.margin = unit(0,"mm"), 
+        legend.title = element_blank(),
+        legend.text = element_text(size=6),
+        legend.box.margin=margin(-20,-10,0,-10),
+        legend.background = element_blank())+
   geom_blank(aes(y=x_nudge,x=1),data=df_labs)+
   coord_flip()+
   scale_x_discrete("")+
   scale_y_continuous("",breaks=c(c(0,1,2,3,4,5,6,7,8,9),seq(10,28,2)))+
   theme(strip.background = element_blank())+
   scale_size(range=c(.5,6))+
-  theme(axis.text.y=element_text(size=6))
-  
+  theme(axis.text.y=element_text(size=6))+
+  guides(size=guide_legend(override.aes=list(color='grey')))
+  #      scale_size("",range=c(0.01,3.5),limits=c(0,1),breaks=c(0.1,.25,0.5))+
+
+
+
   
 
 fn_out = "./output_figures/main_figs/copy_by_sustinence.pdf"
-pdf(fn_out,width=4,height=2)
+pdf(fn_out,width=4.5,height=2)
 print(g)
 dev.off()
+print(g)
 
 
 fn_out = "./output_figures/main_figs/copy_by_sustinence_wide.pdf"
 pdf(fn_out,width=8,height=1.25)
 print(g+facet_wrap(~label,nrow=1,strip.position="bottom",scales="free_x")+theme(strip.placement="outside"))
 dev.off()
+
+fn_out = "./output_figures/main_figs/copy_by_sustinence_wide_TMP.csv"
+write.table(t_data_by_sub,fn_out,row.names=FALSE,sep="\t",quote=FALSE)
+
 
 sus_pop_inf = t_data_by_sub %>% 
   ungroup() %>% 
@@ -297,8 +352,78 @@ sus_pop_inf %>%
   summarize(n=sum(n)) %>%
   mutate(n_total=sum(n))
 
-
 length(unique(t_data_by_sub$p1))
+
+t_subsistence %>% arrange(p1)
+
+
+```
+```{r}
+
+library(tidyverse)
+library(nlme)
+library(lme4)
+
+amy_by_sustenance <- read_tsv("~/Documents/ongoing_projects/amy/copy_by_sustinence_wide_TMP.csv")
+
+t_data_by_sub
+
+for (gene in c("AMY1", "AMY2A", "AMY2B")){
+  print(gene)
+  amy_lme <- lme(cp ~ simple_type, random = ~ 1 | p1, data=amy_by_sustenance %>% filter(label==gene))
+  #summary(amy_lme) %>% print()
+  
+  amy_lmer <- lmer(cp ~ simple_type + (1 | p1), data=amy_by_sustenance %>% filter(label==gene))
+  #summary(amy_lmer)
+  amy_lmer_null <- lmer(cp ~ + (1 | p1), data=amy_by_sustenance %>% filter(label==gene))
+  #summary(amy_lmer_null) %>% print()
+  anova(amy_lmer_null, amy_lmer) %>% print()
+}
+
+
+```
+
+```{r}
+g=ggplot(t_data_by_sub %>% 
+  filter(label=="AMY1") %>% 
+  group_by(p1,label,simple_type) %>%
+  summarize(n=n()))
+g+geom_bar(aes(y=p1,x=n,fill=simple_type),stat='identity')
+  
+t_plot_by_sub_2 = t_data_by_sub %>%
+                ungroup() %>%
+                group_by(simple_type,p1,label) %>%
+                mutate(n_total=n(),
+                    mu = mean(cp),
+                    sdev = sd(cp)) %>%
+          mutate(serr = sdev/sqrt(n_total)) %>%
+          mutate(p1_label = paste(p1," (",n_total,")",sep="")) %>%
+          group_by(cp,n_total,mu,serr,simple_type,p1,label,p1_label) %>%
+          summarize(n=n()) %>%
+          mutate(prop=n/n_total) %>%
+          mutate(simple_type=ifelse(simple_type == "Agriculture","Agriculture","Fishing/Hunting/Pastoralism"))
+
+t_plot_by_sub_2_sum_stats = t_plot_by_sub_2 %>% 
+                              ungroup() %>% 
+                              dplyr::select(p1_label,mu,serr,simple_type,label) %>% 
+                              unique()
+
+g=ggplot(t_plot_by_sub_2)
+g=g+geom_point(aes(x=p1_label,y=cp,size=prop,color=simple_type),alpha=0.8)+
+  #geom_point(aes(x=p1_label,y=mu),data=t_plot_by_sub_2_sum_stats,shape=5)+
+  theme_bw(base_size=6)+
+  facet_grid(simple_type~label,scales="free")+
+  coord_flip()+
+  scale_x_discrete("")+
+  scale_color_manual("",values=brewer.pal(7,"Spectral")[c(2,1)])+
+  scale_size_continuous(range=c(.1,3))+
+  theme(legend.position="None")
+
+fn_out = "./output_figures/main_figs/copy_by_sustinence_all_pops.png"
+#pdf(fn_out,width=8,height=1.25)
+png(fn_out,width=4,height=2.5,units='in',res=400)
+print(g)
+dev.off()
 
 ```
 
@@ -307,7 +432,12 @@ length(unique(t_data_by_sub$p1))
 t_plot$super_pop = factor(t_plot$super_pop, levels = c("modern","archaic"))
 
 t_plot_subset = t_plot %>% 
-                  filter((n_total>=0)|(super_pop=="archaic"))
+                  filter((n_total>=0)|(super_pop=="archaic")) 
+  
+  
+  
+
+  
                   
 group_orders = t_plot_subset %>% 
                 ungroup %>% 
@@ -391,6 +521,10 @@ pdf(fn_out,width=1,height=4)
 print(g+theme(legend.position="right",legend.key.size=unit(0.25,"cm")))
 dev.off()
 
+
+length(unique(t_plot_subset$p1))
+
+t_plot_subset %>% arrange(-n)
 ```
 ```{r}
 ##### PLOT BY SUPERPOP
@@ -434,16 +568,26 @@ plot_amy_super = function(data, curr_label){
       geom_point(aes(y=mu,x=reorder(p2_label,mu)),shape=18,data=t_sum,size=1.5)+
       geom_point(aes(y=mu,x=reorder(p2_label,mu),color=p2),shape=18,data=t_sum,size=.5,color='white')+
       theme_bw(base_size=6)+
-      scale_color_manual("",values=colors)+
-      theme(legend.key.size=unit(0.5,"cm"))+
-      scale_size(range=c(0.01,3.5))+
+      scale_color_manual("",values=colors, guide="none")+
+      theme(legend.key.size=unit(0.15,"cm"))+
+      scale_size("",range=c(0.01,3.5),limits=c(0,1),breaks=c(0.1,.25,0.5))+
       scale_y_continuous("",breaks=seq(0,20,2))+
       theme(strip.background = element_blank(),
             strip.text = element_text(size=3),
-            legend.position="None",
-            panel.grid=element_blank())+
+            #legend.position=c(0.2,.9),
+            legend.position="top",
+            legend.background = element_blank(),
+            #legend.box.background = element_rect(colour = "black"),
+            legend.spacing.y = unit(0, "mm"),
+            legend.margin = unit(0,"mm"), 
+            legend.title = element_blank(),
+            legend.text = element_text(size=3),
+            panel.grid=element_blank(),
+            legend.box.margin=margin(0,-10,-5,-10))+
       scale_x_discrete("")+
-      theme(axis.text.x=element_text(angle=45,hjust=1,vjust=1))
+      theme(axis.text.x=element_text(angle=45,hjust=1,vjust=1))+
+      guides(size=guide_legend(override.aes=list(color='grey')))
+    
   
    return(g)
 }
@@ -542,8 +686,9 @@ g=g+geom_point(aes(x=AMY1,y=AMY2B,size=n,color=n))+
   scale_x_continuous("AMY1",breaks=seq(0,20,2))+
 #  scale_color_viridis_c("", option="inferno",trans = 'norm')+
 #  scale_size_continuous(range=c(0.01,3))+
-  scale_color_viridis_c("", option="inferno",trans = 'norm',breaks=c(100,250,500,750))+
-  scale_size_continuous(range=c(0.01,3),breaks=c(100,250,500,750))+
+  scale_color_viridis_c("", option="inferno",trans = 'norm',breaks=c(1,50,250,750))+
+  scale_size_continuous(range=c(0.01,3),breaks=c(1,50,250,750))+
+  #scale_size("",range=c(0.01,3.5),limits=c(0,1),breaks=c(0.1,.25,0.5))+
   geom_blank(aes(x=4,y=1.5))+
   guides(color = guide_legend(""),
          size = guide_legend(""))
@@ -569,8 +714,8 @@ g=g+geom_point(aes(x=AMY2A,y=AMY2B,color=n,size=n))+
         panel.grid=element_blank())+
   scale_x_continuous("AMY2A",breaks=seq(0,20,1))+
   geom_blank(aes(x=0,y=1.5))+
-  scale_color_viridis_c("", option="inferno",trans = 'norm',breaks=c(100,500,1000,2000))+
-  scale_size_continuous(range=c(0.01,3),breaks=c(100,500,1000,2000))+
+  scale_color_viridis_c("", option="inferno",trans = 'norm',breaks=c(1,50,750,2000))+
+  scale_size_continuous(range=c(0.01,3),breaks=c(1,50,750,2000))+
   guides(color = guide_legend(""),
          size = guide_legend(""))
 

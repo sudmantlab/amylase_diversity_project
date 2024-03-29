@@ -12,23 +12,12 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output"
 
-# t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
-#   transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
 
-#t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230718_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
-#  transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
-
-#t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/graph_genotyping_clusters/output/20230817_dendrogram.jaccard.bestcut_clusters_processed.tsv",header=TRUE,sep="\t",comment="") %>%
-#  transmute(sample = str_replace(sample,"-","_"),cluster=cluster)
 
 t_clusts = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/HPRC_AMY_Sequences/combined_y1_y2_analyses/output/haplotype_assignments.txt",header=TRUE,sep="\t",comment="") %>% 
   dplyr::select(-hap_struc_d) %>%
   mutate(chrom=str_replace(chrom,"-","_"))
   
-
-# t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/cosigt_results.bestgeno.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>% separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
-#   filter(cohort!="SGDP") %>%
-#   mutate(cohort=ifelse(cohort=="SGDPv2","SGDP",cohort))
 
 t = read.table("/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/result_tsv/new_results/best_geno/best_geno_tot.tsv",sep="\t",comment.char = "",col.names = c("sample", "besthaplo1_besthaplo2",  "best_score", "cohort")) %>%
   separate(besthaplo1_besthaplo2,into=c("hap1","hap2"),sep="\\$",extra="merge") %>%
@@ -111,9 +100,6 @@ dim(t_grouped %>% filter(cohort == "StoneAgeAncient"))/2
 #install.packages("ggbreak")
 library(ggbreak)
 
-#plot haplotype frequencies worldwide
-#unique(t$hap1)
-
 #### PLOT SORTED BY HAPLOTYPE copy number
 
 
@@ -134,7 +120,6 @@ haplotype_pred_copy = t_grouped %>%
 
 g=ggplot(t_grouped %>% filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient")))
 g+geom_histogram(aes(x=best_score))
-
 
 haplotype_pred_copy_ancient = t_grouped %>% 
   filter(cohort %in% c("StoneAgeAncient","ExcoffierAncient")) %>%
@@ -273,7 +258,10 @@ tidy_hap_vs_rd_anc %>%
 
 ```{r}
 
-colors = c("#EDB829", "#94B669", "#E97C07", "#00496F", "#0C7996","purple", "#DD4124")
+#colors = c("#EDB829", "#94B669", "#E97C07", "#00496F", "#0C7996","purple", "#DD4124")
+colors = c("#EDB829", "#DD4124", "#00496F", "#94B669", "#E97C07" ,"purple","#0C7996")
+#            AFR,        AMR,       CAS,      WEA,      SA,       OCN,       EA
+pop_order = c("AFR", "AMR", "CAS", "WEA", "SA", "OCN", "EA")
 
 outdir="/Users/petersudmant/Documents/science/sudmantlab/projects/ancient_DNA/amylase/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/output"
 
@@ -292,13 +280,6 @@ write.table(t_sum_ww,
             quote=FALSE,
             row.names = FALSE)
 
-# t_sum_sub = t_grouped %>%
-#           filter(cohort %in% c("SGDP","1KG","1KG_trio","HGDP")) %>%
-#           group_by(p1) %>%
-#           mutate(n_total = n()) %>%
-#           group_by(p1, cluster,n_total) %>%
-#           summarize(count = n()) %>%
-#           mutate(proportion=count/n_total)
 
 t_sum = t_grouped %>%
           filter(cohort %in% c("SGDP","1KG","HGDP")) %>%
@@ -321,47 +302,7 @@ t_sum = t_sum %>% dplyr::select(p2,cluster,proportion) %>%
   arrange(proportion) %>%
   mutate(order=row_number())
 
-# hap_names = data.frame(cluster=seq(0,10),
-#                        hap_names = c("H7", #0,
-#                                      "H3^r", #1,
-#                                      "H2A2B2", #2,
-#                                      "H5", #3,
-#                                      "H1^a", #4,
-#                                      "H3A3B3", #5,
-#                                      "H9", #6,
-#                                      "H4A2B2", #7,
-#                                      "H2A0", #8,
-#                                      "H3.2", #9,
-#                                      "H4A2" #10
-#                        )) %>%
-#   inner_join(t_sum_ww,by="cluster") %>%
-#   mutate(ww_prop = proportion) %>%
-#   dplyr::select(-proportion)
-  
-#t_sum$cluster = factor(t_sum$cluster, levels=c(1,3,4,0,10,7,6,8,2,5,9))
-#H7, H3, H2, H5, H1, H3, H9, H4, H2, H3, H4
-
-hacked_min_max = data.frame(cluster = c("H3^r","H5","H1^a","H7","H4A2","H4A2B2","H9","H2A0","H2A2B2","H3A3B3","H1.2"),
-                            mxs = c(0.55,0.55,0.55,0.1,0.1,0.1,0.1,0.1,0.1,0.1,.1),
-                            line = rep(0.1,11))
-
 t_plot = t_sum %>% mutate(hap_names=cluster)
-#t_plot = inner_join(t_sum %>% mutate(cluster=as.numeric(cluster)), hap_names, by="cluster")
-
-#t_plot$cluster = factor(t_plot$cluster, levels=c(1,3,4,0,10,7,6,8,2,5,9))
-#t_plot$hap_names = factor(t_plot$hap_names, levels=(hap_names %>% arrange(-ww_prop))$hap_names)
-#hacked_min_max$hap_names = factor(hacked_min_max$hap_names, levels=(hap_names %>% arrange(-ww_prop))$hap_names)
-
-
-t_plot %>% arrange(hap_names)
-#filter ultra rare
-#t_plot = t_plot %>% filter(!hap_names %in% c("H1.2"))
-#t_plot = t_plot %>% filter(!hap_names %in% c("H3A2","H1.2"))
-
-#H3A2 is found in 4 haplotypes 4/7188
-4/7188*100
-###
-
 
 plot_order = (t_plot %>% ungroup() %>% group_by(cluster) %>%
     summarize(mu = mean(proportion)) %>%
@@ -369,6 +310,7 @@ plot_order = (t_plot %>% ungroup() %>% group_by(cluster) %>%
   
 t_plot$hap_names = factor(t_plot$hap_names,levels=plot_order)
 
+t_plot$p2 = factor(t_plot$p2, levels = c(pop_order))
 
 g=ggplot(t_plot)
 g=g+geom_bar(aes(y=order,fill=p2,x=proportion),stat='identity',position='dodge',alpha=.8)+
@@ -376,7 +318,6 @@ g=g+geom_bar(aes(y=order,fill=p2,x=proportion),stat='identity',position='dodge',
   theme_bw(base_size=4)+
   scale_fill_manual(values=colors)+
   facet_wrap(~hap_names,scales="free",ncol=1,strip.position = "right",labeller = label_parsed)+
- # geom_vline(xintercept=0.1,linetype="dotted",size=.25)+
   theme(strip.background = element_blank(),
         strip.text = element_text(angle=0))+
   theme(legend.position="None")+
@@ -396,11 +337,9 @@ print(g+facet_wrap(~hap_names,scales="free",ncol=2))
 dev.off()
 print(g)
 
-#g=ggplot(t_plot %>% filter(hap_names %in% c("H3^r","H5","H1^a")))
 g=ggplot(t_plot)
 g=g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',alpha=.8)+
   geom_text(aes(x=order,label=p2,y=proportion),size=.75,hjust=0.5,position=position_nudge(y=0.01,x=0),angle=0)+
-  #geom_text(aes(x=0,y=mxs-0.01,label=hap_names),size=2,hjust=0,data=hacked_min_max %>% filter(!hap_names %in% c("H3^r","H5","H1^a")),parse=TRUE)+
   geom_text(aes(x=0.5,y=0.5,label=cluster),size=2,hjust=0,data=hacked_min_max,parse=TRUE)+
   theme_bw(base_size=6)+
   scale_fill_manual(values=colors)+
@@ -408,7 +347,6 @@ g=g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',
   theme(strip.background = element_blank(),
         strip.text=element_blank())+
   theme(legend.position="None")+
-  #geom_blank(aes(y=mxs),data=hacked_min_max)+
   scale_x_discrete("")+
   scale_y_continuous("allele frequency")
 
@@ -422,6 +360,18 @@ print(g)
 
 
 #t_sum %>% ungroup() %>% summarize(n=sum(count))
+freq_sum_table = t_sum %>% 
+  dplyr::select(p2,cluster,proportion) %>%
+  mutate(proportion = signif(proportion,3)) %>%
+  pivot_wider(names_from = "p2",values_from="proportion") %>%
+  arrange(cluster)
+
+
+write.table(freq_sum_table,
+            file=paste(outdir,"/cluster_freqs_by_pop.tsv",sep=""),
+            sep="\t",
+            quote=FALSE,
+            row.names = FALSE)
 
 ```
 ```{r}
@@ -526,7 +476,6 @@ exist = c("Yakut","Aleut","Tlingit","Mansi")
 #t_subsistence %>% filter(p1 %in% exist)
 #all_CAS = unique(t_gt %>% ungroup() %>% separate(sample,c("dataset","ID",'p1','p2'),sep='\\.') %>% filter(p2=="CAS") %>% dplyr::select(p1))$p1
 
-
 additional_info_df = data.frame(p1=c("Tubular",
                                     "Altaian",
                                     "Ulchi",
@@ -539,7 +488,9 @@ additional_info_df = data.frame(p1=c("Tubular",
                                     "Mansi",
                                     "Biaka",
                                     "Mbuti",
-                                    "Tubalar"),
+                                    "Tubalar",
+                                    "JuhoanNorth",
+                                    "KhomaniSan"),
                                type=c("Hunting",
                                       "Pastoralism",
                                       "Fishing",
@@ -552,14 +503,33 @@ additional_info_df = data.frame(p1=c("Tubular",
                                       "Fishing",
                                       "Hunting",
                                       "Hunting",
+                                      "Hunting",
+                                      "Hunting",
                                       "Hunting"))
 
 ### SEE PLOT_COPY DISTRIBUTION FOR details on IDs
 
-t_subsistence = rbind(t_subsistence,additional_info_df)
+t_subsistence = rbind(t_subsistence,additional_info_df) %>% unique()
 
 
-t_data_by_sus = t_grouped %>% dplyr::select(sample,p1,hap,cluster) %>% #filtering out GTEx etc doesnt matter cause of inner join
+t_data_by_sus = t_grouped %>% dplyr::select(sample,p1,hap,cluster) %>% 
+              mutate(p1 = case_when(p1=="BEB" ~ "Bengali",
+                                p1=="CLM" ~ "Colombian",
+                                p1=="JPT" ~ "Japanese",
+                                p1=="CDX" ~ "Dai",
+                                p1=="CHB" ~ "Han",
+                                p1=="MSL" ~ "Mende",
+                                p1=="ESN" ~ "Esan",
+                                p1=="FIN" ~ "Finnish",
+                                p1=="GWD" ~ "Gambian",
+                                p1=="KHV" ~ "Kinh",
+                                p1=="LWK" ~ "Luhya",
+                                p1=="Maya" ~ "Mayan",
+                                p1=="PJL" ~ "Punjabi",
+                                p1=="TSI" ~ "Tuscan",
+                                p1=="Toscani" ~ "Tuscan",
+                                p1=="YRI" ~ "Yoruba",
+                                TRUE ~ p1)) %>%
           inner_join(t_subsistence, on="p1") %>%
           mutate(type=case_when(type=="Fishing" ~ "Fishing/Hunting",
                                 type=="Hunting" ~ "Fishing/Hunting",
@@ -569,6 +539,19 @@ t_data_by_sus = t_grouped %>% dplyr::select(sample,p1,hap,cluster) %>% #filterin
           filter(type!="Two or more sources") %>%
           mutate(hap_names=cluster)
           #inner_join(hap_names, by="cluster")
+
+#Cap the maximum number of individuals per population to 50
+filtered_samples = t_data_by_sus %>% 
+  dplyr::select(p1,sample) %>% 
+  unique() %>%
+  group_by(p1) %>%
+  mutate(k = row_number()) %>%
+  filter(k<=50) %>%
+  ungroup() %>%
+  dplyr::select(sample)
+
+t_data_by_sus = inner_join(t_data_by_sus, filtered_samples, by="sample") %>% unique()
+
           
 
 t_sum_sus = t_data_by_sus %>%
@@ -610,16 +593,18 @@ hacked_min_max = data.frame(cluster = c(1,3,4,0,10,7,6,8,2),
 t_sum_sus$hap_names = factor(t_sum_sus$hap_names, levels=(sus_mx_f %>% arrange(-mx_f))$hap_names)
 
 g=ggplot(t_sum_sus)
-g=g+geom_bar(aes(x=order,fill=type,y=proportion),stat='identity',position='dodge',alpha=0.8)+
-  #geom_text(aes(x=order,label=type,y=ifelse(hap_names=="H3^r",0,proportion)),size=.85,hjust=0,angle=90,position=position_nudge(y=0.001,x=0))+
+g=g+#geom_bar(aes(x=order,fill=type,y=proportion),stat='identity',position='dodge',alpha=0.8)+
+  geom_bar(aes(x=type,fill=type,y=proportion),stat='identity',position='dodge',alpha=0.8)+
   theme_bw(base_size=5)+
-  scale_fill_manual("",values=brewer.pal(7,"Spectral")[c(1,2,7)])+
+  scale_fill_manual("",values=rev(brewer.pal(7,"Spectral")[c(1,2)]))+
   facet_wrap(~hap_names,scales="free_x",nrow=1,strip.position = "bottom",labeller = label_parsed)+
   theme(strip.background = element_blank())+
   #theme(legend.position="None")+
   theme(legend.position="bottom",
         legend.key.size=unit(.2,"cm"),
-        legend.box.margin=margin(-10,-5,-5,-5))+
+        legend.box.margin=margin(-10,-5,-5,-5),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())+
   scale_x_discrete("")+
   scale_y_continuous("allele frequency")
 
