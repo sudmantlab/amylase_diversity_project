@@ -1,0 +1,534 @@
+sample	p2_l0	p2_l1	site	country	region	age	latitude	longitude	data_source
+NEO281	CHG	CHG	Kotias Klde	Georgia	WesternAsia	9724	42.22	43.32	Allentoft_Sikora_etal2024
+NEO202	EHG	EHG	Peschanitsa	Russia	CentralEasternEurope	10884	61.27	38.91	Allentoft_Sikora_etal2024
+NEO501	EHG	EHG	Vasilevka-I	Ukraine	CentralEasternEurope	10623	48.2	35.22	Allentoft_Sikora_etal2024
+NEO539	EHG	EHG	Minino	Russia	CentralEasternEurope	10060	59.7	39.5	Allentoft_Sikora_etal2024
+NEO100	EHG	EHG	Ural River Beach	Russia	CentralEasternEurope	9929	51.57	53.68	Allentoft_Sikora_etal2024
+NEO27	EHG	EHG	Bredg√•rden	Sweden	NorthernEurope	9694	57.74	13.4	Allentoft_Sikora_etal2024
+NEO536	EHG	EHG	Minino	Russia	CentralEasternEurope	9541	59.7	39.5	Allentoft_Sikora_etal2024
+NEO17	EHG	EHG	Hummervikholmen	Norway	NorthernEurope	9146	58.06	7.74	Allentoft_Sikora_etal2024
+NEO555	EHG	EHG	Karavaikha	Russia	CentralEasternEurope	8280	60.41	38.93	Allentoft_Sikora_etal2024
+NEO521	EHG	EHG	Igren	Ukraine	CentralEasternEurope	8264	48.4	35.16	Allentoft_Sikora_etal2024
+NEO87	EHG	EHG	Zamostye 2	Russia	CentralEasternEurope	8259	56.67	38.02	Allentoft_Sikora_etal2024
+NEO560	EHG	EHG	Karavaikha	Russia	CentralEasternEurope	7919	60.41	38.93	Allentoft_Sikora_etal2024
+NEO88	EHG	EHG	Zamostye 2	Russia	CentralEasternEurope	7871	56.67	38.02	Allentoft_Sikora_etal2024
+NEO113	EHG	EHG	Golubaya Krinitsa (Blue Well)?	Russia	CentralEasternEurope	7336	50.07	39.88	Allentoft_Sikora_etal2024
+NEO270	EHG	EHG	Mamaj Gora	Ukraine	CentralEasternEurope	7297	47.43	34.27	Allentoft_Sikora_etal2024
+NEO516	EHG	EHG	Igren	Ukraine	CentralEasternEurope	7095	48.4	35.16	Allentoft_Sikora_etal2024
+NEO498	EHG	EHG	Vovnigi	Ukraine	CentralEasternEurope	7059	48.13	35.08	Allentoft_Sikora_etal2024
+NEO556	EHG	EHG	Karavaikha	Russia	CentralEasternEurope	7036	60.41	38.93	Allentoft_Sikora_etal2024
+NEO185	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	7034	56.78	40.45	Allentoft_Sikora_etal2024
+NEO304	EHG	EHG	Volnensky	Ukraine	CentralEasternEurope	7011	47.95	35.39	Allentoft_Sikora_etal2024
+NEO186	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	6922	56.78	40.45	Allentoft_Sikora_etal2024
+NEO552	EHG	EHG	Vovnigi	Ukraine	CentralEasternEurope	6898	48.13	35.08	Allentoft_Sikora_etal2024
+NEO507	EHG	EHG	Vovnigi	Ukraine	CentralEasternEurope	6885	48.13	35.08	Allentoft_Sikora_etal2024
+NEO192	EHG	EHG	Sakhtish II	Russia	CentralEasternEurope	6841	56.78	40.45	Allentoft_Sikora_etal2024
+NEO528	EHG	EHG	Vovnigi	Ukraine	CentralEasternEurope	6839	48.13	35.08	Allentoft_Sikora_etal2024
+NEO302	EHG	EHG	Volnensky	Ukraine	CentralEasternEurope	6826	47.95	35.39	Allentoft_Sikora_etal2024
+NEO503	EHG	EHG	Vovnigi	Ukraine	CentralEasternEurope	6708	48.13	35.08	Allentoft_Sikora_etal2024
+NEO300	EHG	EHG	Volnensky	Ukraine	CentralEasternEurope	6678	47.95	35.39	Allentoft_Sikora_etal2024
+NEO502	EHG	EHG	Vovnigi	Ukraine	CentralEasternEurope	6610	48.13	35.08	Allentoft_Sikora_etal2024
+NEO173	EHG	EHG	Ksizovo 6	Russia	CentralEasternEurope	6345	52.28	38.96	Allentoft_Sikora_etal2024
+NEO180	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	5947	56.78	40.45	Allentoft_Sikora_etal2024
+NEO171	EHG	EHG	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	5835	53	40.4	Allentoft_Sikora_etal2024
+NEO195	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	5749	56.78	40.45	Allentoft_Sikora_etal2024
+NEO166	EHG	EHG	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	5668	53	40.4	Allentoft_Sikora_etal2024
+NEO167	EHG	EHG	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	5657	53	40.4	Allentoft_Sikora_etal2024
+NEO189	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	5648	56.78	40.45	Allentoft_Sikora_etal2024
+NEO163	EHG	EHG	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	5603	53	40.4	Allentoft_Sikora_etal2024
+NEO194	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	5575	56.78	40.45	Allentoft_Sikora_etal2024
+NEO170	EHG	EHG	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	5562	53	40.4	Allentoft_Sikora_etal2024
+NEO179	EHG	EHG	Sakhtish II	Russia	CentralEasternEurope	5467	56.78	40.45	Allentoft_Sikora_etal2024
+NEO184	EHG	EHG	Sakhtish 8	Russia	CentralEasternEurope	5458	56.78	40.44	Allentoft_Sikora_etal2024
+NEO193	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	5453	56.78	40.45	Allentoft_Sikora_etal2024
+NEO687	EHG	EHG	Kumyshanskaya Cave	Russia	CentralEasternEurope	5446	57.58	58.2	Allentoft_Sikora_etal2024
+NEO178	EHG	EHG	Sakhtish II	Russia	CentralEasternEurope	5322	56.78	40.45	Allentoft_Sikora_etal2024
+NEO174	EHG	EHG	Ksizovo 6	Russia	CentralEasternEurope	5306	52.28	38.96	Allentoft_Sikora_etal2024
+NEO160	EHG	EHG	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	5269	53	40.4	Allentoft_Sikora_etal2024
+NEO197	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	5245	56.78	40.45	Allentoft_Sikora_etal2024
+NEO898	EHG	EHG	Svinninge Vejle	Denmark	NorthernEurope	5080	55.74	11.43	Allentoft_Sikora_etal2024
+NEO187	EHG	EHG	Sakhtish IIa	Russia	CentralEasternEurope	4940	56.78	40.45	Allentoft_Sikora_etal2024
+NEO509	EHG	EHG	Igren	Ukraine	CentralEasternEurope	4065	48.4	35.16	Allentoft_Sikora_etal2024
+VLASA32-2	WHG	WHG	Vlasac	Serbia	NA	11627.5	44.536351	22.038861	Marchi_etal2022
+VLASA7-3	WHG	WHG	Vlasac	Serbia	NA	10575	44.536351	22.038861	Marchi_etal2022
+NEO254	WHG	WHG	Koelbjerg	Denmark	NorthernEurope	10463	55.4	10.13	Allentoft_Sikora_etal2024
+NEO694	WHG	WHG	Santa Maira	Spain	SouthernEurope	9217	38.73	-0.46	Allentoft_Sikora_etal2024
+NEO91	WHG	WHG	Str√∏by Gr√∏ftemark	Denmark	NorthernEurope	9122	55.39	12.31	Allentoft_Sikora_etal2024
+NEO759	WHG	WHG	K√∏ge S√∏nakke	Denmark	NorthernEurope	9028	55.4	12.37	Allentoft_Sikora_etal2024
+NEO672	WHG	WHG	Schela Cladovei	Romania	CentralEasternEurope	8814	44.64	22.66	Allentoft_Sikora_etal2024
+NEO816	WHG	WHG	Tepe Guran	Iran	WesternAsia	8700	33.76	47.1	Allentoft_Sikora_etal2024
+NEO655	WHG	WHG	Vlasac	Serbia	CentralEasternEurope	8668	44.54	22.04	Allentoft_Sikora_etal2024
+NEO658	WHG	WHG	Vlasac	Serbia	CentralEasternEurope	8668	44.54	22.04	Allentoft_Sikora_etal2024
+NEO646	WHG	WHG	El Mazo	Spain	SouthernEurope	8273	43.4	-4.71	Allentoft_Sikora_etal2024
+NEO123	WHG	WHG	Orehoved Sejlrende	Denmark	NorthernEurope	8182	54.96	11.85	Allentoft_Sikora_etal2024
+NEO19	WHG	WHG	R√∏ntesten	Denmark	NorthernEurope	8163	56.27	10.47	Allentoft_Sikora_etal2024
+NEO122	WHG	WHG	Orehoved Sejlrende	Denmark	NorthernEurope	8146	54.96	11.85	Allentoft_Sikora_etal2024
+NEO669	WHG	WHG	Lepenski Vir	Serbia	CentralEasternEurope	7950	44.56	22.03	Allentoft_Sikora_etal2024
+NEO938	WHG	WHG	El Mazo	Spain	SouthernEurope	7878	43.4	-4.71	Allentoft_Sikora_etal2024
+NEO648	WHG	WHG	Toral III	Spain	SouthernEurope	7539	43.4	-4.71	Allentoft_Sikora_etal2024
+NEO307	WHG	WHG	Zvejnieki	Latvia	NorthernEurope	7495	57.78	25.23	Allentoft_Sikora_etal2024
+NEO586	WHG	WHG	Koed	Denmark	NorthernEurope	7031	56.37	10.57	Allentoft_Sikora_etal2024
+NEO583	WHG	WHG	Koed	Denmark	NorthernEurope	6981	56.37	10.57	Allentoft_Sikora_etal2024
+NEO679	WHG	WHG	Skateholm I	Sweden	NorthernEurope	6834	55.39	13.48	Allentoft_Sikora_etal2024
+NEO745	WHG	WHG	Henriksholm-B√∏gebakken (Vedb√¶k)	Denmark	NorthernEurope	6790	55.85	12.56	Allentoft_Sikora_etal2024
+NEO856	WHG	WHG	Nederst	Denmark	NorthernEurope	6777	56.37	10.64	Allentoft_Sikora_etal2024
+NEO568	WHG	WHG	Erteb√∂lle	Denmark	NorthernEurope	6586	56.81	9.18	Allentoft_Sikora_etal2024
+NEO941	WHG	WHG	Havn√∏	Denmark	NorthernEurope	6372	56.71	10.17	Allentoft_Sikora_etal2024
+NEO570	WHG	WHG	Fannerup E	Denmark	NorthernEurope	6369	56.4	10.72	Allentoft_Sikora_etal2024
+NEO751	WHG	WHG	Bj√∏rnsholm	Denmark	NorthernEurope	6343	56.87	9.22	Allentoft_Sikora_etal2024
+NEO852	WHG	WHG	Norsminde	Denmark	NorthernEurope	6308	56.03	10.26	Allentoft_Sikora_etal2024
+NEO855	WHG	WHG	Fannerup D	Denmark	NorthernEurope	6302	56.4	10.72	Allentoft_Sikora_etal2024
+NEO598	WHG	WHG	S√∂lager	Denmark	NorthernEurope	6075	55.95	11.9	Allentoft_Sikora_etal2024
+NEO960	WHG	WHG	Ravnsbjergg√•rd II	Denmark	NorthernEurope	5926	55.58	11.58	Allentoft_Sikora_etal2024
+NEO645	WHG	WHG	R√∂dhals	Denmark	NorthernEurope	5870	55.91	11.09	Allentoft_Sikora_etal2024
+NEO260	WHG	WHG	Evens√•s	Sweden	NorthernEurope	5825	58.25	11.49	Allentoft_Sikora_etal2024
+AKT16-2	Early farmers	Anatolia Early Farmers	Aktopraklik	Turkey	NA	10570.5	40.173	28.77283	Marchi_etal2022
+BAR25-1	Early farmers	Anatolia Early Farmers	Barcin	Turkey	NA	10317.5	40.30122	29.60833	Marchi_etal2022
+Nea3	Early farmers	Anatolia Early Farmers	Nea Nikomedeia	Greece	NA	10206.5	40.5878	22.24991	Marchi_etal2022
+Nea2	Early farmers	Anatolia Early Farmers	Nea Nikomedeia	Greece	NA	10121	40.5878	22.24991	Marchi_etal2022
+LEPE48-2	Early farmers	Anatolia Early Farmers	Lepinski Vir	Serbia	NA	9955	44.55224	22.02736	Marchi_etal2022
+LEPE52-1	Early farmers	Anatolia Early Farmers	Lepinski Vir	Serbia	NA	9835	44.55224	22.02736	Marchi_etal2022
+STAR1	Early farmers	Anatolia Early Farmers	Grad-Starcevo	Serbia	NA	9555.5	44.82618	20.71596	Marchi_etal2022
+Asp6	Early farmers	Anatolia Early Farmers	Asparn-Schletz	Austria	NA	9528	48.58026	16.46911	Marchi_etal2022
+VC3-2	Early farmers	Anatolia Early Farmers	Vinca-Belo Brdo	Serbia	NA	9518.5	44.76147	20.62346	Marchi_etal2022
+Dil16	Early farmers	Anatolia Early Farmers	Dillingen-Steinheim	Germany	NA	9139.5	48.59503	10.53935	Marchi_etal2022
+Herx	Early farmers	Anatolia Early Farmers	Herxheim	Germany	NA	9101.5	49.14696	8.21807	Marchi_etal2022
+Klein7	Early farmers	Anatolia Early Farmers	Kleinhadersdorf	Austria	NA	9000	48.66388	16.58963	Marchi_etal2022
+NEO137	Early farmers	European Early Farmers	H√∂dmez√∂vasarhely Kotac	Hungary	CentralEasternEurope	7591	46.42	20.33	Allentoft_Sikora_etal2024
+NEO695	Early farmers	European Early Farmers	Maddalena	Italy	SouthernEurope	7299	43.08	13.06	Allentoft_Sikora_etal2024
+NEO145	Early farmers	European Early Farmers	Gorzsa Cukormajor	Hungary	CentralEasternEurope	6744	46.37	20.42	Allentoft_Sikora_etal2024
+NEO147	Early farmers	European Early Farmers	Gorzsa Cukormajor	Hungary	CentralEasternEurope	6724	46.37	20.42	Allentoft_Sikora_etal2024
+NEO140	Early farmers	European Early Farmers	Gorzsa Cukormajor	Hungary	CentralEasternEurope	6718	46.37	20.42	Allentoft_Sikora_etal2024
+NEO142	Early farmers	European Early Farmers	Gorzsa Cukormajor	Hungary	CentralEasternEurope	6641	46.37	20.42	Allentoft_Sikora_etal2024
+NEO674	Early farmers	European Early Farmers	Baile Herculane	Romania	CentralEasternEurope	5570	44.9	22.43	Allentoft_Sikora_etal2024
+NEO641	Early farmers	European Early Farmers	Slonowice	Poland	CentralEasternEurope	5132	50.27	20.45	Allentoft_Sikora_etal2024
+NEO310	Early farmers	Iran Farmer	Monjukli-Depe	Turkmenistan	CentralAsia	7150	36.85	60.42	Allentoft_Sikora_etal2024
+NEO631	Neolithic farmers	Neolithic Farmers	Gruta do Caldeirao	Portugal	SouthernEurope	7139	39.65	-8.42	Allentoft_Sikora_etal2024
+NEO790	Neolithic farmers	Neolithic Farmers	Tysmose	Denmark	NorthernEurope	5663	55.71	12.27	Allentoft_Sikora_etal2024
+NEO891	Neolithic farmers	Neolithic Farmers	Roskilde Fjord (syd for Jyllinge)	Denmark	NorthernEurope	5661	55.73	12.1	Allentoft_Sikora_etal2024
+NEO23	Neolithic farmers	Neolithic Farmers	Jorl√∂se mose	Denmark	NorthernEurope	5533	55.6	11.31	Allentoft_Sikora_etal2024
+NEO753	Neolithic farmers	Neolithic Farmers	Sigersdal Mose 2	Denmark	NorthernEurope	5531	55.77	12.21	Allentoft_Sikora_etal2024
+NEO29	Neolithic farmers	Neolithic Farmers	Lohals	Denmark	NorthernEurope	5489	55.13	10.9	Allentoft_Sikora_etal2024
+NEO28	Neolithic farmers	Neolithic Farmers	Salpetermosen syd 8	Denmark	NorthernEurope	5459	55.91	12.31	Allentoft_Sikora_etal2024
+NEO886	Neolithic farmers	Neolithic Farmers	Dalmosegaard	Denmark	NorthernEurope	5457	54.99	12.42	Allentoft_Sikora_etal2024
+NEO595	Neolithic farmers	Neolithic Farmers	Pandebjerg	Denmark	NorthernEurope	5452	55.79	11.29	Allentoft_Sikora_etal2024
+NEO757	Neolithic farmers	Neolithic Farmers	Sejerby (Sejer√∏)	Denmark	NorthernEurope	5452	55.9	11.12	Allentoft_Sikora_etal2024
+NEO896	Neolithic farmers	Neolithic Farmers	Mandemarke	Denmark	NorthernEurope	5446	54.97	12.49	Allentoft_Sikora_etal2024
+NEO945	Neolithic farmers	Neolithic Farmers	L√¶sten Mose	Denmark	NorthernEurope	5445	56.49	9.83	Allentoft_Sikora_etal2024
+NEO830	Neolithic farmers	Neolithic Farmers	Fontenoce	Italy	SouthernEurope	5393	43.38	13.55	Allentoft_Sikora_etal2024
+NEO933	Neolithic farmers	Neolithic Farmers	Sludeg√•rd S√∏mose	Denmark	NorthernEurope	5337	55.25	10.75	Allentoft_Sikora_etal2024
+NEO744	Neolithic farmers	Neolithic Farmers	Femh√∏ve	Denmark	NorthernEurope	5333	55.86	11.59	Allentoft_Sikora_etal2024
+NEO597	Neolithic farmers	Neolithic Farmers	Storelyng (√òg√•rde boat III)	Denmark	NorthernEurope	5210	55.59	11.57	Allentoft_Sikora_etal2024
+NEO599	Neolithic farmers	Neolithic Farmers	Vanl√∂se mose	Denmark	NorthernEurope	5134	55.55	11.68	Allentoft_Sikora_etal2024
+NEO627	Neolithic farmers	Neolithic Farmers	Banks tomb	UK	WesternEurope	5132	58.73	-2.94	Allentoft_Sikora_etal2024
+NEO626	Neolithic farmers	Neolithic Farmers	Banks tomb	UK	WesternEurope	5082	58.73	-2.94	Allentoft_Sikora_etal2024
+NEO39	Neolithic farmers	Neolithic Farmers	Hindby mosse	Sweden	NorthernEurope	5074	55.57	13.04	Allentoft_Sikora_etal2024
+NEO43	Neolithic farmers	Neolithic Farmers	Rude	Denmark	NorthernEurope	5067	55.99	10.25	Allentoft_Sikora_etal2024
+NEO25	Neolithic farmers	Neolithic Farmers	Kainsbakke II	Denmark	NorthernEurope	4956	56.43	10.79	Allentoft_Sikora_etal2024
+NEO925	Neolithic farmers	Neolithic Farmers	Myrebjerg mose	Denmark	NorthernEurope	4947	54.77	10.68	Allentoft_Sikora_etal2024
+NEO640	Neolithic farmers	Neolithic Farmers	Slonowice	Poland	CentralEasternEurope	4902	50.27	20.45	Allentoft_Sikora_etal2024
+NEO630	Neolithic farmers	Neolithic Farmers	Banks tomb	UK	WesternEurope	4898	58.73	-2.94	Allentoft_Sikora_etal2024
+NEO624	Neolithic farmers	Neolithic Farmers	Banks tomb	UK	WesternEurope	4897	58.73	-2.94	Allentoft_Sikora_etal2024
+NEO717	Neolithic farmers	Neolithic Farmers	Banks tomb	UK	WesternEurope	4893	58.73	-2.94	Allentoft_Sikora_etal2024
+NEO823	Neolithic farmers	Neolithic Farmers	Grotta Nisco	Italy	SouthernEurope	4665	40.88	16.73	Allentoft_Sikora_etal2024
+NEO943	Neolithic farmers	Neolithic Farmers	Stenderup Hage	Denmark	NorthernEurope	4614	55.46	9.69	Allentoft_Sikora_etal2024
+NEO121	Neolithic farmers	Neolithic Farmers	Grotte Mandrin	France	WesternEurope	4531	44.47	4.77	Allentoft_Sikora_etal2024
+NEO119	Neolithic farmers	Neolithic Farmers	Grotte Mandrin	France	WesternEurope	4382	44.47	4.77	Allentoft_Sikora_etal2024
+NEO609	Neolithic farmers	Neolithic Farmers	Sao Paulo 2	Portugal	SouthernEurope	4333	38.68	-9.16	Allentoft_Sikora_etal2024
+NEO721	Neolithic farmers	Neolithic Farmers	Camino de las Yeseras	Spain	SouthernEurope	4170	40.44	-3.5	Allentoft_Sikora_etal2024
+NEO653	Neolithic farmers	Neolithic Farmers	Toral III	Spain	SouthernEurope	3423	43.4	-4.71	Allentoft_Sikora_etal2024
+RISE507	Steppe pastoralists	Steppe pastoralists	River Kuyum	Russia	NorthAsia	5077	51.5	85.97	Allentoft_etal2015
+RISE550	Steppe pastoralists	Steppe pastoralists	Peshany V	Russia	CentralEasternEurope	4934.5	46.56	43.68	Allentoft_etal2015
+RISE546	Steppe pastoralists	Steppe pastoralists	Temrta IV	Russia	CentralEasternEurope	4850	46.54	43.7	Allentoft_etal2015
+RISE548	Steppe pastoralists	Steppe pastoralists	Temrta IV	Russia	CentralEasternEurope	4850	46.54	43.7	Allentoft_etal2015
+RISE547	Steppe pastoralists	Steppe pastoralists	Temrta IV	Russia	CentralEasternEurope	4710.5	46.54	43.7	Allentoft_etal2015
+RISE240	Steppe pastoralists	Steppe pastoralists	Sukhaya Termista I	Russia	CentralEasternEurope	4706	46.58	43.68	Allentoft_etal2015
+RISE555	Steppe pastoralists	Steppe pastoralists	Stalingrad Quarry	Russia	CentralEasternEurope	4627	48.72	44.5	Allentoft_etal2015
+RISE510	Steppe pastoralists	Steppe pastoralists	Middle Yenisei region, Afanasieva Gora	Russia	NorthAsia	4609.5	54.36	90.92	Allentoft_etal2015
+NEO175	Steppe pastoralists	Steppe pastoralists	Ksizovo 6	Russia	CentralEasternEurope	4607	52.28	38.96	Allentoft_Sikora_etal2024
+RISE503	Steppe pastoralists	Steppe pastoralists	Kytmanovo	Russia	NorthAsia	3569	53.46	85.45	Allentoft_etal2015
+RISE500	Steppe pastoralists	Steppe pastoralists	Kytmanovo	Russia	NorthAsia	3550	53.46	85.45	Allentoft_etal2015
+RISE523	Steppe pastoralists	Steppe pastoralists	Kapova cave	Russia	CentralEasternEurope	3448	53.04	57.07	Allentoft_etal2015
+RISE494	Steppe pastoralists	Steppe pastoralists	Sabinka 2	Russia	NorthAsia	3292	53.15	91.05	Allentoft_etal2015
+RISE499	Steppe pastoralists	Steppe pastoralists	Bystrovka	Russia	NorthAsia	3100	51.91	88.57	Allentoft_etal2015
+RISE525	Steppe pastoralists	Steppe pastoralists	Kapova cave	Russia	CentralEasternEurope	3000	53.04	57.07	Allentoft_etal2015
+NEO518	Steppe pastoralists	Steppe pastoralists	Igren	Ukraine	CentralEasternEurope	2156	48.4	35.16	Allentoft_Sikora_etal2024
+RISE407	Bronze age	Post Neolithic Caucasus	Norabak	Armenia	WesternAsia	2955	40.15	45.86	Allentoft_etal2015
+RISE446	Bronze age	Post Neolithic European	Bergrheinfeld	Germany	WesternEurope	4597	50.01	10.18	Allentoft_etal2015
+RISE94	Bronze age	Post Neolithic European	Viby	Sweden	NorthernEurope	4496.5	56.03	14.23	Allentoft_etal2015
+RISE563	Bronze age	Post Neolithic European	Osterhofen-Altenmarkt	Germany	WesternEurope	4492	48.69	13.02	Allentoft_etal2015
+NEO306	Bronze age	Post Neolithic European	Sope	Estonia	NorthernEurope	4472	59.41	27.03	Allentoft_Sikora_etal2024
+NEO44	Bronze age	Post Neolithic European	D√∂semarken	Sweden	NorthernEurope	4389	55.56	12.95	Allentoft_Sikora_etal2024
+NEO51	Bronze age	Post Neolithic European	Kastanjeg√•rden	Sweden	NorthernEurope	4361	55.56	13.02	Allentoft_Sikora_etal2024
+VK531	Bronze age	Post Neolithic European	Tromso	Norway	NorthernEurope	4350	69.47	18	Margaryan_etal2020
+NEO870	Bronze age	Post Neolithic European	Toftum mose	Denmark	NorthernEurope	4240	55.9	9.99	Allentoft_Sikora_etal2024
+NEO92	Bronze age	Post Neolithic European	Barh√∏j (Str√∏by Egede)	Denmark	NorthernEurope	4188	55.4	12.27	Allentoft_Sikora_etal2024
+NEO649	Bronze age	Post Neolithic European	Toral III	Spain	SouthernEurope	4117	43.4	-4.71	Allentoft_Sikora_etal2024
+NEO737	Bronze age	Post Neolithic European	Borreby	Denmark	NorthernEurope	4106	55.23	11.3	Allentoft_Sikora_etal2024
+RISE566	Bronze age	Post Neolithic European	Knezeves	CzechRepublic	CentralEasternEurope	4106	50.12	14.26	Allentoft_etal2015
+NEO738	Bronze age	Post Neolithic European	Kolind	Denmark	NorthernEurope	4103	56.36	10.59	Allentoft_Sikora_etal2024
+NEO861	Bronze age	Post Neolithic European	Mosede Mose	Denmark	NorthernEurope	4102	55.58	12.28	Allentoft_Sikora_etal2024
+RISE71	Bronze age	Post Neolithic European	Falsh√∂j	Denmark	NorthernEurope	4059.5	56.68	10.03	Allentoft_etal2015
+NEO878	Bronze age	Post Neolithic European	Kyndel√∏se	Denmark	NorthernEurope	4026	55.7	11.86	Allentoft_Sikora_etal2024
+RISE577	Bronze age	Post Neolithic European	Velk√© P≈ô√≠lepy	CzechRepublic	CentralEasternEurope	4000	50.17	14.32	Allentoft_etal2015
+RISE586	Bronze age	Post Neolithic European	Moravsk√° Nov√° Ves	CzechRepublic	CentralEasternEurope	4000	48.8	17.02	Allentoft_etal2015
+NEO220	Bronze age	Post Neolithic European	Falk√∂ping 5	Sweden	NorthernEurope	3989	58.17	13.57	Allentoft_Sikora_etal2024
+NEO735	Bronze age	Post Neolithic European	Borreby	Denmark	NorthernEurope	3972	55.23	11.3	Allentoft_Sikora_etal2024
+NEO875	Bronze age	Post Neolithic European	Toftum mose	Denmark	NorthernEurope	3970	55.9	9.99	Allentoft_Sikora_etal2024
+NEO227	Bronze age	Post Neolithic European	Falk√∂ping 5	Sweden	NorthernEurope	3948	58.17	13.57	Allentoft_Sikora_etal2024
+NEO224	Bronze age	Post Neolithic European	Falk√∂ping 5	Sweden	NorthernEurope	3945	58.17	13.57	Allentoft_Sikora_etal2024
+RISE97	Bronze age	Post Neolithic European	Fredriksberg	Sweden	NorthernEurope	3905	55.56	13.06	Allentoft_etal2015
+NEO261	Bronze age	Post Neolithic European	Sillvik	Sweden	NorthernEurope	3895	57.74	11.74	Allentoft_Sikora_etal2024
+NEO228	Bronze age	Post Neolithic European	Falk√∂ping 5	Sweden	NorthernEurope	3843	58.17	13.57	Allentoft_Sikora_etal2024
+RISE109	Bronze age	Post Neolithic European	Wojkowice	Poland	CentralEasternEurope	3813	50.98	17.07	Allentoft_etal2015
+RISE154	Bronze age	Post Neolithic European	Szczepankowice	Poland	CentralEasternEurope	3795	50.95	16.94	Allentoft_etal2015
+VK214	Bronze age	Post Neolithic European	Gerdrup	Denmark	NorthernEurope	3782	55.73	12.12	Margaryan_etal2020
+NEO52	Bronze age	Post Neolithic European	Vattenledningen	Sweden	NorthernEurope	3765	55.5	13.01	Allentoft_Sikora_etal2024
+NEO225	Bronze age	Post Neolithic European	Falk√∂ping 5	Sweden	NorthernEurope	3750	58.17	13.57	Allentoft_Sikora_etal2024
+NEO93	Bronze age	Post Neolithic European	Str√∏by Ladeplads	Denmark	NorthernEurope	3735	55.41	12.29	Allentoft_Sikora_etal2024
+RISE479	Bronze age	Post Neolithic European	Erd 4	Hungary	CentralEasternEurope	3700	47.34	18.9	Allentoft_etal2015
+NEO860	Bronze age	Post Neolithic European	Mosede Mose	Denmark	NorthernEurope	3697	55.58	12.28	Allentoft_Sikora_etal2024
+NEO563	Bronze age	Post Neolithic European	Bybjerg	Denmark	NorthernEurope	3350	55.76	11.8	Allentoft_Sikora_etal2024
+NEO590	Bronze age	Post Neolithic European	Magle√∂	Denmark	NorthernEurope	3290	55.34	11.16	Allentoft_Sikora_etal2024
+NEO951	Bronze age	Post Neolithic European	Kl√¶strup Holm Mose	Denmark	NorthernEurope	3242	57.29	10.03	Allentoft_Sikora_etal2024
+RISE397	Bronze age	Post Neolithic European	Kapan	Armenia	WesternAsia	2901.5	39.2	46.4	Allentoft_etal2015
+RISE559	Bronze age	Post Neolithic Levant	Augsburg	Germany	WesternEurope	4284	48.33	10.9	Allentoft_etal2015
+RISE373	Bronze age	Post Neolithic Levant	Sz√∂reg, Sziv Utca	Hungary	CentralEasternEurope	3741	46.22	20.2	Allentoft_etal2015
+RISE484	Bronze age	Post Neolithic Levant	Erd 4	Hungary	CentralEasternEurope	3700	47.34	18.9	Allentoft_etal2015
+RISE374	Bronze age	Post Neolithic Levant	Sz√∂reg, Sziv Utca	Hungary	CentralEasternEurope	3692.5	46.22	20.2	Allentoft_etal2015
+RISE247	Bronze age	Post Neolithic Levant	Sz√°zhalombatta-F√∂ldv√°r	Hungary	CentralEasternEurope	3628.5	47.33	18.96	Allentoft_etal2015
+RISE480	Bronze age	Post Neolithic Levant	Erd 4	Hungary	CentralEasternEurope	3550	47.34	18.9	Allentoft_etal2015
+NEO806	Bronze age	Post Neolithic Levant	Grotta Delle Mura	Italy	SouthernEurope	3015	40.96	17.29	Allentoft_Sikora_etal2024
+VK523	Iron age to early modern	Iron age to early modern	Sor-Trondelag	Norway	NorthernEurope	1800	63.83	9.7	Margaryan_etal2020
+VK521	Iron age to early modern	Iron age to early modern	Brondsager Torsiinre	Denmark	NorthernEurope	1650	55.64	12.24	Margaryan_etal2020
+VK418	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	1500	67.94	14.98	Margaryan_etal2020
+VK213	Iron age to early modern	Iron age to early modern	Gerdrup	Denmark	NorthernEurope	1491	55.73	12.12	Margaryan_etal2020
+RISE174	Iron age to early modern	Iron age to early modern	Oxie 7	Sweden	NorthernEurope	1431	55.55	13.1	Allentoft_etal2015
+VK390	Iron age to early modern	Iron age to early modern	Telemark	Norway	NorthernEurope	1350	59.22	9.59	Margaryan_etal2020
+VK391	Iron age to early modern	Iron age to early modern	Telemark	Norway	NorthernEurope	1350	59.22	9.59	Margaryan_etal2020
+RISE569	Iron age to early modern	Iron age to early modern	Brandysek	CzechRepublic	CentralEasternEurope	1235	50.19	14.16	Allentoft_etal2015
+VK296	Iron age to early modern	Iron age to early modern	Hundstrup	Denmark	NorthernEurope	1230	55.15	11.87	Margaryan_etal2020
+VK297	Iron age to early modern	Iron age to early modern	Hundstrup	Denmark	NorthernEurope	1200	55.15	11.87	Margaryan_etal2020
+VK65	Iron age to early modern	Iron age to early modern	Tollemosegard	Denmark	NorthernEurope	1200	55.87	12.08	Margaryan_etal2020
+VK69	Iron age to early modern	Iron age to early modern	Tollemosegard	Denmark	NorthernEurope	1200	55.87	12.08	Margaryan_etal2020
+VK71	Iron age to early modern	Iron age to early modern	Tollemosegard	Denmark	NorthernEurope	1200	55.87	12.08	Margaryan_etal2020
+VK301	Iron age to early modern	Iron age to early modern	Ladby	Denmark	NorthernEurope	1185	55.43	10.61	Margaryan_etal2020
+VK545	Iron age to early modern	Iron age to early modern	Ireland	Ireland	WesternEurope	1185	53.34	-6.27	Margaryan_etal2020
+VK350	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1151	56.73	16.72	Margaryan_etal2020
+VK319	Iron age to early modern	Iron age to early modern	Ladby	Denmark	NorthernEurope	1150	55.43	10.61	Margaryan_etal2020
+VK349	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1121	56.46	16.43	Margaryan_etal2020
+VK355	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1102	56.29	16.41	Margaryan_etal2020
+VK442	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1102	56.42	16.43	Margaryan_etal2020
+VK444	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1102	56.42	16.43	Margaryan_etal2020
+VK480	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK481	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK482	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK483	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK484	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK486	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK487	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK488	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK489	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK491	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK492	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK493	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK495	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK496	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK498	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK504	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK505	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK506	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK507	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK508	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK509	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK510	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK511	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK512	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK514	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	1100	67.91	15.13	Margaryan_etal2020
+VK519	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	1100	67.93	14.96	Margaryan_etal2020
+VK549	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK550	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK551	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK552	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK553	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK554	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK555	Iron age to early modern	Iron age to early modern	Salme	Estonia	NorthernEurope	1100	58.17	22.25	Margaryan_etal2020
+VK336	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1097	56.81	16.73	Margaryan_etal2020
+VK358	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1097	56.81	16.73	Margaryan_etal2020
+VK332	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1092	56.42	16.43	Margaryan_etal2020
+VK337	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1092	56.48	16.58	Margaryan_etal2020
+VK325	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	1091	55.33	8.76	Margaryan_etal2020
+VK328	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	1079	55.33	8.76	Margaryan_etal2020
+VK294	Iron age to early modern	Iron age to early modern	Bakkendrup	Denmark	NorthernEurope	1075	55.56	11.25	Margaryan_etal2020
+VK300	Iron age to early modern	Iron age to early modern	Hesselbjerg	Denmark	NorthernEurope	1075	55.95	10.2	Margaryan_etal2020
+VK312	Iron age to early modern	Iron age to early modern	Rantzausminde	Denmark	NorthernEurope	1075	55.05	10.53	Margaryan_etal2020
+VK313	Iron age to early modern	Iron age to early modern	Rantzausminde	Denmark	NorthernEurope	1075	55.05	10.53	Margaryan_etal2020
+VK314	Iron age to early modern	Iron age to early modern	Rantzausminde	Denmark	NorthernEurope	1075	55.05	10.53	Margaryan_etal2020
+VK315	Iron age to early modern	Iron age to early modern	Bakkendrup	Denmark	NorthernEurope	1075	55.56	11.25	Margaryan_etal2020
+VK340	Iron age to early modern	Iron age to early modern	Hesselbjerg	Denmark	NorthernEurope	1075	55.95	10.2	Margaryan_etal2020
+VK369	Iron age to early modern	Iron age to early modern	Bakkendrup	Denmark	NorthernEurope	1075	55.56	11.25	Margaryan_etal2020
+VK384	Iron age to early modern	Iron age to early modern	Hesselbjerg	Denmark	NorthernEurope	1075	55.95	10.2	Margaryan_etal2020
+VK84	Iron age to early modern	Iron age to early modern	Hesselbjerg	Denmark	NorthernEurope	1075	55.95	10.2	Margaryan_etal2020
+VK87	Iron age to early modern	Iron age to early modern	Hesselbjerg	Denmark	NorthernEurope	1075	55.95	10.2	Margaryan_etal2020
+VK90	Iron age to early modern	Iron age to early modern	Lejre	Denmark	NorthernEurope	1075	55.6	11.95	Margaryan_etal2020
+VK92	Iron age to early modern	Iron age to early modern	Lejre	Denmark	NorthernEurope	1075	55.6	11.95	Margaryan_etal2020
+VK333	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	1065	56.58	16.46	Margaryan_etal2020
+VK371	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	1065	55.5	10.33	Margaryan_etal2020
+VK528	Iron age to early modern	Iron age to early modern	Troms	Norway	NorthernEurope	1050	69.65	18.16	Margaryan_etal2020
+VK529	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	1050	67.64	14.79	Margaryan_etal2020
+VK221	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	1039	60	32.3	Margaryan_etal2020
+VK143	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK144	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK145	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK146	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK147	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK150	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK151	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK165	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK166	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK168	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK172	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK173	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK174	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK175	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK177	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK178	Iron age to early modern	Iron age to early modern	Oxford	UK	WesternEurope	1010	51.76	-1.26	Margaryan_etal2020
+VK289	Iron age to early modern	Iron age to early modern	Bodkergarden	Denmark	NorthernEurope	1000	54.8	10.69	Margaryan_etal2020
+VK291	Iron age to early modern	Iron age to early modern	Bodkergarden	Denmark	NorthernEurope	1000	54.8	10.69	Margaryan_etal2020
+VK392	Iron age to early modern	Iron age to early modern	Telemark	Norway	NorthernEurope	1000	59.58	7.92	Margaryan_etal2020
+VK417	Iron age to early modern	Iron age to early modern	Oppland	Norway	NorthernEurope	1000	60.36	10.57	Margaryan_etal2020
+VK525	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	1000	66.18	12.72	Margaryan_etal2020
+VK526	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	1000	65.97	12.27	Margaryan_etal2020
+VK543	Iron age to early modern	Iron age to early modern	Ireland	Ireland	WesternEurope	1000	53.51	-10.13	Margaryan_etal2020
+VK544	Iron age to early modern	Iron age to early modern	Ireland	Ireland	WesternEurope	1000	53.39	-6.3	Margaryan_etal2020
+VK548	Iron age to early modern	Iron age to early modern	Nord-Trondelag	Norway	NorthernEurope	1000	63.44	11.22	Margaryan_etal2020
+VK232	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK428	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK429	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK430	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK431	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK432	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK433	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK434	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK438	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK439	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK450	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK452	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK453	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK454	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK455	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK456	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK457	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK458	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK459	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK460	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK461	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK463	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK468	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK469	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK471	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK473	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK474	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK476	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK477	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK478	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK479	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK48	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK51	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK53	Iron age to early modern	Iron age to early modern	Gotland_Kopparsvik	Sweden	NorthernEurope	975	57.63	18.28	Margaryan_etal2020
+VK56	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK57	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK60	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK63	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK64	Iron age to early modern	Iron age to early modern	Gotland_Frojel	Sweden	NorthernEurope	975	57.34	18.19	Margaryan_etal2020
+VK354	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	964	56.44	16.57	Margaryan_etal2020
+VK219	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	958	60	32.3	Margaryan_etal2020
+VK326	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	958	55.33	8.76	Margaryan_etal2020
+VK256	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK257	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK258	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK259	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK260	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK261	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK262	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK263	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK264	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK449	Iron age to early modern	Iron age to early modern	Dorset	UK	WesternEurope	953	50.67	-2.47	Margaryan_etal2020
+VK170	Iron age to early modern	Iron age to early modern	Balladoole	UK	WesternEurope	950	54.08	-4.68	Margaryan_etal2020
+VK420	Iron age to early modern	Iron age to early modern	Hedmark	Norway	NorthernEurope	950	60.8	11.1	Margaryan_etal2020
+VK448	Iron age to early modern	Iron age to early modern	Hedmark	Norway	NorthernEurope	950	60.8	10.87	Margaryan_etal2020
+VK532	Iron age to early modern	Iron age to early modern	Kragehave Odetofter	Denmark	NorthernEurope	950	55.66	12.25	Margaryan_etal2020
+VK327	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	945	55.33	8.76	Margaryan_etal2020
+VK324	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	938	55.33	8.76	Margaryan_etal2020
+VK186	Iron age to early modern	Iron age to early modern	Greenland	Greenland	NorthernEurope	903	60.99	-45.42	Margaryan_etal2020
+VK334	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	901	56.81	16.73	Margaryan_etal2020
+VK353	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	901	56.42	16.43	Margaryan_etal2020
+VK134	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK138	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK139	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK141	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK201	Iron age to early modern	Iron age to early modern	Orkney_Buckquoy	UK	WesternEurope	900	59.13	-3.32	Margaryan_etal2020
+VK202	Iron age to early modern	Iron age to early modern	Orkney_Buckquoy	UK	WesternEurope	900	59.13	-3.32	Margaryan_etal2020
+VK203	Iron age to early modern	Iron age to early modern	Orkney	UK	WesternEurope	900	59.13	-3.32	Margaryan_etal2020
+VK204	Iron age to early modern	Iron age to early modern	Orkney_Newark	UK	WesternEurope	900	58.93	-2.75	Margaryan_etal2020
+VK205	Iron age to early modern	Iron age to early modern	Orkney_Newark	UK	WesternEurope	900	58.93	-2.75	Margaryan_etal2020
+VK207	Iron age to early modern	Iron age to early modern	Orkney	UK	WesternEurope	900	59.13	-3.32	Margaryan_etal2020
+VK265	Iron age to early modern	Iron age to early modern	Karda	Sweden	NorthernEurope	900	57.18	13.93	Margaryan_etal2020
+VK266	Iron age to early modern	Iron age to early modern	Karda	Sweden	NorthernEurope	900	57.18	13.93	Margaryan_etal2020
+VK268	Iron age to early modern	Iron age to early modern	Karda	Sweden	NorthernEurope	900	57.18	13.93	Margaryan_etal2020
+VK274	Iron age to early modern	Iron age to early modern	Kaargarden	Denmark	NorthernEurope	900	54.85	10.78	Margaryan_etal2020
+VK275	Iron age to early modern	Iron age to early modern	Kaargarden	Denmark	NorthernEurope	900	54.85	10.78	Margaryan_etal2020
+VK276	Iron age to early modern	Iron age to early modern	Kaargarden	Denmark	NorthernEurope	900	54.85	10.78	Margaryan_etal2020
+VK278	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK279	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK280	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK281	Iron age to early modern	Iron age to early modern	Barse	Denmark	NorthernEurope	900	55.13	11.95	Margaryan_etal2020
+VK282	Iron age to early modern	Iron age to early modern	Stengade	Denmark	NorthernEurope	900	54.96	10.83	Margaryan_etal2020
+VK284	Iron age to early modern	Iron age to early modern	Grydehoj	Denmark	NorthernEurope	900	55.65	12.14	Margaryan_etal2020
+VK285	Iron age to early modern	Iron age to early modern	Kaargarden	Denmark	NorthernEurope	900	54.85	10.78	Margaryan_etal2020
+VK286	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK287	Iron age to early modern	Iron age to early modern	Kaargarden	Denmark	NorthernEurope	900	54.85	10.78	Margaryan_etal2020
+VK288	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK290	Iron age to early modern	Iron age to early modern	Kumle	Denmark	NorthernEurope	900	54.89	10.74	Margaryan_etal2020
+VK292	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK295	Iron age to early modern	Iron age to early modern	Hessum	Denmark	NorthernEurope	900	55.51	10.45	Margaryan_etal2020
+VK298	Iron age to early modern	Iron age to early modern	Besser	Denmark	NorthernEurope	900	55.85	10.64	Margaryan_etal2020
+VK316	Iron age to early modern	Iron age to early modern	Hessum	Denmark	NorthernEurope	900	55.51	10.45	Margaryan_etal2020
+VK317	Iron age to early modern	Iron age to early modern	Kaargarden	Denmark	NorthernEurope	900	54.85	10.78	Margaryan_etal2020
+VK320	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK323	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	900	55.33	8.76	Margaryan_etal2020
+VK335	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.73	16.72	Margaryan_etal2020
+VK338	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK342	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.44	16.57	Margaryan_etal2020
+VK343	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.55	16.62	Margaryan_etal2020
+VK344	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.33	16.41	Margaryan_etal2020
+VK345	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.73	16.72	Margaryan_etal2020
+VK346	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.73	16.72	Margaryan_etal2020
+VK348	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.88	16.72	Margaryan_etal2020
+VK352	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.72	16.71	Margaryan_etal2020
+VK361	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK362	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK363	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK364	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK365	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK366	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK367	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK368	Iron age to early modern	Iron age to early modern	Bogovej	Denmark	NorthernEurope	900	54.87	10.72	Margaryan_etal2020
+VK370	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK372	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK373	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK380	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	57.34	17.02	Margaryan_etal2020
+VK386	Iron age to early modern	Iron age to early modern	Oppland	Norway	NorthernEurope	900	62.09	9.05	Margaryan_etal2020
+VK389	Iron age to early modern	Iron age to early modern	Telemark	Norway	NorthernEurope	900	59.22	9.61	Margaryan_etal2020
+VK393	Iron age to early modern	Iron age to early modern	Hedmark	Norway	NorthernEurope	900	60.84	11	Margaryan_etal2020
+VK394	Iron age to early modern	Iron age to early modern	Hedmark	Norway	NorthernEurope	900	61.15	11.34	Margaryan_etal2020
+VK422	Iron age to early modern	Iron age to early modern	Hedmark	Norway	NorthernEurope	900	61.15	11.34	Margaryan_etal2020
+VK443	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	57.34	17.02	Margaryan_etal2020
+VK445	Iron age to early modern	Iron age to early modern	Lejre	Denmark	NorthernEurope	900	55.62	11.97	Margaryan_etal2020
+VK446	Iron age to early modern	Iron age to early modern	Galgedil	Denmark	NorthernEurope	900	55.5	10.33	Margaryan_etal2020
+VK515	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	900	67.28	14.39	Margaryan_etal2020
+VK516	Iron age to early modern	Iron age to early modern	Sor-Trondelag	Norway	NorthernEurope	900	63.7	9.75	Margaryan_etal2020
+VK520	Iron age to early modern	Iron age to early modern	Troms	Norway	NorthernEurope	900	69.65	18.13	Margaryan_etal2020
+VK524	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	900	66.26	12.73	Margaryan_etal2020
+VK530	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	900	67.28	14.39	Margaryan_etal2020
+VK533	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	900	56.81	16.73	Margaryan_etal2020
+VK94	Iron age to early modern	Iron age to early modern	Lejre	Denmark	NorthernEurope	900	55.62	11.97	Margaryan_etal2020
+VK357	Iron age to early modern	Iron age to early modern	Oland	Sweden	NorthernEurope	897	56.42	16.43	Margaryan_etal2020
+VK212	Iron age to early modern	Iron age to early modern	Cedynia	Poland	CentralEasternEurope	889	52.88	14.2	Margaryan_etal2020
+VK20	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	888	60	32.3	Margaryan_etal2020
+VK322	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	866	55.33	8.76	Margaryan_etal2020
+VK330	Iron age to early modern	Iron age to early modern	Ribe	Denmark	NorthernEurope	861	55.33	8.76	Margaryan_etal2020
+VK156	Iron age to early modern	Iron age to early modern	Bodzia	Poland	CentralEasternEurope	850	52.7	18.9	Margaryan_etal2020
+VK159	Iron age to early modern	Iron age to early modern	Pskov	Russia	CentralEasternEurope	850	57.81	28.34	Margaryan_etal2020
+VK171	Iron age to early modern	Iron age to early modern	Cardiff	UK	WesternEurope	850	53.3	-4.22	Margaryan_etal2020
+VK217	Iron age to early modern	Iron age to early modern	Ljungbacka	Sweden	NorthernEurope	850	55.54	13.05	Margaryan_etal2020
+VK223	Iron age to early modern	Iron age to early modern	Gnezdovo	Russia	CentralEasternEurope	850	54.78	31.87	Margaryan_etal2020
+VK224	Iron age to early modern	Iron age to early modern	Gnezdovo	Russia	CentralEasternEurope	850	54.78	31.87	Margaryan_etal2020
+VK254	Iron age to early modern	Iron age to early modern	Gnezdovo	Russia	CentralEasternEurope	850	54.78	31.87	Margaryan_etal2020
+VK272	Iron age to early modern	Iron age to early modern	Gnezdovo	Russia	CentralEasternEurope	850	54.78	31.87	Margaryan_etal2020
+VK273	Iron age to early modern	Iron age to early modern	Gnezdovo	Russia	CentralEasternEurope	850	54.78	31.87	Margaryan_etal2020
+VK387	Iron age to early modern	Iron age to early modern	Oppland	Norway	NorthernEurope	850	60.31	10.43	Margaryan_etal2020
+VK414	Iron age to early modern	Iron age to early modern	Oppland	Norway	NorthernEurope	850	61.88	8.4	Margaryan_etal2020
+VK466	Iron age to early modern	Iron age to early modern	Gnezdovo	Russia	CentralEasternEurope	850	54.78	31.87	Margaryan_etal2020
+VK494	Iron age to early modern	Iron age to early modern	Sandomierz	Poland	CentralEasternEurope	850	50.68	21.75	Margaryan_etal2020
+VK410	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	843	60	32.3	Margaryan_etal2020
+VK16	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	839	60	32.3	Margaryan_etal2020
+VK14	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK15	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK17	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK18	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK19	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK218	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK21	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK22	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK23	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK24	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	800	61.6	-6.96	Margaryan_etal2020
+VK303	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK306	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK308	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK309	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK30	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK31	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK34	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK35	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK395	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK396	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK397	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK398	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK399	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK39	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK400	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK401	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK402	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK403	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK404	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK405	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK406	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK407	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK408	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK409	Iron age to early modern	Iron age to early modern	Ladoga	Russia	CentralEasternEurope	800	60	32.3	Margaryan_etal2020
+VK40	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK424	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK425	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK426	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK427	Iron age to early modern	Iron age to early modern	Skara	Sweden	NorthernEurope	800	58.38	13.65	Margaryan_etal2020
+VK527	Iron age to early modern	Iron age to early modern	Uppsala	Sweden	NorthernEurope	800	59.86	17.65	Margaryan_etal2020
+VK534	Iron age to early modern	Iron age to early modern	Foggia	Italy	SouthernEurope	800	41.42	15.58	Margaryan_etal2020
+VK539	Iron age to early modern	Iron age to early modern	Shestovitsa	Ukraine	CentralEasternEurope	800	51.37	31.18	Margaryan_etal2020
+VK542	Iron age to early modern	Iron age to early modern	Chernigov	Ukraine	CentralEasternEurope	800	51.49	31.31	Margaryan_etal2020
+VK160	Iron age to early modern	Iron age to early modern	Kurevanikka	Russia	CentralEasternEurope	750	58.78	36.16	Margaryan_etal2020
+VK535	Iron age to early modern	Iron age to early modern	Foggia	Italy	SouthernEurope	713	41.42	15.58	Margaryan_etal2020
+VK211	Iron age to early modern	Iron age to early modern	Cedynia	Poland	CentralEasternEurope	700	52.88	14.2	Margaryan_etal2020
+VK388	Iron age to early modern	Iron age to early modern	Nordland	Norway	NorthernEurope	700	68.34	15.66	Margaryan_etal2020
+VK536	Iron age to early modern	Iron age to early modern	Foggia	Italy	SouthernEurope	700	41.34	15.26	Margaryan_etal2020
+VK537	Iron age to early modern	Iron age to early modern	Foggia	Italy	SouthernEurope	700	41.34	15.26	Margaryan_etal2020
+VK538	Iron age to early modern	Iron age to early modern	Foggia	Italy	SouthernEurope	700	41.34	15.26	Margaryan_etal2020
+VK113	Iron age to early modern	Iron age to early modern	Trondheim	Norway	NorthernEurope	650	63.43	10.39	Margaryan_etal2020
+VK114	Iron age to early modern	Iron age to early modern	Trondheim	Norway	NorthernEurope	650	63.43	10.39	Margaryan_etal2020
+VK117	Iron age to early modern	Iron age to early modern	Trondheim	Norway	NorthernEurope	650	63.43	10.39	Margaryan_etal2020
+VK118	Iron age to early modern	Iron age to early modern	Trondheim	Norway	NorthernEurope	650	63.43	10.39	Margaryan_etal2020
+VK124	Iron age to early modern	Iron age to early modern	Trondheim	Norway	NorthernEurope	650	63.43	10.39	Margaryan_etal2020
+VK237	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	250	61.85	-6.8	Margaryan_etal2020
+VK238	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	250	61.85	-6.8	Margaryan_etal2020
+VK241	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	250	61.85	-6.8	Margaryan_etal2020
+VK244	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	250	61.85	-6.8	Margaryan_etal2020
+VK27	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	250	61.85	-6.8	Margaryan_etal2020
+VK44	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	250	61.85	-6.8	Margaryan_etal2020
+VK46	Iron age to early modern	Iron age to early modern	Faroe	Faroes	NorthernEurope	250	61.85	-6.8	Margaryan_etal2020
+VK127	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	900	65.71	-23.75	Margaryan_etal2020
+VK128	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	900	65.71	-23.75	Margaryan_etal2020
+VK129	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	900	65.79	-17.34	Margaryan_etal2020
+VK187	Iron age to early modern	Vikings Iron Age	Greenland	Greenland	NorthernEurope	849	60.99	-45.42	Margaryan_etal2020
+VK179	Iron age to early modern	Vikings Iron Age	Greenland	Greenland	NorthernEurope	800	61.18	-45.68	Margaryan_etal2020
+VK183	Iron age to early modern	Vikings Iron Age	Greenland	Greenland	NorthernEurope	800	61.18	-45.68	Margaryan_etal2020
+VK184	Iron age to early modern	Vikings Iron Age	Greenland	Greenland	NorthernEurope	800	61.18	-45.68	Margaryan_etal2020
+VK513	Iron age to early modern	Vikings Iron Age	Greenland	Greenland	NorthernEurope	800	61.18	-45.68	Margaryan_etal2020
+VK122	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK123	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK225	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK227	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK230	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK95	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK98	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK99	Iron age to early modern	Vikings Iron Age	Iceland	Iceland	NorthernEurope	750	65.61	-17.16	Margaryan_etal2020
+VK75	Iron age to early modern	Vikings Iron Age	Greenland	Greenland	NorthernEurope	654	64.25	-50.1	Margaryan_etal2020

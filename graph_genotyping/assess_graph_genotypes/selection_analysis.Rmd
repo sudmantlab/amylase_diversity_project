@@ -7,64 +7,618 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE)
 ```
 
 ```{r}
 library(tidyverse)
 library(cowplot)
 library(googlesheets4)
+library(ggridges)
+library(rjson)
+library(readxl)
 ```
 
 ## Organizing the data
 
 #### Data wrangling
 
-```{r}
-sample_age_allentoft_ancient <- read_tsv("ancient_info.tsv") %>%
-  transmute(sample, age=parse_double(ageAverage))
-sample_age_excoffier_ancient <- read_tsv("../../read_depth_genotyping/d4_cvg_analysis/bam_to_d4/meta_data/ExcoffierAncients.tsv") %>%
-  transmute(sample = SAMPLE_ID, age=parse_double(AGE_AVG_BP))
-sample_age_ancient <- bind_rows(sample_age_allentoft_ancient, sample_age_excoffier_ancient)
-genotype_raw <- read_sheet("https://docs.google.com/spreadsheets/d/1q7L_dfSoj3yWWtlTGqV2eXCI-H1aFr0QDERYF6J7LXU/edit#gid=1746085135", sheet = "Sheet3", skip = 1)
+
+```{r eval=FALSE}
+## meta data
+meta_data_allentoft_sample_id <- fromJSON(file="../../read_depth_genotyping/d4_cvg_analysis/bam_to_d4/meta_data/config_final_ancient_info.json")  %>% 
+  as_tibble() %>% 
+  colnames()
+meta_data_allentoft <- fromJSON(file="../../read_depth_genotyping/d4_cvg_analysis/bam_to_d4/meta_data/config_final_ancient_info.json")  %>% 
+  as_tibble() %>% 
+  t() %>% 
+  as_tibble() %>% 
+  unnest() %>%
+  transmute(sample=meta_data_allentoft_sample_id, site=V3, country=V4, region=V5, latitude=parse_double(V11), longitude=parse_double(V12), age=parse_double(V18), data_source=V14, pop_grouping=V28) 
+meta_data_excoffier <- read_tsv("../../read_depth_genotyping/d4_cvg_analysis/bam_to_d4/meta_data/ExcoffierAncients.tsv") %>%
+  transmute(sample = SAMPLE_ID, site=SITE, country=COUNTRY, latitude=LAT, longitude=LONG, age=parse_double(AGE_AVG_BP), data_source = PAPER, pop_grouping=MAIN_CLUSTER)
+meta_data_ancient <- bind_rows(meta_data_allentoft, meta_data_excoffier)
+## copy number
+copy_number_raw <- read_sheet("https://docs.google.com/spreadsheets/d/1q7L_dfSoj3yWWtlTGqV2eXCI-H1aFr0QDERYF6J7LXU/edit#gid=1746085135", sheet = "Table S1", skip = 1)
+copy_number_wide <- copy_number_raw %>%
+  pivot_wider(names_from = label, values_from = copy) %>%
+  left_join(meta_data_ancient, by="sample") %>%
+  filter(!(is.na(age) & source=="ExcoffierAncient")) %>%
+  mutate(age=ifelse(is.na(age) & source != "Archaic" & source != "ExcoffierAncient", 0, age))
+copy_number_ancient_wide <- copy_number_wide %>% 
+  filter(source %in% c("ExcoffierAncient", "StoneAgeAncient"))
+## concensus haplotype
+genotype_raw <- read_sheet("https://docs.google.com/spreadsheets/d/1q7L_dfSoj3yWWtlTGqV2eXCI-H1aFr0QDERYF6J7LXU/edit#gid=1746085135", sheet = "Table S4", skip = 1)
 genotype <- genotype_raw %>% 
   filter(cohort %in% c("ExcoffierAncient", "StoneAgeAncient") | p2 == "WEA", cohort !="1KG_trio") %>%
-  left_join(sample_age_ancient) %>%
+  left_join(meta_data_ancient) %>%
   filter(!(is.na(age) & cohort %in% c("ExcoffierAncient", "StoneAgeAncient"))) %>% 
   filter((!cohort %in% c("ExcoffierAncient", "StoneAgeAncient")) | age< 12000) %>%
-  mutate(age=ifelse(is.na(age), 0, age))
+  mutate(age=ifelse(is.na(age), 0, age),
+         p2=ifelse(p2=="HunterGathererE", "Hunter-GathererE", p2))
 genotype %>% count(cohort)
 genotype %>%
   filter(age>0) %>%
   ggplot(aes(x=-age, fill=p2))+
   geom_histogram(color="black") +
-  scale_y_log10()
+  geom_vline(xintercept=c(-200*29, -140*29))
 genotype_long <- genotype %>%
   pivot_longer(cols=c(H1, H2), names_to = "hap", values_to = "structure") %>%
   mutate(dup_hap=case_when(structure %in% c("H1^a", "H2A0") ~ 0,
                            TRUE ~ 1))
 count(genotype_long, structure, dup_hap) %>% arrange(-n)
+## Ale's new labels
+new_p2_labels <- read_sheet("https://docs.google.com/spreadsheets/d/1W2yYuTdOarUMVi5hampNedvFMZjuAOsZl6O_Kyx2xZE", sheet = "AR", col_names = FALSE, skip=1, n_max = 534) %>%
+  transmute(sample=`...2`, source_ar = `...5`, p2_ar=`...8`) %>%
+  mutate(p2_ar = case_when(p2_ar=="X - WHG?" ~ "WHG",
+                           p2_ar=="X - Bronze Age?" ~ "Bronze Age",
+                           p2_ar=="X - Iron Age?" ~ "Iron Age",
+                           TRUE ~ p2_ar))
+copy_number_wide %>%
+  write_tsv("amy_copy_number.tsv")
+copy_number_ancient_wide %>%
+  write_tsv("amy_copy_number.ancient_only.tsv")
 genotype_long %>%
-  ggplot(aes(x=-age, y=dup_hap)) +
-  geom_point(aes(color=p2)) +
-  geom_smooth(method = "glm", 
-              method.args = list(family = "binomial"), 
-              se = TRUE) 
+  write_tsv("haplotype_structure.tsv")
+new_p2_labels %>%
+  write_tsv("new_labels_ar.tsv")
+```
+
+```{r eval=FALSE}
+copy_number_wide <- read_tsv("amy_copy_number.tsv")
+genotype_long <- read_tsv("haplotype_structure.tsv")
+new_p2_labels <- read_tsv("new_labels_ar.tsv")
+generation_time <- 30
+
 genotype_wide <- genotype_long %>%
   pivot_wider(names_from = hap, values_from = c(structure, dup_hap)) %>%
   mutate(dup_hap_geno = dup_hap_H1 + dup_hap_H2) %>% 
   arrange(sample)
-genotype_wide %>%
-  ggplot(aes(x=-age, y=dup_hap_geno)) +
-  geom_point(aes(color=p2)) +
-  geom_smooth() 
-genotype_wide %>% 
-  count(p2, dup_hap_geno)
+master_table_wide <- copy_number_wide %>%
+  filter(!is.na(age), source != "1KG_trio") %>%
+  filter(age > 0 | p2 == "WEA") %>%
+  mutate(p2=ifelse(p2=="HunterGathererE", "Hunter-GathererE", p2)) %>%
+  left_join(genotype_wide) %>%
+  left_join(new_p2_labels) %>%
+  mutate(p2_ar=ifelse(p2=="WEA", "WEA", p2_ar)) %>%
+  mutate(p2_ar=fct_relevel(p2_ar, c("EHG", "WHG", "CHG", "Farmers", "Steppe", "Bronze Age", "Iron Age", "Viking Age", "Medieval Early Modern", "WEA"))) %>%
+  mutate(epoc = cut(-age, 
+                    breaks = c(-1500*generation_time,
+                               -800*generation_time,
+                               -600*generation_time,
+                               -259*generation_time,
+                               -177*generation_time,
+                               -166*generation_time,
+                               -1,
+                               0), 
+                    labels = c("after NE WA split",
+                               "after CHG ANA split",
+                               "after EHG WHG split",
+                               "after NEO formation",
+                               "after YAM formation",
+                               "after BRO formation",
+                               "modern"))) %>%
+  mutate(p2_new=case_when(p2_ar %in% c("WHG", "Farmers") & epoc %in% c("after NEO formation", "after YAM formation") ~ "Neolithic farmers",
+                          p2_ar =="Farmers" & epoc == "after EHG WHG split" ~ "Anatolian farmers",
+                          p2_ar %in% c("EHG", "CHG") & epoc == "after YAM formation" ~ "Steppe",
+                          p2_ar %in% c("Iron Age", "Viking Age", "Medieval Early Modern") ~ "Iron age to early modern",
+                          p2_ar == "WEA" ~ "Modern",
+                          epoc=="after BRO formation" ~ "Bronze age",
+                          p2_ar %in% c("EHG", "CHG") ~ "EHG & CHG",
+                          #epoc=="after BRO formation" ~ "Bronze age to early modern",
+                          TRUE~p2_ar)) %>% 
+  mutate(p2_new=fct_relevel(p2_new, c("WHG", "EHG & CHG", "Anatolian farmers", "Neolithic farmers", "Steppe", "Bronze age", "Iron age to early modern",  "Modern"))) %>%
+  mutate(p2_validation_needed = case_when(p2_ar %in% c("WHG", "Farmers") & epoc %in% c("after NEO formation", "after YAM formation") ~ TRUE,
+                                          p2_ar %in% c("EHG", "CHG") & epoc == "after YAM formation" ~ TRUE,
+                                          p2_ar %in% c("WHG", "EHG", "Farmers", "Steppe") & epoc == "after BRO formation" ~ TRUE,
+                                          TRUE ~ FALSE)) %>%
+  mutate(data_source=ifelse(is.na(source_ar), source, source_ar)) %>%
+  dplyr::select(sample, p1, p2, p2_ar, p2_new, p2_validation_needed, epoc, age, latitude, longitude, site, country, region, data_source, AMY1, AMY2A, AMY2B, structure_H1, structure_H2, dup_hap_H1, dup_hap_H2, best_matching_score) %>%
+  ## use the following line to control which population label to plot
+  mutate(p2_final=p2_new) 
+master_table_wide %>% write_tsv("master_table_wide.tsv")
+
+archaic_samples <- read_sheet("https://docs.google.com/spreadsheets/d/1q7L_dfSoj3yWWtlTGqV2eXCI-H1aFr0QDERYF6J7LXU/edit#gid=1746085135", sheet = "Table S1", skip = 1) %>% 
+  filter(source=="Archaic") %>% 
+  pivot_wider(names_from = label, values_from = copy)
+write_tsv(archaic_samples, "archaic_samples.tsv")
+
+non_wea_modern_samples_haplotype_wide <- read_sheet("https://docs.google.com/spreadsheets/d/1q7L_dfSoj3yWWtlTGqV2eXCI-H1aFr0QDERYF6J7LXU/edit#gid=1746085135", sheet = "Table S4", skip = 1) %>% 
+  filter(! cohort %in% c("ExcoffierAncient", "StoneAgeAncient")) %>%
+  filter(cohort == "1KG_trio" | p2 != "WEA")
+pivot_wider(names_from = label, values_from = copy)
+write_tsv(non_wea_modern_samples_haplotype_wide, "haplotype_structure_non_wea_modern.tsv")
+```
+
+
+```{r}
+p2_colors <- pals::cols25()
+archaic_samples <- read_tsv("archaic_samples.tsv") %>%
+  mutate(p2="Archaic")
+master_table_wide <- read_tsv("master_table_wide.tsv") %>%
+  left_join(readxl::read_excel("master_table_wide_ar.xlsx", na = "NA") %>% dplyr::select(sample, p2_l0, p2_L1)) %>%
+  bind_rows(archaic_samples) %>%
+  mutate(p2=case_when(p2_l0 == "EarlyFarmers" ~ "Early farmers",
+                      p2_l0 == "Europen Farmers" ~ "Neolithic farmers",
+                      p2_l0 == "Steppe" ~ "Steppe pastoralists",
+                      p2_l0 == "PostNeolithic_BA" ~ "Bronze age",
+                      p2_l0 == "present day" ~ "WEA",
+                      p2_l0 == "EHG & CHG" & p2_ar == "CHG" ~ "CHG",
+                      p2_l0 == "EHG & CHG" ~ "EHG",
+                      is.na(p2_l0) ~ p2,
+                      TRUE ~ p2_l0)) %>%
+  mutate(p2=fct_relevel(p2, c("Archaic",
+                              "CHG",
+                              "EHG",
+                              "WHG",
+                              "Early farmers",
+                              "Neolithic farmers",
+                              "Steppe pastoralists",
+                              "Bronze age",
+                              "Iron age to early modern",
+                              "WEA"))) %>%
+  mutate(p2_for_plot=case_when(p2 %in% c("EHG", "CHG") ~ "EHG & CHG", 
+                               p2 == "WEA" ~ "Present day",
+                               TRUE ~ p2)) %>%
+  mutate(p2_for_plot=fct_relevel(p2_for_plot, c("Archaic",
+                                                "EHG & CHG",
+                                                "WHG",
+                                                "Early farmers",
+                                                "Neolithic farmers",
+                                                "Steppe pastoralists",
+                                                "Bronze age",
+                                                "Iron age to early modern",
+                                                "Present day"))) %>%
+  mutate(p2_for_simulation=case_when(p2 == "Early farmers" ~ "ANA",
+                                     p2 == "Neolithic farmers" ~ "NEO",
+                                     p2 == "Steppe pastoralists" ~ "YAM",
+                                     p2 %in% c("Bronze age", "Iron age to early modern", "WEA")  ~ "BRO",
+                                     p2 == "Bronze age" ~ "BRO",
+                                     p2 == "Archaic" ~ NA,
+                                     TRUE ~ p2)) %>%
+  mutate(p2_for_supplement=case_when(p2_L1 == "Anatolia and / Early Farmers" ~ "Anatolia Early Farmers",
+                                     p2_L1 == "EHG Genetically - to remove?" ~ "EHG",
+                                     p2_L1 == "EHG & CHG" & p2_ar == "CHG" ~ "CHG",
+                                     p2_L1 == "EHG & CHG" ~ "EHG",
+                                     p2_L1 == "Europen Early Farmers" ~ "European Early Farmers",
+                                     p2_L1 == "Europen Farmers" ~ "Neolithic Farmers",
+                                     p2_L1 == "Steppe" ~ "Steppe pastoralists",
+                                     p2_L1 == "Vikings Iron Age, peculiar. To remove?" ~ "Vikings Iron Age",
+                                     p2_L1 == "present day" ~ "Present Day",
+                                     p2 == "Archaic" ~ "Archaic",
+                                     TRUE ~ p2_L1)) %>%
+  mutate(p2_for_supplement=fct_reorder(p2_for_supplement, p2_for_plot, function(x){median(as.numeric(x))})) %>%
+  mutate(epoc=fct_relevel(epoc, c("after NE WA split",
+                                  "after CHG ANA split",
+                                  "after EHG WHG split",
+                                  "after NEO formation",
+                                  "after YAM formation",
+                                  "after BRO formation",
+                                  "modern"))) %>%
+  rename(epoch=epoc) %>%
+  mutate(hap_availability=!is.na(structure_H1)) 
+copy_number_long <- master_table_wide %>%
+  dplyr::select(sample, p2, p2_for_plot, p2_for_supplement, epoch, age, latitude, longitude, AMY1, AMY2A, AMY2B) %>%
+  pivot_longer(cols = AMY1:AMY2B, names_to="gene", values_to = "copy_number") 
+
+## only include samples with confident haplotype structure calls
+# copy_number_relabelled <- copy_number_relabelled %>%
+#   filter(sample %in% genotype_long$sample)
+
+copy_number_long %>%
+  ## only include samples with confident haplotype structure calls
+  #filter(sample %in% genotype_long$sample) %>%
+  ## only include samples whose p2 labels need to be checked
+  #filter(p2_validation_needed) %>%
+  group_by(epoch, p2, gene) %>%
+  summarise(n=n(), copy_number=mean(copy_number)) %>%
+  ungroup() %>%
+  arrange(gene) %>%
+  group_by(epoch, p2, n) %>%
+  summarise(copy_number=str_c(round(copy_number,1), collapse = " ")) %>%
+  transmute(p2, epoch, mean_amy_copy_number=str_c(copy_number,
+                                                  "( n=",
+                                                  n,
+                                                  ")",
+                                                  sep = " ")) %>% 
+  arrange(epoch, p2) %>%
+  pivot_wider(names_from = p2, values_from = mean_amy_copy_number)
+```
+
+```{r eval=FALSE}
+## supplementary tables
+## copy number
+copy_number_table_for_supplement <- read_tsv("amy_copy_number.tsv") %>%
+  filter(! source %in% c("ExcoffierAncient", "StoneAgeAncient", "Archaic")) %>%
+  filter(source == "1KG_trio" | p2 != "WEA") %>%
+  bind_rows(master_table_wide %>% mutate(source=data_source) %>% mutate(source=ifelse(is.na(source), "Archaic", source))) %>%
+  mutate(type=case_when(source %in% c("1KG", "HGDP", "SGDP") ~ "Modern",
+                        source %in% c("Allentoft_Sikora_etal2024", "Allentoft_etal2015", "Marchi_etal2022", "Margaryan_etal2020") ~ "Ancient",
+                        source == "Archaic" ~ "Archaic",
+                        source == "1KG_trio" ~ "Trio",
+                        source == "GTEx" ~ "GTEx")) %>%
+  mutate(type=fct_relevel(type, c("Archaic", "Ancient", "Modern", "Trio", "GTEx"))) %>%
+  transmute(type, source, sample, p1, p2, AMY1, AMY2A, AMY2B) %>%
+  arrange(type, source, p2, p1, sample)
+copy_number_table_for_supplement %>% count(source)
+copy_number_table_for_supplement %>% count(type)
+write_tsv(copy_number_table_for_supplement, "supplementary_tables/copy_number_table_for_supplement.tsv")
+## haplytype structure
+haplotype_structure_for_supplement <- read_tsv("haplotype_structure_non_wea_modern.tsv") %>%
+  rename(source=cohort) %>%
+  bind_rows(master_table_wide %>% mutate(source=data_source) %>% rename(H1=structure_H1, H2=structure_H2)) %>%
+  filter(!is.na(H1)) %>%
+  mutate(type=case_when(source %in% c("1KG", "HGDP", "SGDP") ~ "Modern",
+                        source %in% c("Allentoft_Sikora_etal2024", "Allentoft_etal2015", "Marchi_etal2022", "Margaryan_etal2020") ~ "Ancient",
+                        source == "1KG_trio" ~ "Trio")) %>%
+  transmute(type, source, sample, p1, p2, best_matching_score, H1, H2) %>%
+  arrange(type, source, p2, p1, sample)
+write_tsv(haplotype_structure_for_supplement, "supplementary_tables/haplotype_structure_for_supplement.tsv")
+## ancient metadata
+ancient_metadata_for_supplement <- master_table_wide %>%
+  filter(age > 0) %>%
+  transmute(sample, p2_l0=p2, p2_l1=p2_for_supplement, site, country, region, age, latitude, longitude, data_source) %>%
+  mutate(p2_l0=fct_relevel(p2_l0, c("CHG", 
+                                    "EHG", 
+                                    "WHG",
+                                    "Early farmers",
+                                    "Neolithic farmers",
+                                    "Steppe pastoralists",
+                                    "Bronze age",
+                                    "Iron age to early modern"))) %>%
+  arrange(p2_l0, p2_l1, desc(age))
+write_tsv(ancient_metadata_for_supplement, "supplementary_tables/ancient_metadata_for_supplement.tsv")
+```
+
+```{r, fig.width=10, fig.height=5}
+set.seed(42)
+master_table_wide %>%
+  distinct(sample, age, p2_for_plot, hap_availability) %>% 
+  filter(!is.na(age)) %>%
+  ggplot(aes(x=-age/1000, y=fct_rev(p2_for_plot))) +
+  ggridges::geom_density_ridges(aes(fill=p2_for_plot), alpha=0.3) +
+  #ggridges::geom_density_ridges(mapping=aes(point_color=p2_for_plot, point_fill=p2_for_plot, point_shape=hap_availability), jittered_points = TRUE, position="raincloud", color=NA, alpha=0, point_alpha=1) +
+  geom_jitter(aes(color=p2_for_plot, fill=p2_for_plot, shape=hap_availability), height = 0.1, alpha=1) +
+  scale_shape_manual(values = c(1,21)) +
+  scale_color_manual(values = p2_colors[-1]) +
+  scale_fill_manual(values = p2_colors[-1]) +
+  xlab("kyr BP") +
+  #geom_vline(xintercept = -177*generation_time) +
+  #scale_discrete_manual(aesthetics = "point_shape", values = c(1, 21)) +
+  coord_cartesian(ylim=c(1, 8.2), expand = TRUE) +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+```{r, eval=FALSE, fig.width=6, fig.height=3}
+set.seed(42)
+sample_age_distribution_plot <- master_table_wide %>%
+  distinct(sample, age, p2_for_plot, hap_availability) %>% 
+  filter(!is.na(age)) %>%
+  ggplot(aes(x=-age/1000, y=fct_rev(p2_for_plot))) +
+  # ggridges::geom_density_ridges(aes(fill=p2_for_plot), alpha=0.3) +
+  ggridges::geom_density_ridges(mapping=aes(fill=p2_for_plot), jittered_points = TRUE, position="raincloud", point_size=0.5, alpha=0.5) +
+  scale_color_manual(values = p2_colors[-1]) +
+  scale_fill_manual(values = p2_colors[-1]) +
+  # geom_jitter(aes(color=p2_for_plot, fill=p2_for_plot, shape=hap_availability), height = 0.1, alpha=1) +
+  scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
+  theme_bw() +
+  xlab("kyr BP") +
+  coord_cartesian(ylim=c(1, 8.2), expand = TRUE) +
+  theme(legend.position = "none",
+        axis.title.y=element_blank(),
+        panel.grid.minor = element_blank())
+sample_age_distribution_plot
+#ggsave("figures/sample_age_distribution_plot.pdf", sample_age_distribution_plot, width=6, height=3)
+```
+
+```{r, fig.width=15, fig.height=7}
+europe_map <- map_data("world") %>% 
+  filter(lat > 30, lat < 90, long > -60, long < 150)
+set.seed(42)
+ancient_map <- master_table_wide %>%
+  filter(age>0) %>%
+  distinct(sample, age, epoch, p2_for_plot, p2_for_supplement, latitude, longitude) %>% 
+  rename(long=longitude, lat=latitude) %>%
+  ggplot(aes(x=long, y=lat)) +
+  geom_polygon(data=europe_map, mapping=aes(group = group), fill="grey80", color="white", linewidth=0.5) +
+  scale_shape_manual(values = rep(21:25, 3)) +
+  scale_fill_manual(values = p2_colors[-1]) +
+  coord_map("gilbert", xlim = c(-35, 80), ylim=c(33, 72)) +
+  cowplot::theme_map() +
+  theme(panel.border = element_rect(color="black", fill=NA, linewidth = 2),
+        legend.position = c(0.05, 0.3),
+        legend.title = element_blank())
+sample_distribution_map <- ancient_map +
+  geom_jitter(aes(fill=p2_for_plot, shape=p2_for_plot), size=2, color="black", alpha=0.8, height = 0.3, width = 0.3)
+sample_distribution_map
+#ggsave("figures/sample_distribution_map.pdf", sample_distribution_map, width=15, height = 7)
+```
+
+```{r, fig.width=20, fig.height=10}
+ancient_map +
+  geom_jitter(aes(fill=p2_for_plot, shape=p2_for_plot), size=2, color="black", alpha=0.8, height = 0.3, width = 0.3)
+facet_wrap(~epoch) +
+  theme(legend.position = "top")
+```
+
+```{r, fig.width=18, fig.height=18}
+sample_distribution_facet_map <- ancient_map +
+  geom_jitter(aes(fill=p2_for_supplement, shape=p2_for_supplement), size=2, color="black", alpha=0.8, height = 0.3, width = 0.3) +
+  facet_grid(p2_for_plot~epoch) +
+  theme(legend.position = "top")
+sample_distribution_facet_map
+ggsave("figures/sample_distribution_facet_map.pdf", sample_distribution_facet_map, width=18, height = 18)
+```
+
+```{r, eval=FALSE,fig.width=8, fig.height=10}
+master_table_wide %>%
+  filter(age>0, p2_validation_needed) %>%
+  distinct(sample, age, epoch, p2_ar, latitude, longitude) %>% 
+  rename(long=longitude, lat=latitude) %>%
+  ggplot(aes(x=long, y=lat)) +
+  geom_polygon(data=europe_map, mapping=aes(group = group), fill="grey80", color="white", linewidth=0.5) +
+  geom_jitter(aes(fill=p2_ar, shape=p2_ar), size=2, color="black") +
+  scale_shape_manual(values = rep(21:25, 3)) +
+  facet_wrap(~epoch, ncol = 1) +
+  coord_map("gilbert", xlim = c(-35, 80), ylim=c(33, 72)) +
+  cowplot::theme_map() +
+  theme(panel.border = element_rect(color="black", fill=NA, linewidth = 2))
+
+master_table_wide %>%
+  filter(age>0, p2_validation_needed) %>%
+  distinct(sample, age, epoch, p2_final, latitude, longitude) %>% 
+  rename(long=longitude, lat=latitude) %>%
+  ggplot(aes(x=long, y=lat)) +
+  geom_polygon(data=europe_map, mapping=aes(group = group), fill="grey80", color="white", linewidth=0.5) +
+  geom_jitter(aes(fill=p2_final, shape=p2_final), size=2, color="black") +
+  scale_shape_manual(values = rep(21:25, 3)) +
+  facet_wrap(~epoch, ncol = 1) +
+  coord_map("gilbert", xlim = c(-35, 80), ylim=c(33, 72)) +
+  cowplot::theme_map() +
+  theme(panel.border = element_rect(color="black", fill=NA, linewidth = 2))
+```
+
+```{r fig.width=12, fig.height=4}
+copy_number_summary <- copy_number_long %>%
+  group_by(p2_for_plot, gene) %>%
+  summarise(n=n(), copy_number=mean(copy_number)) %>%
+  ungroup() %>%
+  mutate(y_label=str_c(p2_for_plot, " (n=", n, ")"),
+         y_label=fct_reorder(y_label, p2_for_plot, function(x){median(as.numeric(x))}))
+copy_number_distribution_plot <- copy_number_long %>%
+  count(p2_for_plot, gene, copy_number) %>%
+  group_by(p2_for_plot, gene) %>%
+  mutate(n_total=sum(n)) %>%
+  ungroup() %>%
+  mutate(p=n/n_total, 
+         y_label=str_c(p2_for_plot, " (n=", n_total, ")"), 
+         y_label=fct_reorder(y_label, p2_for_plot, function(x){median(as.numeric(x))})) %>%
+  ggplot(aes(x=copy_number, y=fct_rev(y_label), size=p, color=y_label, fill=y_label)) +
+  geom_point(shape=21, stroke=1, alpha=0.5) +
+  geom_point(data=copy_number_summary, shape=23, size=1.5, color="black", fill="white",stroke=1) +
+  scale_size_area(name ="frequency", breaks=c(0.02, 0.1, 0.2, 0.5, 1)) +
+  scale_fill_manual(values = p2_colors, guide="none") +
+  scale_color_manual(values = p2_colors,  guide="none") +
+  xlab("copy number") +
+  facet_wrap(~gene, scales = "free_x") +
+  cowplot::theme_minimal_grid() +
+  theme(legend.position=c(0.88, 0.7), 
+        legend.background = element_rect(color="black", fill="white"),
+        legend.margin = margin(t = 0.2, r = 0.2, b = 0.2, l = 0.2, unit='cm'),
+        panel.border = element_rect(color="black"),
+        axis.title.y = element_blank())
+copy_number_trend_plot <- copy_number_long %>%
+  filter(!is.na(age)) %>%
+  ggplot(aes(x=-age/1000, y=copy_number)) +
+  geom_jitter(aes(color=p2_for_plot), width = 0, height = 0.1, alpha=0.5) +
+  geom_smooth(method = "gam") +
+  scale_color_manual(values = p2_colors[-1]) +
+  scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
+  xlab("kyr BP") +
+  ylab("copy number") +
+  facet_wrap(~gene, scales = "free_y") +
+  cowplot::theme_minimal_grid() +
+  theme(legend.position="none", 
+        panel.border = element_rect(color="black"))
+copy_number_distribution_plot
+copy_number_trend_plot
+# ggsave("figures/copy_number_distribution.pdf", copy_number_distribution_plot, width=12, height = 4)
+# ggsave("figures/copy_number_trend.pdf", copy_number_trend_plot, width=12, height = 4)
+```
+
+```{r fig.width=15, fig.height=5}
+copy_number_summary_for_supplement <- copy_number_long %>%
+  group_by(p2_for_supplement, gene) %>%
+  summarise(n=n(), copy_number=mean(copy_number)) %>%
+  ungroup() %>%
+  mutate(y_label=str_c(p2_for_supplement, " (n=", n, ")"),
+         y_label=fct_reorder(y_label, p2_for_supplement, function(x){median(as.numeric(x))}))
+copy_number_distribution_plot_for_supplement <- copy_number_long %>%
+  count(p2_for_supplement, p2_for_plot, gene, copy_number) %>%
+  group_by(p2_for_supplement, p2_for_plot, gene) %>%
+  mutate(n_total=sum(n)) %>%
+  ungroup() %>%
+  mutate(p=n/n_total, 
+         y_label=str_c(p2_for_supplement, " (n=", n_total, ")"), 
+         y_label=fct_reorder(y_label, p2_for_supplement, function(x){median(as.numeric(x))})) %>%
+  ggplot(aes(x=copy_number, y=fct_rev(y_label), size=p)) +
+  geom_point(aes(color=p2_for_plot, fill=p2_for_plot), shape=21, stroke=1, alpha=0.5) +
+  geom_point(data=copy_number_summary_for_supplement, shape=23, size=1.5, color="black", fill="white",stroke=1) +
+  scale_size_area(name ="frequency", breaks=c(0.02, 0.1, 0.2, 0.5, 1)) +
+  scale_fill_manual(values = p2_colors, name="population") +
+  scale_color_manual(values = p2_colors, name="population") +
+  xlab("copy number") +
+  facet_wrap(~gene, scales = "free_x") +
+  cowplot::theme_minimal_grid() +
+  theme(panel.border = element_rect(color="black"),
+        axis.title.y = element_blank())
+copy_number_distribution_plot_for_supplement
+#ggsave("figures/copy_number_distribution_for_supplement.pdf", copy_number_distribution_plot_for_supplement, width=15, height = 5)
+```
+
+```{r fig.width=8, fig.height=4}
+total_copy_number_summary <- copy_number_long %>%
+  group_by(sample, p2_for_plot, epoch, age) %>%
+  summarise(copy_number=sum(copy_number)) %>%
+  ungroup() %>%
+  group_by(p2_for_plot) %>%
+  summarise(n=n(), copy_number=mean(copy_number)) %>%
+  ungroup() %>%
+  mutate(y_label=str_c(p2_for_plot, " (n=", n, ")"),
+         y_label=fct_reorder(y_label, p2_for_plot, function(x){median(as.numeric(x))}))
+
+copy_number_long %>%
+  group_by(sample, p2_for_plot, epoch, age) %>%
+  summarise(copy_number=sum(copy_number)) %>%
+  ungroup() %>%
+  count(p2_for_plot, copy_number) %>%
+  group_by(p2_for_plot) %>%
+  mutate(n_total=sum(n)) %>%
+  ungroup() %>%
+  mutate(p=n/n_total, 
+         y_label=str_c(p2_for_plot, " (n=", n_total, ")"), 
+         y_label=fct_reorder(y_label, p2_for_plot, function(x){median(as.numeric(x))})) %>%
+  ggplot(aes(x=copy_number, y=fct_rev(y_label), size=p, color=y_label, fill=y_label)) +
+  geom_point(shape=21, stroke=1, alpha=0.5) +
+  geom_point(data=total_copy_number_summary, shape=23, size=1.5, color="black", fill="white", stroke=1) +
+  scale_fill_manual(values = p2_colors, guide="none") +
+  scale_color_manual(values = p2_colors, guide="none") +
+  scale_size_area(name ="frequency", breaks=c(0.02, 0.1, 0.2, 0.5, 1)) +
+  xlab("copy number") +
+  cowplot::theme_minimal_grid() +
+  theme(legend.position = c(0.8, 0.3),
+        legend.background = element_rect(color="black", fill="white"),
+        legend.margin = margin(t = 0.2, r = 0.2, b = 0.2, l = 0.2, unit='cm'),
+        panel.border = element_rect(color="black"),
+        axis.title.y = element_blank())
+
+```
+
+```{r eval=TRUE, fig.width=10, fig.height=5}
+master_table_wide %>%
+  filter(!is.na(structure_H1), !is.na(age)) %>%
+  arrange(desc(age)) %>%
+  dplyr::select(sample, p2_for_plot, age, structure_H1, structure_H2, AMY1, AMY2A, AMY2B) %>% 
+  head()
+haplotype_long <- distinct(master_table_wide, sample, p2_for_plot, p2_for_simulation, epoch, age, dup_hap_H1, dup_hap_H2) %>%
+  filter(!is.na(dup_hap_H1)) %>%
+  group_by(p2_for_plot) %>%
+  mutate(y_label=str_c(p2_for_plot, " (n=", n(), ")"),
+         y_label=fct_reorder(y_label, p2_for_plot, function(x){median(as.numeric(x))})) %>%
+  ungroup() %>%
+  pivot_longer(cols = c(dup_hap_H1, dup_hap_H2), names_to = "haplotype", values_to = "dup_hap")
+```
+
+```{r fig.width=10, fig.height=5}
+set.seed(10)
+haplotype_age_distribution_plot <- haplotype_long %>%
+  ggplot(aes(x=-age/1000, y=fct_rev(y_label))) +
+  ggridges::geom_density_ridges(aes(fill=p2_for_plot, alpha=0.3)) +
+  #ggridges::geom_density_ridges(mapping = aes(x=-age, y=p2_for_plot, point_fill = as.character(dup_hap)), jittered_points = TRUE, point_alpha=1, alpha=0, color=NA, show.legend = TRUE, point_color="black", point_shape=21, position = "raincloud") +
+  geom_jitter(aes(color=p2_for_plot, fill=p2_for_plot, shape=as.character(dup_hap)), height = 0.2, width=0, alpha=1) +
+  scale_shape_manual(values = c(1,21)) +
+  scale_color_manual(values = p2_colors[-1]) +
+  scale_fill_manual(values = p2_colors[-1]) +
+  coord_cartesian(ylim=c(1, 8.2), expand = TRUE) +
+  scale_x_continuous(breaks = c(-12, -8.500, -5.5, -2.5, 0),
+                     labels = c(12, 8.500, 5.5, 2.5, 0)) +
+  xlab("kyr BP") +
+  theme_bw() +
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_blank()) 
+haplotype_age_distribution_plot
+#ggsave("figures/haplotype_age_distribution.pdf", haplotype_age_distribution_plot, width=10, height = 5)
+```
+
+```{r fig.width=8, fig.height=5}
+haplotype_summary <- haplotype_long %>%
+  group_by(p2_for_plot, y_label) %>%
+  summarise(dup_hap=mean(dup_hap))
+haplotype_long %>%
+  count(p2_for_plot, dup_hap, y_label) %>%
+  group_by(p2_for_plot, y_label) %>%
+  mutate(n_total=sum(n)) %>%
+  ungroup() %>%
+  mutate(p=n/n_total) %>%
+  ggplot(aes(x=dup_hap, y=fct_rev(y_label))) +
+  geom_point(aes(size=p, fill=p2_for_plot, color=p2_for_plot), shape=21, stroke=1, alpha=0.5) +
+  geom_point(data=haplotype_summary, shape=23, size=1.5, color="black", fill="white", stroke=1) +
+  scale_fill_manual(values = p2_colors[-1], guide="none") +
+  scale_color_manual(values = p2_colors[-1], guide="none") +
+  scale_size_area(name ="frequency", breaks=c(0.2, 0.4, 0.6, 0.8)) +
+  xlab("duplication-containing haplotype") +
+  theme_bw() +
+  theme(panel.border = element_rect(color="black"),
+        axis.title.y = element_blank())
+haplotype_long %>%
+  mutate(epoch=cut(-age, breaks= c(-12000, -8500, -5500, -2500, -1, 1))) %>%
+  #mutate(epoch=cut(-age, breaks=c(-12000, -9000, -5500, -4500, -3000, 1, -1))) %>%
+  count(epoch, p2_for_plot) %>%
+  pivot_wider(names_from = epoch, values_from = n)
+haplotype_binned <- haplotype_long %>%
+  mutate(epoch=cut(-age, breaks=c(-12000, -8500, -5500, -2500, -1, 1), labels = 1:5),
+         generation=1500-round(age/30), epoch) 
+haplotype_binned_frequency <- haplotype_binned %>%
+  group_by(epoch) %>%
+  summarise(age=mean(age), generation=mean(generation), dup_hap=mean(dup_hap), n=n())
+haplotype_binned_frequency
+haplotype_trend_plot <- haplotype_long %>%
+  #ggplot(aes(x=round(-age/30), y=dup_hap)) +
+  ggplot(aes(x=-age, y=dup_hap)) +
+  geom_jitter(aes(color=p2_for_plot), height=0.1) +
+  geom_smooth(aes(), method="gam") +
+  geom_point(data=haplotype_binned_frequency, aes(size=n)) +
+  geom_line(data=haplotype_binned_frequency) +
+  #scale_x_continuous(breaks = c(-12000,  -8500,  -6000,  -3500,  -1000, 0)) +
+  scale_x_continuous(breaks = c(-12000, -8500, -5500, -2500, 0), labels = c(12, 8.5, 5.5, 2.5, 0), name = "kyr BP") +
+  scale_y_continuous(breaks = c(0, 0.5, 1), name="frequency of duplication-containing haplotypes") +
+  scale_color_manual(values=p2_colors[-1], name="population") +
+  scale_size_area(name="number of haplotypes") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank())
+haplotype_trend_plot
+#ggsave("figures/haplotype_trend.pdf", haplotype_trend_plot, width=8, height = 5)
+```
+
+```{r eval=FALSE}
+haplotype_binned %>%
+  filter(haplotype=="dup_hap_H1") %>% 
+  transmute(pop=p2_for_simulation, generation) %>%
+  write_tsv("slim/sampled_populations.tsv")
+haplotype_binned_frequency %>%
+  write_tsv("slim/binned_frequency.tsv")
 ```
 
 #### Prepare input for bmws
 
 ```{r eval=FALSE}
+genotype_long <- read_tsv("haplotype_structure.tsv")
+genotype_wide <- genotype_long %>%
+  pivot_wider(names_from = hap, values_from = c(structure, dup_hap)) %>%
+  mutate(dup_hap_geno = dup_hap_H1 + dup_hap_H2) %>% 
+  arrange(sample)
 genotype_wide %>%
   transmute(`#CHROM`=1,
             POS=1,
@@ -77,8 +631,8 @@ genotype_wide %>%
             FORMAT="GT",
             sample, 
             genotype=case_when(dup_hap_geno==0 ~"0/0",
-                                            dup_hap_geno==1 ~"0/1",
-                                            dup_hap_geno==2 ~"1/1")) %>%
+                               dup_hap_geno==1 ~"0/1",
+                               dup_hap_geno==2 ~"1/1")) %>%
   pivot_wider(names_from = sample, values_from = genotype) %>%
   write_tsv("bmws/amy.vcf.gz")
 genotype_wide %>%
@@ -133,6 +687,7 @@ genotype_filtered <- genotype_raw %>%
 count(genotype_filtered, cohort)
 ```
 
+
 ## bmws 
 
 (https://github.com/jthlab/bmws)
@@ -157,19 +712,19 @@ cd /global/scratch/users/nicolas931010/amylase_diversity_project/src/bmws/src/bm
 python /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/bmws/amy.1.py
 ## run 1000 bootstraps
 for SEED in {10..999}; do
-  echo '#!/bin/bash
-  source ~/.bashrc
-  conda activate bmws
-  cd /global/scratch/users/nicolas931010/amylase_diversity_project/src/bmws/src/bmws
-  python /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/bmws/amy.2.py '${SEED} |
-  sbatch \
-    --time=60 \
-    --nodes=1 \
-    --cpus-per-task=1 \
-    --account=co_genomicdata \
-    --partition=savio4_htc \
-    --qos=savio_lowprio \
-    --output=/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/bmws/bootstrap/amy.s_hat.${SEED}.log
+echo '#!/bin/bash
+source ~/.bashrc
+conda activate bmws
+cd /global/scratch/users/nicolas931010/amylase_diversity_project/src/bmws/src/bmws
+python /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/bmws/amy.2.py '${SEED} |
+sbatch \
+--time=60 \
+--nodes=1 \
+--cpus-per-task=1 \
+--account=co_genomicdata \
+--partition=savio4_htc \
+--qos=savio_lowprio \
+--output=/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/bmws/bootstrap/amy.s_hat.${SEED}.log
 done
 ```
 
@@ -198,7 +753,7 @@ s_trajectory %>%
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
   scale_y_continuous(breaks=0:3 * 0.02) +
   ylim(c(0, 0.06)) +
-  xlab("kya BP") +
+  xlab("kyr BP") +
   theme_cowplot()
 ```
 
@@ -225,7 +780,7 @@ s_plot <- s_hat %>%
   geom_hline(yintercept = s_hat_mean, linetype=3) +
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
   scale_y_continuous(breaks=0:3 * 0.02) +
-  xlab("kya BP") +
+  xlab("kyr BP") +
   ylab("selection coefficient") +
   theme_cowplot() +
   theme(axis.line = element_blank(),
@@ -235,21 +790,306 @@ p_plot <- paths %>%
   geom_line(aes(y=p_mean), color="blue", size=1) +
   geom_ribbon(aes(ymin=p_lower, ymax=p_higher), fill="lightblue", alpha=0.5) +
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
-  xlab("kya BP") +
-  ylab("allele frequency") +
+  xlab("kyr BP") +
+  ylab("frequency ofduplication-\ncontaining haplotypes") +
   theme_cowplot() +
   theme(axis.line = element_blank(),
         panel.border = element_rect(color="black", size=1))
-combined_plot <- plot_grid(s_plot, p_plot, nrow = 2, align = "hv")
+combined_plot <- plot_grid(p_plot, s_plot , nrow = 2, align = "hv")
 combined_plot
 ```
 
 ```{r eval=FALSE}
-ggsave("bmws/s_p_plot.pdf", combined_plot, width = 6, height = 6)
+ggsave("figures/s_p_plot.pdf", combined_plot, width = 6, height = 6)
+```
+
+
+## slim
+
+```{bash eval=FALSE}
+mamba create -c conda-forge -c bioconda -n slim slim==3.7.1 r-essentials r-tidyverse r-cowplot
+conda activate slim
+## test run
+REP_ID=1
+STARTING_FREQUENCY=0.1
+SELECTION_COEFF=0.02
+SELECTION_ONSET=1100
+mkdir -p /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_${STARTING_FREQUENCY}/s_${SELECTION_COEFF}/t_${SELECTION_ONSET}/
+slim \
+-d rep_id=$REP_ID  \
+-d starting_frequency=$STARTING_FREQUENCY \
+-d selection_coeff=$SELECTION_COEFF \
+-d selection_onset=$SELECTION_ONSET \
+/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/selection_simulation_irving_pease.slim
+## run with a grid of parameters using snakemake
+conda activate snakemake
+snakemake \
+--profile /global/scratch/users/nicolas931010/amylase_diversity_project/profiles \
+--directory /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/ \
+--default-resources mem_mb=None disk_mb=None \
+--snakefile /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/run_slim.py -n
+```
+
+
+```{r, fig.height=7, fig.width=8}
+library(tidyverse)
+library(cowplot)
+haplotype_binned_frequency <- read_tsv("slim/binned_frequency.tsv")
+# starting_frequency_vector <- 0.3
+# selection_coeff_vector <- "0.04"
+starting_frequency_vector <- seq(from=0.05, to=0.8, length.out=31)
+# starting_frequency_vector <- seq(from=0.05, to=0.55, length.out=21)
+selection_coeff_vector <- seq(from=-0.01, to=0.04, length.out=21)
+selection_onset_vector <- seq(from=1000, to=1400, length.out=21)
+
+simulation_summary <- expand.grid(starting_frequency_vector, selection_coeff_vector) %>%
+  transmute(starting_frequency_vector=Var1,
+            selection_coeff_vector=as.character(Var2),
+            selection_coeff_vector=ifelse(selection_coeff_vector=="0", "0.0", selection_coeff_vector)) %>%
+  transmute(path=str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency_vector, "/s_", selection_coeff_vector, "/simulation_summary.tsv")) %>%
+  pull(path) %>%
+  read_tsv()
+
+simulated_binned_frequency <- expand.grid(starting_frequency_vector, selection_coeff_vector) %>%
+  transmute(starting_frequency_vector=Var1,
+            selection_coeff_vector=as.character(Var2),
+            selection_coeff_vector=ifelse(selection_coeff_vector=="0", "0.0", selection_coeff_vector))  %>%
+  transmute(path=str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency_vector, "/s_", selection_coeff_vector, "/simulated_binned_frequency.tsv")) %>%
+  pull(path) %>%
+  read_tsv()
+n_simulation <- dim(simulation_summary)[1]
+acceptance_rate <- 0.001
+n_acceptance <- round(n_simulation*acceptance_rate)
+
+starting_frequency_histogram <- simulation_summary %>%
+  slice_min(delta, n=n_acceptance) %>%
+  ggplot(aes(x=starting_frequency, y=..prop..)) +
+  geom_bar() +
+  xlim(c(min(starting_frequency_vector), max(starting_frequency_vector))) +
+  ylab("density") +
+  theme_bw() +
+  theme()
+starting_frequency_histogram
+top_histogram <- simulation_summary %>%
+  slice_min(delta, n=n_acceptance) %>%
+  ggplot(aes(x=selection_coeff, y=..prop..)) +
+  geom_bar() +
+  scale_x_continuous(expand = c(0.0025, 0.0025)) +
+  coord_cartesian(xlim=c(min(selection_coeff_vector), max(selection_coeff_vector))) +
+  ylab("density") +
+  theme_bw() +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank())
+right_histogram <- simulation_summary %>%
+  slice_min(delta, n=n_acceptance) %>%
+  ggplot(aes(x=(1500-selection_onset)*30/1000)) +
+  geom_bar(aes(y=..prop..)) +
+  scale_x_continuous(expand = c(0.03, 0.03)) +
+  scale_y_continuous(n.breaks = 4) +
+  coord_cartesian(xlim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000))) +
+  ylab("density") +
+  coord_flip(xlim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000)))  +
+  theme_bw() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        rect = element_rect(fill="transparent", color="transparent"), plot.background = element_rect(fill="transparent", color="transparent"))
+heatmap <- simulation_summary %>%
+  slice_min(delta, n=n_acceptance) %>%
+  count(selection_coeff, selection_onset) %>%
+  mutate(density=n/sum(n)) %>%
+  mutate_all(as.character) %>%
+  left_join(expand.grid(selection_coeff=selection_coeff_vector, selection_onset=selection_onset_vector) %>% mutate_all(as.character), .) %>% 
+  mutate(n=ifelse(is.na(n), "0", n),
+         density=ifelse(is.na(density), "0", density)) %>%
+  mutate_all(as.numeric) %>%
+  ggplot(aes(x=selection_coeff, y=(1500-selection_onset)*30/1000, fill=density)) +
+  geom_raster(interpolate = FALSE) +
+  scale_fill_viridis_c(direction = 1) +
+  scale_x_continuous(expand = c(0.0025, 0.0025)) +
+  scale_y_continuous(expand = c(0.03, 0.03)) +
+  coord_cartesian(xlim=c(min(selection_coeff_vector), max(selection_coeff_vector)),
+                  ylim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000))) +
+  labs(x="selection coefficient", 
+       y="timing of onset of selection (kyr BP)") +
+  theme_bw() 
+combined_heatmap <- plot_grid(NULL, top_histogram, NULL, NULL, 
+          NULL, NULL, NULL, NULL,
+          get_legend(heatmap), heatmap + theme(legend.position="none"), NULL, right_histogram, 
+          nrow = 3, rel_widths = c(0.5, 4, -0.3, 1.6), rel_heights = c(1.5, -0.2, 4), align ="hv", axis="tblr")
+combined_heatmap
+```
+
+```{r}
+simulation_summary %>%
+  # filter(selection_onset==1180) %>%
+  # group_by(starting_frequency, selection_coeff, selection_onset) %>%
+  group_by(selection_coeff, selection_onset) %>%
+  slice_min(delta, n=10) %>%
+  summarise(delta=mean(delta)) %>%
+  ggplot(aes(x=selection_coeff, y=(1500-selection_onset)*30/1000, fill=log(delta))) +
+  geom_tile() +
+  geom_vline(xintercept = 0, color="red", linetype=2) +
+  scale_fill_viridis_c(direction = -1)
+
+best_trajectories <- simulation_summary %>%
+  slice_min(delta, n=n_acceptance) %>%
+  semi_join(simulated_binned_frequency, .) %>%
+  mutate(type="best simulations")
+best_neutral_trajectories <- simulation_summary %>%
+  filter(selection_coeff==0) %>%
+  slice_min(delta, n=n_acceptance) %>%
+  semi_join(simulated_binned_frequency, .) %>%
+  mutate(type="best neutral simulations")
+
+best_trajectories_plot <- bind_rows(best_trajectories, best_neutral_trajectories) %>% 
+  ggplot(aes(x=(generation-1500)*30/1000, y=dup_hap, color=type)) +
+  geom_line(aes(group=str_c(starting_frequency, selection_coeff, selection_onset, rep_id, sep = "_")), size=0.05, alpha=0.1) +
+  geom_line(data=haplotype_binned_frequency, color="black") +
+  geom_point(data=haplotype_binned_frequency, color="black", mapping=aes(size=n/2)) +
+  annotate(geom = "label", x = c(-8.5, -8.9, -9.2), y=c(0.8, 0.3, 0.2), label=c("best neutral simulations", "best simulations", "real data"), color=c(MetBrewer::met.brewer(name = 'Archambault', type = "d", n = 2), "black")) +
+  scale_color_manual(guide="none", values=MetBrewer::met.brewer(name = 'Archambault', type = "d", n = 2)) +
+  scale_size_area(name="sample size", breaks=c(20, 200, 800)) +
+  scale_x_continuous(breaks=-5:0*2, labels = 5:0*2) +
+  labs(x="kyr BP", y="frequency of duplication-containing haplotypes") +
+  theme_bw() +
+  theme(legend.position = c(0.8, 0.2),
+        legend.background = element_rect(color="black"))
+```
+
+
+```{r eval=FALSE}
+ggsave("figures/starting_frequency_histogram.pdf", starting_frequency_histogram, height=5, width = 8)
+ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=7, width = 8)
+ggsave("figures/best_trajectories.pdf", height = 5, width=8)
+```
+
+```{r fig.height=10}
+simulation_summary %>%
+  group_by(starting_frequency, selection_coeff, selection_onset) %>%
+  slice_min(delta, n=10) %>%
+  summarise(delta=mean(delta)) %>%
+  ggplot(aes(x=starting_frequency, y=selection_coeff, fill=log(delta))) +
+  geom_tile() +
+  geom_point(data=simulation_summary %>% group_by(selection_onset) %>% slice_min(delta, n=1), color="red", shape=4) +
+  geom_hline(yintercept = 0, color="red", linetype=2) +
+  scale_fill_viridis_c(direction = -1) +
+  facet_wrap(~selection_onset)
+```
+
+```{r}
+pop_info <- read_tsv("slim/pop_info.tsv")
+pop_info_expanded <- pop_info %>%
+  rowwise() %>%
+  do(tibble(pop_slim=.$pop_slim, pop=.$pop, ne=.$ne, generation=(.$starting_gen:.$ending_gen))) %>%
+  filter(generation>=1000)
+sampled_populations <- read_tsv("slim/sampled_populations.tsv")
+haplotype_binned_frequency <- read_tsv("slim/binned_frequency.tsv")
+rep_id <- 5
+
+starting_frequency_vector <- 0.3
+selection_coeff_vector <- "0.04"
+selection_onset_vector <- 1200
+
+# starting_frequency_vector <- seq(from=0.05, to=0.55, length.out=21)
+# selection_coeff_vector <- seq(from=-0.01, to=0.04, length.out=21)
+# selection_onset_vector <- seq(from=1000, to=1400, length.out=21)
+
+simulated_binned_frequency <- NULL
+for (starting_frequency in starting_frequency_vector){
+  for (selection_coeff in selection_coeff_vector) {
+    for (selection_onset in selection_onset_vector){
+      for(rep_id in 1:100){
+        frequency_trajectory <- read_delim(str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency, "/s_", selection_coeff, "/t_", selection_onset, "/rep_", rep_id, "_allele_frequency.tsv"), col_names = FALSE, delim = " ") %>%
+          transmute(pop_slim=X4, generation=X2, allele_count=X12) %>%
+          left_join(pop_info_expanded,., by=c("pop_slim", "generation")) %>%
+          mutate(allele_count=ifelse(is.na(allele_count), 0, allele_count)) %>%
+          mutate(allele_frequency=allele_count/ne/2)
+        simulated_binned_frequency_tmp <- sampled_populations %>% 
+          left_join(frequency_trajectory, by=c("pop", "generation"))  %>%
+          group_by(epoch) %>%
+          summarise(generation=mean(generation), dup_hap=mean(allele_frequency), n=n()) %>%
+          ungroup() %>%
+          mutate(type="simulated", starting_frequency=starting_frequency, selection_coeff=selection_coeff, selection_onset=selection_onset, rep_id=rep_id)
+        simulated_binned_frequency=bind_rows(simulated_binned_frequency_tmp, simulated_binned_frequency)
+      }
+    }
+  }
+}
+simulated_binned_frequency %>%
+  ggplot(aes(x=(generation-1500)*30/1000, y=dup_hap)) +
+  geom_line(aes(group=rep_id), size=0.1) +
+  geom_line(data=haplotype_binned_frequency, color="red")
+
+
+simulation_summary <- simulated_binned_frequency %>%
+  group_by(starting_frequency, selection_coeff, selection_onset, rep_id) %>%
+  summarise(delta=sum(abs(dup_hap-haplotype_binned_frequency$dup_hap)),
+            r=cor(dup_hap, haplotype_binned_frequency$dup_hap))
+simulation_summary %>%
+  arrange(delta)
+
+simulated_binned_frequency %>%
+  semi_join(slice_min(simulation_summary, delta, n = 10)) %>%
+  ggplot(aes(x=(generation-1500)*30/1000, y=dup_hap)) +
+  geom_line(aes(group=rep_id), size=0.1) +
+  geom_line(data=haplotype_binned_frequency, color="red")
+
+# frequency_trajectory %>%
+#   ggplot(aes(x=generation, y=allele_frequency, color=pop)) +
+#   geom_line() +
+#   ylim(c(0,1)) +
+#   theme_minimal_grid() +
+#   theme(panel.border = element_rect(color="black"))
+
+
+
+
+```
+
+```{r}
+starting_frequency <- seq(from=0.05, to=0.55, length.out=21)
+selection_coeff <- seq(from=-0.01, to=0.04, length.out=21)
+selection_onset <- seq(from=1000, to=1400, length.out=21)
+
 ```
 
 ## stdpopsim
 
 ```{bash eval=FALSE}
 mamba create -c conda-forge -c bioconda -n stdpopsim stdpopsim==0.2.0
+
+stdpopsim HomSap -d AncientEurope_4A21 -e slim --slim-script Bronze:2
+
+stdpopsim -e slim --slim-script HomSap Bronze:2
+
 ```
+
+```{python eval=FALSE}
+import stdpopsim
+
+species = stdpopsim.get_species("HomSap")
+model = species.get_demographic_model("AncientEurope_4A21")
+contig = species.get_contig(
+  "chr1", left=1, right=2, mutation_rate=0
+  )
+  # default is a flat genetic map with average rate across chr22
+  samples = {"Bronze": 2}
+  engine = stdpopsim.get_engine("slim")
+  
+  from contextlib import redirect_stdout
+  
+  with open("script.slim", "w") as f:
+    with redirect_stdout(f):
+      ts = engine.simulate(
+        model,
+        contig,
+        samples,
+        slim_script=True,
+        verbosity=2,
+        slim_scaling_factor=1,
+        )
+        
+        ```
+        

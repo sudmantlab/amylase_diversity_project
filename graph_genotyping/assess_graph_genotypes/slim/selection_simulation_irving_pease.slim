@@ -1,0 +1,159 @@
+// Model based on Irving Pease et al. 2024
+initialize() {
+	setSeed(rep_id);
+	initializeMutationRate(0); 
+	initializeMutationType("m1", 0.5, "f", 0.0);
+	initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElement(g1, 0, 0); 
+	initializeRecombinationRate(0);
+	m1.convertToSubstitution = F; 
+	// define some variables
+	//defineConstant("starting_frequency", 0.1);
+	//defineConstant("selection_coeff", 0.02);
+	//defineConstant("selection_onset", 1100);
+	
+	// model parameters based on Irving-Pease
+	defineConstant("starting_ne", 1500.0); // out-of-Africa (p1)
+	defineConstant("wa_ne", 15000.0); // WA (p2)
+	defineConstant("ne_ne", 15000.0); // NE (p3)
+	defineConstant("ana_ne", 5000.0); // ANA (p4)
+	defineConstant("chg_ne", 3000.0); // CHG (p5)
+	defineConstant("whg_ne", 2000.0); // WHG (p6)
+	defineConstant("ehg_ne", 3000.0); // EHG (p7)
+	defineConstant("neo_ne", 50000.0); // NEO (p8)
+	defineConstant("yam_ne", 20000.0); // YAM (p9)
+	defineConstant("bro_ne", 50000.0); // BRO (p10)
+}
+
+// INITIALIZE the out of Africa population (p1, Ne = 1500)
+1 { 
+	sim.addSubpop("p1", asInteger(round(starting_ne)));
+}
+
+1 late() {
+	target = sample(p1.genomes, asInteger(starting_ne*2*starting_frequency)); // sample 10% of genomes
+   target.addNewDrawnMutation(m1, 0); // include the mutation to the sample genomes
+}
+
+// 45000 years, or 1500 generations ago
+// split WA (p2) and NE (p3) from out-of-Africa (p1)
+2 {
+	sim.addSubpopSplit("p2", asInteger(round(wa_ne)), p1); // 
+	sim.addSubpopSplit("p3", asInteger(round(ne_ne)), p1); // 
+}
+
+2 late() {
+   p1.setSubpopulationSize(0);
+}
+
+// 24000 years, or 800 generations ago
+// split ANA (p4) and CHG (p5) from WA (p2)
+700 {
+	sim.addSubpopSplit("p4", asInteger(round(ana_ne)), p2); // 
+	sim.addSubpopSplit("p5", asInteger(round(chg_ne)), p2); // 
+
+}
+700 late() {
+	p2.setSubpopulationSize(0);
+}
+
+// 18000 years, or 600 generations ago
+// split WHG (p6) and EHG (p7) from NE (p3)
+900 early() {
+	sim.addSubpopSplit("p6", asInteger(round(whg_ne)), p3); // 
+	sim.addSubpopSplit("p7", asInteger(round(ehg_ne)), p3); // 
+}
+900 late() {
+	p3.setSubpopulationSize(0);
+}
+
+// from 100 generations prior to the adoption of agriculture (12 kya, or 400 generataions ago) to the merging and ANA and WHG
+// apply selection to ANA (p4) after the simulation passes the onset of selection
+
+1000:1500 fitness(m1, p4) {
+	if(homozygous & sim.generation >= selection_onset)
+		return 1.0 + (selection_coeff)*1;
+	else if(sim.generation >= selection_onset)
+		return 1.0 + 0.5 * (selection_coeff)*1;
+	else
+		return 1.0;
+}
+
+// 7770 years, or 259 generations ago
+// merge ANA (p4) and WHG (p6) to form NEO (p8)
+1241 early() {
+	sim.addSubpop("p8", asInteger(neo_ne));
+	p8.setMigrationRates(c(p4, p6), c(0.75, 0.25));
+}
+1241 late() {
+	// remove the source subpopulations
+	p8.setMigrationRates(c(p4, p6), c(0.0, 0.0));
+	//p4.setSubpopulationSize(0);
+	//p6.setSubpopulationSize(0);
+}
+
+// from the formation of NEO to the merging and NEO and YAM
+// apply selection to NEO (p8)
+1241:1500 fitness(m1, p8) {
+	if(homozygous & sim.generation >= selection_onset)
+		return 1.0 + (selection_coeff)*1;
+	else if(sim.generation >= selection_onset)
+		return 1.0 + 0.5 * (selection_coeff)*1;
+	else
+		return 1.0;
+}
+
+// 5310 years, or 177 generations ago
+// merge CHG (p5) and EHG (p7) to form YAM (p9)
+1323 early() {
+	sim.addSubpop("p9", asInteger(yam_ne));
+	p9.setMigrationRates(c(p5, p7), c(0.5, 0.5));
+}
+1323 late() {
+	// remove the source subpopulations
+	p9.setMigrationRates(c(p5, p7), c(0.0, 0.0));
+	//p5.setSubpopulationSize(0);
+	//p7.setSubpopulationSize(0);
+}
+
+// 4980 years, or 166 generations ago
+// merge NEO (p8) and YAM (p9) to form BRO (p10)
+// apply selection to BRO
+1334 early() {
+	sim.addSubpop("p10", asInteger(bro_ne));
+	p10.setMigrationRates(c(p8, p9), c(0.5, 0.5));
+	//sim.mutationsOfType(m1).setSelectionCoeff(selection_coeff);
+}
+1334:1500 fitness(m1, p10) {
+	if(homozygous & sim.generation >= selection_onset)
+		return 1.0 + (selection_coeff)*1;
+	else if(sim.generation >= selection_onset)
+		return 1.0 + 0.5 * (selection_coeff)*1;
+	else
+		return 1.0;
+}
+1334 late() {
+	// remove the source subpopulations
+	p10.setMigrationRates(c(p8, p9), c(0.0, 0.0));
+	//p8.setSubpopulationSize(0);
+	//p9.setSubpopulationSize(0);
+}
+
+// output allele count in all populations starting from 15kya, or 500 generations ago
+1000 late() {
+	sim.outputMutations(sim.mutationsOfType(m1), "/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_" + starting_frequency + "/s_" + selection_coeff + "/t_" + selection_onset + "/rep_" + rep_id + "_allele_frequency.tsv");
+}
+1001:1500 late() {
+	sim.outputMutations(sim.mutationsOfType(m1), "/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_" + starting_frequency + "/s_" + selection_coeff + "/t_" + selection_onset + "/rep_" + rep_id + "_allele_frequency.tsv", T);
+}
+
+
+// Exponential growth
+// growth rate taken from stdpopsim, but may not be the same as in Irving-Pease
+//1335:1500 {
+//	t = sim.generation - 1334;
+//	size = round(bro_ne * (1 + 0.067)^t); //
+//	size = round(bro_ne * exp(0.067*t)); //
+//	p10.setSubpopulationSize(asInteger(size));
+//}
+
