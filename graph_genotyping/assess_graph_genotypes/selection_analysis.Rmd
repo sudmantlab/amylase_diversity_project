@@ -310,7 +310,7 @@ master_table_wide %>%
   theme(legend.position = "none")
 ```
 
-```{r, eval=FALSE, fig.width=6, fig.height=3}
+```{r, eval=FALSE, fig.width=4, fig.height=2}
 set.seed(42)
 sample_age_distribution_plot <- master_table_wide %>%
   distinct(sample, age, p2_for_plot, hap_availability) %>% 
@@ -329,10 +329,10 @@ sample_age_distribution_plot <- master_table_wide %>%
         axis.title.y=element_blank(),
         panel.grid.minor = element_blank())
 sample_age_distribution_plot
-#ggsave("figures/sample_age_distribution_plot.pdf", sample_age_distribution_plot, width=6, height=3)
+#ggsave("figures/sample_age_distribution_plot.pdf", sample_age_distribution_plot, width=4, height=2)
 ```
 
-```{r, fig.width=15, fig.height=7}
+```{r, fig.width=10, fig.height=4.8}
 europe_map <- map_data("world") %>% 
   filter(lat > 30, lat < 90, long > -60, long < 150)
 set.seed(42)
@@ -347,12 +347,12 @@ ancient_map <- master_table_wide %>%
   coord_map("gilbert", xlim = c(-35, 80), ylim=c(33, 72)) +
   cowplot::theme_map() +
   theme(panel.border = element_rect(color="black", fill=NA, linewidth = 2),
-        legend.position = c(0.05, 0.3),
+        legend.position = c(0.02, 0.25),
         legend.title = element_blank())
 sample_distribution_map <- ancient_map +
-  geom_jitter(aes(fill=p2_for_plot, shape=p2_for_plot), size=2, color="black", alpha=0.8, height = 0.3, width = 0.3)
+  geom_jitter(aes(fill=p2_for_plot, shape=p2_for_plot), size=2, color="black", alpha=0.6, height = 0.3, width = 0.3)
 sample_distribution_map
-#ggsave("figures/sample_distribution_map.pdf", sample_distribution_map, width=15, height = 7)
+#ggsave("figures/sample_distribution_map.pdf", sample_distribution_map, width=10, height = 4.8)
 ```
 
 ```{r, fig.width=20, fig.height=10}
@@ -399,7 +399,7 @@ master_table_wide %>%
   theme(panel.border = element_rect(color="black", fill=NA, linewidth = 2))
 ```
 
-```{r fig.width=12, fig.height=4}
+```{r fig.width=9, fig.height=3}
 copy_number_summary <- copy_number_long %>%
   group_by(p2_for_plot, gene) %>%
   summarise(n=n(), copy_number=mean(copy_number)) %>%
@@ -417,17 +417,23 @@ copy_number_distribution_plot <- copy_number_long %>%
   ggplot(aes(x=copy_number, y=fct_rev(y_label), size=p, color=y_label, fill=y_label)) +
   geom_point(shape=21, stroke=1, alpha=0.5) +
   geom_point(data=copy_number_summary, shape=23, size=1.5, color="black", fill="white",stroke=1) +
-  scale_size_area(name ="frequency", breaks=c(0.02, 0.1, 0.2, 0.5, 1)) +
+  scale_size_area(name ="frequency", breaks=c(0.02, 0.1, 0.5, 1)) +
   scale_fill_manual(values = p2_colors, guide="none") +
   scale_color_manual(values = p2_colors,  guide="none") +
   xlab("copy number") +
   facet_wrap(~gene, scales = "free_x") +
   cowplot::theme_minimal_grid() +
-  theme(legend.position=c(0.88, 0.7), 
+  theme(legend.position=c(0.82, 0.6), 
         legend.background = element_rect(color="black", fill="white"),
         legend.margin = margin(t = 0.2, r = 0.2, b = 0.2, l = 0.2, unit='cm'),
         panel.border = element_rect(color="black"),
         axis.title.y = element_blank())
+copy_number_distribution_plot
+# ggsave("figures/copy_number_distribution.pdf", copy_number_distribution_plot, width=9, height = 3)
+```
+
+```{r fig.width=3, fig.height=6}
+
 copy_number_trend_plot <- copy_number_long %>%
   filter(!is.na(age)) %>%
   ggplot(aes(x=-age/1000, y=copy_number)) +
@@ -437,14 +443,12 @@ copy_number_trend_plot <- copy_number_long %>%
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
   xlab("kyr BP") +
   ylab("copy number") +
-  facet_wrap(~gene, scales = "free_y") +
+  facet_grid(gene~., scales = "free_y") +
   cowplot::theme_minimal_grid() +
   theme(legend.position="none", 
         panel.border = element_rect(color="black"))
-copy_number_distribution_plot
 copy_number_trend_plot
-# ggsave("figures/copy_number_distribution.pdf", copy_number_distribution_plot, width=12, height = 4)
-# ggsave("figures/copy_number_trend.pdf", copy_number_trend_plot, width=12, height = 4)
+# ggsave("figures/copy_number_trend.pdf", copy_number_trend_plot, width=3, height = 6)
 ```
 
 ```{r fig.width=15, fig.height=5}
@@ -757,7 +761,7 @@ s_trajectory %>%
   theme_cowplot()
 ```
 
-```{r fig.width=6, fig.height=6}
+```{r fig.width=4, fig.height=4}
 s_hat <- read_tsv("bmws/amy.s_hat.txt", col_names = "s") %>%
   mutate(generation=388:1, time=(388-generation)*30)
 s_hat_mean=mean(s_hat$s)
@@ -775,32 +779,36 @@ s_plot <- s_hat %>%
   geom_line(aes(y=s), color="blue", size=1) +
   #geom_line(data=s_ci, mapping = aes(y=s_mean)) +
   geom_ribbon(data=s_ci, aes(ymin=s_lower, ymax=s_higher), fill="lightblue", alpha=0.5) +
-  annotate(geom = "text", x=-1.78, y=s_hat_mean*1.2, label="bar(s)", parse=TRUE, size=5) +
-  annotate(geom = "text", x=-0.8, y=s_hat_mean*1.2, label=str_c("=", round(s_hat_mean, 3)), size=5) +
+  annotate(geom = "text", x=-2.7, y=s_hat_mean*1.3, label="bar(s)", parse=TRUE, size=5) +
+  annotate(geom = "text", x=-1, y=s_hat_mean*1.3, label=str_c("=", round(s_hat_mean, 3)), size=5) +
   geom_hline(yintercept = s_hat_mean, linetype=3) +
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
   scale_y_continuous(breaks=0:3 * 0.02) +
   xlab("kyr BP") +
-  ylab("selection coefficient") +
+  ylab("selection<br>coefficient") +
   theme_cowplot() +
   theme(axis.line = element_blank(),
-        panel.border = element_rect(color="black", size=1))
+        panel.border = element_rect(color="black", size=1),
+        axis.title.y = ggtext::element_markdown(lineheight = 1.2))
 p_plot <- paths %>%
   ggplot(aes(x=-time/1000)) +
   geom_line(aes(y=p_mean), color="blue", size=1) +
   geom_ribbon(aes(ymin=p_lower, ymax=p_higher), fill="lightblue", alpha=0.5) +
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
   xlab("kyr BP") +
-  ylab("frequency ofduplication-\ncontaining haplotypes") +
+  #ylab(expression(str_c("frequency of\n", italic("dup"), " haplotypes"))) +
+  ylab("frequency of<br>*dup* haplotypes") +
   theme_cowplot() +
   theme(axis.line = element_blank(),
-        panel.border = element_rect(color="black", size=1))
-combined_plot <- plot_grid(p_plot, s_plot , nrow = 2, align = "hv")
+        panel.border = element_rect(color="black", size=1),
+        axis.title.x = element_blank(),
+        axis.title.y = ggtext::element_markdown(lineheight = 1.2))
+combined_plot <- plot_grid(p_plot, s_plot , nrow = 2, rel_heights  = c(1, 1.12), align = "v")
 combined_plot
 ```
 
 ```{r eval=FALSE}
-ggsave("figures/s_p_plot.pdf", combined_plot, width = 6, height = 6)
+ggsave("figures/s_p_plot.pdf", combined_plot, width = 4, height = 4)
 ```
 
 
@@ -831,7 +839,7 @@ snakemake \
 ```
 
 
-```{r, fig.height=7, fig.width=8}
+```{r, fig.height=3.5, fig.width=4.3}
 library(tidyverse)
 library(cowplot)
 haplotype_binned_frequency <- read_tsv("slim/binned_frequency.tsv")
@@ -875,6 +883,7 @@ top_histogram <- simulation_summary %>%
   ggplot(aes(x=selection_coeff, y=..prop..)) +
   geom_bar() +
   scale_x_continuous(expand = c(0.0025, 0.0025)) +
+  scale_y_continuous(n.breaks = 3) +
   coord_cartesian(xlim=c(min(selection_coeff_vector), max(selection_coeff_vector))) +
   ylab("density") +
   theme_bw() +
@@ -886,7 +895,7 @@ right_histogram <- simulation_summary %>%
   ggplot(aes(x=(1500-selection_onset)*30/1000)) +
   geom_bar(aes(y=..prop..)) +
   scale_x_continuous(expand = c(0.03, 0.03)) +
-  scale_y_continuous(n.breaks = 4) +
+  scale_y_continuous(breaks = c(0, 0.1)) +
   coord_cartesian(xlim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000))) +
   ylab("density") +
   coord_flip(xlim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000)))  +
@@ -917,11 +926,11 @@ heatmap <- simulation_summary %>%
 combined_heatmap <- plot_grid(NULL, top_histogram, NULL, NULL, 
           NULL, NULL, NULL, NULL,
           get_legend(heatmap), heatmap + theme(legend.position="none"), NULL, right_histogram, 
-          nrow = 3, rel_widths = c(0.5, 4, -0.3, 1.6), rel_heights = c(1.5, -0.2, 4), align ="hv", axis="tblr")
+          nrow = 3, rel_widths = c(0.8, 4, -0.6, 1.6), rel_heights = c(1.5, -0.6, 4), align ="hv", axis="tblr")
 combined_heatmap
 ```
 
-```{r}
+```{r, fig.width=5, fig.height=3.2}
 simulation_summary %>%
   # filter(selection_onset==1180) %>%
   # group_by(starting_frequency, selection_coeff, selection_onset) %>%
@@ -942,27 +951,29 @@ best_neutral_trajectories <- simulation_summary %>%
   slice_min(delta, n=n_acceptance) %>%
   semi_join(simulated_binned_frequency, .) %>%
   mutate(type="best neutral simulations")
-
 best_trajectories_plot <- bind_rows(best_trajectories, best_neutral_trajectories) %>% 
   ggplot(aes(x=(generation-1500)*30/1000, y=dup_hap, color=type)) +
   geom_line(aes(group=str_c(starting_frequency, selection_coeff, selection_onset, rep_id, sep = "_")), size=0.05, alpha=0.1) +
   geom_line(data=haplotype_binned_frequency, color="black") +
   geom_point(data=haplotype_binned_frequency, color="black", mapping=aes(size=n/2)) +
-  annotate(geom = "label", x = c(-8.5, -8.9, -9.2), y=c(0.8, 0.3, 0.2), label=c("best neutral simulations", "best simulations", "real data"), color=c(MetBrewer::met.brewer(name = 'Archambault', type = "d", n = 2), "black")) +
+  annotate(geom = "label", x = c(-7.8, -5.5, -8), y=c(0.9, 0.45, 0.2), label=c("best neutral simulations", "best simulations", "observed"), color=c(MetBrewer::met.brewer(name = 'Archambault', type = "d", n = 2), "black")) +
   scale_color_manual(guide="none", values=MetBrewer::met.brewer(name = 'Archambault', type = "d", n = 2)) +
   scale_size_area(name="sample size", breaks=c(20, 200, 800)) +
   scale_x_continuous(breaks=-5:0*2, labels = 5:0*2) +
-  labs(x="kyr BP", y="frequency of duplication-containing haplotypes") +
+  labs(x="kyr BP", y="frequency of *dup* haplotypes") +
   theme_bw() +
-  theme(legend.position = c(0.8, 0.2),
-        legend.background = element_rect(color="black"))
+  theme(legend.position = c(0.8, 0.3),
+        legend.background = element_rect(color="black"),
+        axis.title.y = ggtext::element_markdown(lineheight = 1.2),
+        text = element_text(size=15))
+best_trajectories_plot
 ```
 
 
 ```{r eval=FALSE}
 ggsave("figures/starting_frequency_histogram.pdf", starting_frequency_histogram, height=5, width = 8)
-ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=7, width = 8)
-ggsave("figures/best_trajectories.pdf", height = 5, width=8)
+ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=3.5, width = 4.3)
+ggsave("figures/best_trajectories.pdf", height = 3.2, width=5)
 ```
 
 ```{r fig.height=10}
