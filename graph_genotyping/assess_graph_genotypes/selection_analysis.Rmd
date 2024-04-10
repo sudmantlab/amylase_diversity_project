@@ -17,6 +17,8 @@ library(googlesheets4)
 library(ggridges)
 library(rjson)
 library(readxl)
+library(ggpp)
+library(broom)
 ```
 
 ## Organizing the data
@@ -327,7 +329,8 @@ sample_age_distribution_plot <- master_table_wide %>%
   coord_cartesian(ylim=c(1, 8.2), expand = TRUE) +
   theme(legend.position = "none",
         axis.title.y=element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank(),
+        text=element_text(size=13))
 sample_age_distribution_plot
 #ggsave("figures/sample_age_distribution_plot.pdf", sample_age_distribution_plot, width=4, height=2)
 ```
@@ -353,13 +356,6 @@ sample_distribution_map <- ancient_map +
   geom_jitter(aes(fill=p2_for_plot, shape=p2_for_plot), size=2, color="black", alpha=0.6, height = 0.3, width = 0.3)
 sample_distribution_map
 #ggsave("figures/sample_distribution_map.pdf", sample_distribution_map, width=10, height = 4.8)
-```
-
-```{r, fig.width=20, fig.height=10}
-ancient_map +
-  geom_jitter(aes(fill=p2_for_plot, shape=p2_for_plot), size=2, color="black", alpha=0.8, height = 0.3, width = 0.3)
-facet_wrap(~epoch) +
-  theme(legend.position = "top")
 ```
 
 ```{r, fig.width=18, fig.height=18}
@@ -400,6 +396,22 @@ master_table_wide %>%
 ```
 
 ```{r fig.width=9, fig.height=3}
+get_p_val <- function(data){
+  aov(copy_number~p2_for_plot, data=data) %>% 
+    TukeyHSD() %>%
+    tidy() %>%
+    filter(str_detect(contrast, "Present day")) %>%
+    transmute(p2_for_plot=str_remove(contrast, "Present day-"),
+              p_val=adj.p.value%>% format(scientific=TRUE, digits=2),
+              significance=ifelse(adj.p.value<=0.05, "S.", "N.S."))
+}
+copy_number_distribution_p_val <- copy_number_long %>%
+  group_by(gene) %>%
+  do(get_p_val(.)) %>%
+  dplyr::select(-significance) %>%
+  pivot_wider(names_from=gene, values_from = p_val)
+copy_number_distribution_p_val
+
 copy_number_summary <- copy_number_long %>%
   group_by(p2_for_plot, gene) %>%
   summarise(n=n(), copy_number=mean(copy_number)) %>%
@@ -433,14 +445,46 @@ copy_number_distribution_plot
 ```
 
 ```{r fig.width=3, fig.height=6}
-
+plot_copy_number_trend_inset <- function(amy){
+  copy_number_long %>%
+    filter(!is.na(age), gene==amy) %>%
+    ggplot(aes(x=-age/1000, y=copy_number)) +
+    geom_smooth(method = "lm", alpha=.5, color="blue", fill="lightblue", size=.8) +
+    geom_smooth(method = "gam",alpha=.5,color="red",fill="pink",size=.8) +
+    cowplot::theme_minimal_grid() +
+    theme(legend.position="none",
+          panel.border = element_rect(color="black"),
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank())
+}
+copy_number_trend_inset_tibble <- tibble(gene=c("AMY1", "AMY2A", "AMY2B"),
+                       plot=lapply(c("AMY1", "AMY2A", "AMY2B"), plot_copy_number_trend_inset),
+                       x=-13,
+                       y=c(18, 6, 6))
+copy_number_trend_p_val <- copy_number_long %>%
+  filter(!is.na(age)) %>%
+  mutate(age=-age/1000) %>%
+  nest_by(gene) %>%
+  mutate(mod = list(lm(copy_number ~ age, data = data))) %>%
+  reframe(tidy(mod)) %>%
+  filter(term=="age") %>%
+  transmute(gene, 
+            p_val=p.value %>% format(scientific=TRUE, digits=2), 
+            text=str_c("p==", p_val),
+            x=-5,
+            y=c(17, 5.6, 5.7))
 copy_number_trend_plot <- copy_number_long %>%
   filter(!is.na(age)) %>%
   ggplot(aes(x=-age/1000, y=copy_number)) +
   geom_jitter(aes(color=p2_for_plot), width = 0, height = 0.1, alpha=0.5) +
-  geom_smooth(method = "gam") +
+  geom_smooth(method = "gam", color="red",fill="pink") +
+  geom_plot(data=copy_number_trend_inset_tibble, mapping = aes(label=plot, x=x, y=y), vp.width=0.4,vp.height=0.45) +
+  geom_text(data=copy_number_trend_p_val, mapping=aes(x=x, y=y, label=text), parse=TRUE) + 
   scale_color_manual(values = p2_colors[-1]) +
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
+  coord_cartesian(xlim= c(-12, 0)) +
   xlab("kyr BP") +
   ylab("copy number") +
   facet_grid(gene~., scales = "free_y") +
@@ -914,7 +958,8 @@ heatmap <- simulation_summary %>%
          density=ifelse(is.na(density), "0", density)) %>%
   mutate_all(as.numeric) %>%
   ggplot(aes(x=selection_coeff, y=(1500-selection_onset)*30/1000, fill=density)) +
-  geom_raster(interpolate = FALSE) +
+  #geom_raster(interpolate = FALSE) +
+  geom_tile() +
   scale_fill_viridis_c(direction = 1) +
   scale_x_continuous(expand = c(0.0025, 0.0025)) +
   scale_y_continuous(expand = c(0.03, 0.03)) +
@@ -926,11 +971,11 @@ heatmap <- simulation_summary %>%
 combined_heatmap <- plot_grid(NULL, top_histogram, NULL, NULL, 
           NULL, NULL, NULL, NULL,
           get_legend(heatmap), heatmap + theme(legend.position="none"), NULL, right_histogram, 
-          nrow = 3, rel_widths = c(0.8, 4, -0.6, 1.6), rel_heights = c(1.5, -0.6, 4), align ="hv", axis="tblr")
+          nrow = 3, rel_widths = c(0.8, 4, -0.6, 1.6), rel_heights = c(1.5, -0.55, 4), align ="hv", axis="tblr")
 combined_heatmap
 ```
 
-```{r, fig.width=5, fig.height=3.2}
+```{r, fig.width=4.8, fig.height=3.2}
 simulation_summary %>%
   # filter(selection_onset==1180) %>%
   # group_by(starting_frequency, selection_coeff, selection_onset) %>%
@@ -965,7 +1010,7 @@ best_trajectories_plot <- bind_rows(best_trajectories, best_neutral_trajectories
   theme(legend.position = c(0.8, 0.3),
         legend.background = element_rect(color="black"),
         axis.title.y = ggtext::element_markdown(lineheight = 1.2),
-        text = element_text(size=15))
+        text = element_text(size=13))
 best_trajectories_plot
 ```
 
@@ -973,10 +1018,10 @@ best_trajectories_plot
 ```{r eval=FALSE}
 ggsave("figures/starting_frequency_histogram.pdf", starting_frequency_histogram, height=5, width = 8)
 ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=3.5, width = 4.3)
-ggsave("figures/best_trajectories.pdf", height = 3.2, width=5)
+ggsave("figures/best_trajectories.pdf", height = 3.2, width=4.8)
 ```
 
-```{r fig.height=10}
+```{r eval=FALSE, fig.height=10}
 simulation_summary %>%
   group_by(starting_frequency, selection_coeff, selection_onset) %>%
   slice_min(delta, n=10) %>%
@@ -989,7 +1034,7 @@ simulation_summary %>%
   facet_wrap(~selection_onset)
 ```
 
-```{r}
+```{r eval=FALSE}
 pop_info <- read_tsv("slim/pop_info.tsv")
 pop_info_expanded <- pop_info %>%
   rowwise() %>%
@@ -1053,20 +1098,12 @@ simulated_binned_frequency %>%
 #   ylim(c(0,1)) +
 #   theme_minimal_grid() +
 #   theme(panel.border = element_rect(color="black"))
-
-
-
-
 ```
 
-```{r}
-starting_frequency <- seq(from=0.05, to=0.55, length.out=21)
-selection_coeff <- seq(from=-0.01, to=0.04, length.out=21)
-selection_onset <- seq(from=1000, to=1400, length.out=21)
-
-```
 
 ## stdpopsim
+
+We didn't end up using this
 
 ```{bash eval=FALSE}
 mamba create -c conda-forge -c bioconda -n stdpopsim stdpopsim==0.2.0
@@ -1101,6 +1138,5 @@ contig = species.get_contig(
         verbosity=2,
         slim_scaling_factor=1,
         )
-        
-        ```
+```
         
