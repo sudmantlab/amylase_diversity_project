@@ -1295,7 +1295,7 @@ best_trajectories_plot
 ggsave("figures/starting_frequency_histogram.pdf", starting_frequency_histogram, height=5, width = 8)
 ggsave("figures/starting_frequency_histogram.png", starting_frequency_histogram, height=5, width = 8)
 ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=3.5, width = 4.3)
-ggsave("figures/best_trajectories.pdf", height = 3.2, width=4.8)
+ggsave("figures/best_trajectories.pdf", best_trajectories_plot, height = 3.2, width=4.8)
 ```
 
 ``` r
