@@ -50,7 +50,11 @@ rule run_slim:
 rule summarize_simulation:
     input:
         expand('/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_{{starting_frequency}}/s_{{selection_coeff}}/t_{selection_onset}/run_slim.done', 
-        selection_onset=selection_onset_vector)
+        selection_onset=selection_onset_vector),
+        '/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/sampled_populations.tsv',
+        '/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/pop_info.tsv',
+        '/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/binned_frequency.tsv',
+
     output:
         done=touch('/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_{starting_frequency}/s_{selection_coeff}/summarize_simulation.done'),
     conda:

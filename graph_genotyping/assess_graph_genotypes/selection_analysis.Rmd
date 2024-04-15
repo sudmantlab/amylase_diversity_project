@@ -160,6 +160,10 @@ archaic_samples <- read_tsv("archaic_samples.tsv") %>%
 master_table_wide <- read_tsv("master_table_wide.tsv") %>%
   left_join(readxl::read_excel("master_table_wide_ar.xlsx", na = "NA") %>% dplyr::select(sample, p2_l0, p2_L1)) %>%
   bind_rows(archaic_samples) %>%
+  mutate(p2_l0=ifelse(sample =="NEO816", "EarlyFarmers", p2_l0)) %>%
+  mutate(p2_L1=ifelse(sample =="NEO816", "Iran Farmers", p2_L1)) %>%
+  mutate(p2_L1=ifelse(p2_L1 == "Iran Farmer", "Iran Farmers", p2_L1)) %>%
+  mutate(p2_L1=ifelse(p2_L1 == "Anatolia and / Early Farmers" & longitude < 25, "Europen Early Farmers", p2_L1)) %>%
   mutate(p2=case_when(p2_l0 == "EarlyFarmers" ~ "Early farmers",
                       p2_l0 == "Europen Farmers" ~ "Neolithic farmers",
                       p2_l0 == "Steppe" ~ "Steppe pastoralists",
@@ -316,7 +320,7 @@ master_table_wide %>%
 set.seed(42)
 sample_age_distribution_plot <- master_table_wide %>%
   distinct(sample, age, p2_for_plot, hap_availability) %>% 
-  filter(!is.na(age)) %>%
+  filter(!is.na(age), age > 0) %>%
   ggplot(aes(x=-age/1000, y=fct_rev(p2_for_plot))) +
   # ggridges::geom_density_ridges(aes(fill=p2_for_plot), alpha=0.3) +
   ggridges::geom_density_ridges(mapping=aes(fill=p2_for_plot), jittered_points = TRUE, position="raincloud", point_size=0.5, alpha=0.5) +
@@ -326,7 +330,7 @@ sample_age_distribution_plot <- master_table_wide %>%
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
   theme_bw() +
   xlab("kyr BP") +
-  coord_cartesian(ylim=c(1, 8.2), expand = TRUE) +
+  coord_cartesian(ylim=c(1, 7.2), expand = TRUE) +
   theme(legend.position = "none",
         axis.title.y=element_blank(),
         panel.grid.minor = element_blank(),
@@ -359,12 +363,14 @@ sample_distribution_map
 ```
 
 ```{r, fig.width=18, fig.height=18}
+set.seed(42)
 sample_distribution_facet_map <- ancient_map +
   geom_jitter(aes(fill=p2_for_supplement, shape=p2_for_supplement), size=2, color="black", alpha=0.8, height = 0.3, width = 0.3) +
   facet_grid(p2_for_plot~epoch) +
   theme(legend.position = "top")
 sample_distribution_facet_map
-ggsave("figures/sample_distribution_facet_map.pdf", sample_distribution_facet_map, width=18, height = 18)
+#ggsave("figures/sample_distribution_facet_map.pdf", sample_distribution_facet_map, width=18, height = 18)
+#ggsave("figures/sample_distribution_facet_map.png", sample_distribution_facet_map, width=18, height = 18)
 ```
 
 ```{r, eval=FALSE,fig.width=8, fig.height=10}
@@ -400,17 +406,21 @@ get_p_val <- function(data){
   aov(copy_number~p2_for_plot, data=data) %>% 
     TukeyHSD() %>%
     tidy() %>%
-    filter(str_detect(contrast, "Present day")) %>%
-    transmute(p2_for_plot=str_remove(contrast, "Present day-"),
-              p_val=adj.p.value%>% format(scientific=TRUE, digits=2),
+    transmute(contrast,
+              adj.p.value,
+              p_val=ifelse(adj.p.value<=0.05,adj.p.value %>% format(scientific=TRUE, digits=2), "N.S."),
               significance=ifelse(adj.p.value<=0.05, "S.", "N.S."))
 }
 copy_number_distribution_p_val <- copy_number_long %>%
   group_by(gene) %>%
   do(get_p_val(.)) %>%
-  dplyr::select(-significance) %>%
+  dplyr::select(contrast, p_val) %>%
   pivot_wider(names_from=gene, values_from = p_val)
 copy_number_distribution_p_val
+
+copy_number_distribution_p_val %>%
+  filter(str_detect(contrast, "Present day")) %>%
+  mutate(p2_for_plot=str_remove(contrast, "Present day-"))
 
 copy_number_summary <- copy_number_long %>%
   group_by(p2_for_plot, gene) %>%
@@ -445,6 +455,27 @@ copy_number_distribution_plot
 ```
 
 ```{r fig.width=3, fig.height=6}
+lmp <- function (modelobject) {
+    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(modelobject)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+}
+for (curr_gene in c("AMY1", "AMY2A", "AMY2B")){
+  pval = lmp(lm(age~copy_number,copy_number_long %>% filter(gene == curr_gene)))
+  m = lm(copy_number~age,copy_number_long %>% filter(gene == curr_gene) %>% mutate(age=-age))
+  mu_pred = predict(m,data.frame(age=c(-12000,0)))
+  print(curr_gene)
+  print(pval)
+  delta = mu_pred[2]-mu_pred[1]
+  print(c(mu_pred,delta))
+  m2 = mgcv::gam(copy_number ~ s(age, bs = "cs"), data=copy_number_long %>% filter(gene == curr_gene) %>% mutate(age=-age))
+  print(summary(m2)$s.pv)
+  mu_pred_m2 = predict(m2,data.frame(age=c(-12000,0)))
+  delta = mu_pred_m2[2]-mu_pred_m2[1]
+  print(c(mu_pred_m2,delta))
+}
 plot_copy_number_trend_inset <- function(amy){
   copy_number_long %>%
     filter(!is.na(age), gene==amy) %>%
@@ -523,6 +554,7 @@ copy_number_distribution_plot_for_supplement <- copy_number_long %>%
         axis.title.y = element_blank())
 copy_number_distribution_plot_for_supplement
 #ggsave("figures/copy_number_distribution_for_supplement.pdf", copy_number_distribution_plot_for_supplement, width=15, height = 5)
+#ggsave("figures/copy_number_distribution_for_supplement.png", copy_number_distribution_plot_for_supplement, width=15, height = 5)
 ```
 
 ```{r fig.width=8, fig.height=4}
@@ -535,7 +567,6 @@ total_copy_number_summary <- copy_number_long %>%
   ungroup() %>%
   mutate(y_label=str_c(p2_for_plot, " (n=", n, ")"),
          y_label=fct_reorder(y_label, p2_for_plot, function(x){median(as.numeric(x))}))
-
 copy_number_long %>%
   group_by(sample, p2_for_plot, epoch, age) %>%
   summarise(copy_number=sum(copy_number)) %>%
@@ -598,9 +629,11 @@ haplotype_age_distribution_plot <- haplotype_long %>%
         axis.title.y = element_blank()) 
 haplotype_age_distribution_plot
 #ggsave("figures/haplotype_age_distribution.pdf", haplotype_age_distribution_plot, width=10, height = 5)
+#ggsave("figures/haplotype_age_distribution.png", haplotype_age_distribution_plot, width=10, height = 5)
 ```
 
 ```{r fig.width=8, fig.height=5}
+set.seed(42)
 haplotype_summary <- haplotype_long %>%
   group_by(p2_for_plot, y_label) %>%
   summarise(dup_hap=mean(dup_hap))
@@ -648,12 +681,14 @@ haplotype_trend_plot <- haplotype_long %>%
   theme(panel.grid.minor = element_blank())
 haplotype_trend_plot
 #ggsave("figures/haplotype_trend.pdf", haplotype_trend_plot, width=8, height = 5)
+#ggsave("figures/haplotype_trend.png", haplotype_trend_plot, width=8, height = 5)
 ```
 
 ```{r eval=FALSE}
 haplotype_binned %>%
   filter(haplotype=="dup_hap_H1") %>% 
-  transmute(pop=p2_for_simulation, generation) %>%
+  transmute(pop=p2_for_simulation, generation, epoch) %>%
+  arrange(-generation, pop) %>%
   write_tsv("slim/sampled_populations.tsv")
 haplotype_binned_frequency %>%
   write_tsv("slim/binned_frequency.tsv")
@@ -759,7 +794,7 @@ cd /global/scratch/users/nicolas931010/amylase_diversity_project/src/bmws/src/bm
 ## estimate s
 python /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/bmws/amy.1.py
 ## run 1000 bootstraps
-for SEED in {10..999}; do
+for SEED in {0..999}; do
 echo '#!/bin/bash
 source ~/.bashrc
 conda activate bmws
@@ -890,7 +925,6 @@ haplotype_binned_frequency <- read_tsv("slim/binned_frequency.tsv")
 # starting_frequency_vector <- 0.3
 # selection_coeff_vector <- "0.04"
 starting_frequency_vector <- seq(from=0.05, to=0.8, length.out=31)
-# starting_frequency_vector <- seq(from=0.05, to=0.55, length.out=21)
 selection_coeff_vector <- seq(from=-0.01, to=0.04, length.out=21)
 selection_onset_vector <- seq(from=1000, to=1400, length.out=21)
 
@@ -912,19 +946,28 @@ simulated_binned_frequency <- expand.grid(starting_frequency_vector, selection_c
 n_simulation <- dim(simulation_summary)[1]
 acceptance_rate <- 0.001
 n_acceptance <- round(n_simulation*acceptance_rate)
-
-starting_frequency_histogram <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
+top_simulations <- simulation_summary %>%
+  slice_min(delta, n=n_acceptance)
+top_simulations %>% 
+  count(selection_coeff) %>% 
+  slice_max(n, n = 3)
+top_simulations %>% 
+  count(selection_onset) %>% 
+  slice_max(n, n = 3)
+top_simulations %>% 
+  count(selection_coeff, selection_onset) %>% 
+  slice_max(n, n = 5)
+starting_frequency_histogram <-  top_simulations %>%
   ggplot(aes(x=starting_frequency, y=..prop..)) +
   geom_bar() +
   xlim(c(min(starting_frequency_vector), max(starting_frequency_vector))) +
   ylab("density") +
+  xlab("starting frequency") +
   theme_bw() +
   theme()
 starting_frequency_histogram
-top_histogram <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
-  ggplot(aes(x=selection_coeff, y=..prop..)) +
+top_histogram <- top_simulations %>%
+  ggplot(aes(x=selection_coeff, y=after_stat(prop))) +
   geom_bar() +
   scale_x_continuous(expand = c(0.0025, 0.0025)) +
   scale_y_continuous(n.breaks = 3) +
@@ -934,8 +977,7 @@ top_histogram <- simulation_summary %>%
   theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks.x = element_blank())
-right_histogram <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
+right_histogram <- top_simulations %>%
   ggplot(aes(x=(1500-selection_onset)*30/1000)) +
   geom_bar(aes(y=..prop..)) +
   scale_x_continuous(expand = c(0.03, 0.03)) +
@@ -948,8 +990,7 @@ right_histogram <- simulation_summary %>%
         axis.title.y = element_blank(),
         axis.ticks.y = element_blank(),
         rect = element_rect(fill="transparent", color="transparent"), plot.background = element_rect(fill="transparent", color="transparent"))
-heatmap <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
+heatmap <- top_simulations %>%
   count(selection_coeff, selection_onset) %>%
   mutate(density=n/sum(n)) %>%
   mutate_all(as.character) %>%
@@ -966,7 +1007,7 @@ heatmap <- simulation_summary %>%
   coord_cartesian(xlim=c(min(selection_coeff_vector), max(selection_coeff_vector)),
                   ylim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000))) +
   labs(x="selection coefficient", 
-       y="timing of onset of selection (kyr BP)") +
+       y="time of selection onset (kyr BP)") +
   theme_bw() 
 combined_heatmap <- plot_grid(NULL, top_histogram, NULL, NULL, 
           NULL, NULL, NULL, NULL,
@@ -1017,6 +1058,7 @@ best_trajectories_plot
 
 ```{r eval=FALSE}
 ggsave("figures/starting_frequency_histogram.pdf", starting_frequency_histogram, height=5, width = 8)
+ggsave("figures/starting_frequency_histogram.png", starting_frequency_histogram, height=5, width = 8)
 ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=3.5, width = 4.3)
 ggsave("figures/best_trajectories.pdf", height = 3.2, width=4.8)
 ```

@@ -56,7 +56,6 @@ NEO694	WHG	WHG	Santa Maira	Spain	SouthernEurope	9217	38.73	-0.46	Allentoft_Sikor
 NEO91	WHG	WHG	Str√∏by Gr√∏ftemark	Denmark	NorthernEurope	9122	55.39	12.31	Allentoft_Sikora_etal2024
 NEO759	WHG	WHG	K√∏ge S√∏nakke	Denmark	NorthernEurope	9028	55.4	12.37	Allentoft_Sikora_etal2024
 NEO672	WHG	WHG	Schela Cladovei	Romania	CentralEasternEurope	8814	44.64	22.66	Allentoft_Sikora_etal2024
-NEO816	WHG	WHG	Tepe Guran	Iran	WesternAsia	8700	33.76	47.1	Allentoft_Sikora_etal2024
 NEO655	WHG	WHG	Vlasac	Serbia	CentralEasternEurope	8668	44.54	22.04	Allentoft_Sikora_etal2024
 NEO658	WHG	WHG	Vlasac	Serbia	CentralEasternEurope	8668	44.54	22.04	Allentoft_Sikora_etal2024
 NEO646	WHG	WHG	El Mazo	Spain	SouthernEurope	8273	43.4	-4.71	Allentoft_Sikora_etal2024
@@ -84,16 +83,16 @@ NEO645	WHG	WHG	R√∂dhals	Denmark	NorthernEurope	5870	55.91	11.09	Allentoft_Si
 NEO260	WHG	WHG	Evens√•s	Sweden	NorthernEurope	5825	58.25	11.49	Allentoft_Sikora_etal2024
 AKT16-2	Early farmers	Anatolia Early Farmers	Aktopraklik	Turkey	NA	10570.5	40.173	28.77283	Marchi_etal2022
 BAR25-1	Early farmers	Anatolia Early Farmers	Barcin	Turkey	NA	10317.5	40.30122	29.60833	Marchi_etal2022
-Nea3	Early farmers	Anatolia Early Farmers	Nea Nikomedeia	Greece	NA	10206.5	40.5878	22.24991	Marchi_etal2022
-Nea2	Early farmers	Anatolia Early Farmers	Nea Nikomedeia	Greece	NA	10121	40.5878	22.24991	Marchi_etal2022
-LEPE48-2	Early farmers	Anatolia Early Farmers	Lepinski Vir	Serbia	NA	9955	44.55224	22.02736	Marchi_etal2022
-LEPE52-1	Early farmers	Anatolia Early Farmers	Lepinski Vir	Serbia	NA	9835	44.55224	22.02736	Marchi_etal2022
-STAR1	Early farmers	Anatolia Early Farmers	Grad-Starcevo	Serbia	NA	9555.5	44.82618	20.71596	Marchi_etal2022
-Asp6	Early farmers	Anatolia Early Farmers	Asparn-Schletz	Austria	NA	9528	48.58026	16.46911	Marchi_etal2022
-VC3-2	Early farmers	Anatolia Early Farmers	Vinca-Belo Brdo	Serbia	NA	9518.5	44.76147	20.62346	Marchi_etal2022
-Dil16	Early farmers	Anatolia Early Farmers	Dillingen-Steinheim	Germany	NA	9139.5	48.59503	10.53935	Marchi_etal2022
-Herx	Early farmers	Anatolia Early Farmers	Herxheim	Germany	NA	9101.5	49.14696	8.21807	Marchi_etal2022
-Klein7	Early farmers	Anatolia Early Farmers	Kleinhadersdorf	Austria	NA	9000	48.66388	16.58963	Marchi_etal2022
+Nea3	Early farmers	European Early Farmers	Nea Nikomedeia	Greece	NA	10206.5	40.5878	22.24991	Marchi_etal2022
+Nea2	Early farmers	European Early Farmers	Nea Nikomedeia	Greece	NA	10121	40.5878	22.24991	Marchi_etal2022
+LEPE48-2	Early farmers	European Early Farmers	Lepinski Vir	Serbia	NA	9955	44.55224	22.02736	Marchi_etal2022
+LEPE52-1	Early farmers	European Early Farmers	Lepinski Vir	Serbia	NA	9835	44.55224	22.02736	Marchi_etal2022
+STAR1	Early farmers	European Early Farmers	Grad-Starcevo	Serbia	NA	9555.5	44.82618	20.71596	Marchi_etal2022
+Asp6	Early farmers	European Early Farmers	Asparn-Schletz	Austria	NA	9528	48.58026	16.46911	Marchi_etal2022
+VC3-2	Early farmers	European Early Farmers	Vinca-Belo Brdo	Serbia	NA	9518.5	44.76147	20.62346	Marchi_etal2022
+Dil16	Early farmers	European Early Farmers	Dillingen-Steinheim	Germany	NA	9139.5	48.59503	10.53935	Marchi_etal2022
+Herx	Early farmers	European Early Farmers	Herxheim	Germany	NA	9101.5	49.14696	8.21807	Marchi_etal2022
+Klein7	Early farmers	European Early Farmers	Kleinhadersdorf	Austria	NA	9000	48.66388	16.58963	Marchi_etal2022
 NEO137	Early farmers	European Early Farmers	H√∂dmez√∂vasarhely Kotac	Hungary	CentralEasternEurope	7591	46.42	20.33	Allentoft_Sikora_etal2024
 NEO695	Early farmers	European Early Farmers	Maddalena	Italy	SouthernEurope	7299	43.08	13.06	Allentoft_Sikora_etal2024
 NEO145	Early farmers	European Early Farmers	Gorzsa Cukormajor	Hungary	CentralEasternEurope	6744	46.37	20.42	Allentoft_Sikora_etal2024
@@ -102,7 +101,8 @@ NEO140	Early farmers	European Early Farmers	Gorzsa Cukormajor	Hungary	CentralEas
 NEO142	Early farmers	European Early Farmers	Gorzsa Cukormajor	Hungary	CentralEasternEurope	6641	46.37	20.42	Allentoft_Sikora_etal2024
 NEO674	Early farmers	European Early Farmers	Baile Herculane	Romania	CentralEasternEurope	5570	44.9	22.43	Allentoft_Sikora_etal2024
 NEO641	Early farmers	European Early Farmers	Slonowice	Poland	CentralEasternEurope	5132	50.27	20.45	Allentoft_Sikora_etal2024
-NEO310	Early farmers	Iran Farmer	Monjukli-Depe	Turkmenistan	CentralAsia	7150	36.85	60.42	Allentoft_Sikora_etal2024
+NEO816	Early farmers	Iran Farmers	Tepe Guran	Iran	WesternAsia	8700	33.76	47.1	Allentoft_Sikora_etal2024
+NEO310	Early farmers	Iran Farmers	Monjukli-Depe	Turkmenistan	CentralAsia	7150	36.85	60.42	Allentoft_Sikora_etal2024
 NEO631	Neolithic farmers	Neolithic Farmers	Gruta do Caldeirao	Portugal	SouthernEurope	7139	39.65	-8.42	Allentoft_Sikora_etal2024
 NEO790	Neolithic farmers	Neolithic Farmers	Tysmose	Denmark	NorthernEurope	5663	55.71	12.27	Allentoft_Sikora_etal2024
 NEO891	Neolithic farmers	Neolithic Farmers	Roskilde Fjord (syd for Jyllinge)	Denmark	NorthernEurope	5661	55.73	12.1	Allentoft_Sikora_etal2024

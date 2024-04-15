@@ -160,6 +160,10 @@ archaic_samples <- read_tsv("archaic_samples.tsv") %>%
 master_table_wide <- read_tsv("master_table_wide.tsv") %>%
   left_join(readxl::read_excel("master_table_wide_ar.xlsx", na = "NA") %>% dplyr::select(sample, p2_l0, p2_L1)) %>%
   bind_rows(archaic_samples) %>%
+  mutate(p2_l0=ifelse(sample =="NEO816", "EarlyFarmers", p2_l0)) %>%
+  mutate(p2_L1=ifelse(sample =="NEO816", "Iran Farmers", p2_L1)) %>%
+  mutate(p2_L1=ifelse(p2_L1 == "Iran Farmer", "Iran Farmers", p2_L1)) %>%
+  mutate(p2_L1=ifelse(p2_L1 == "Anatolia and / Early Farmers" & longitude < 25, "Europen Early Farmers", p2_L1)) %>%
   mutate(p2=case_when(p2_l0 == "EarlyFarmers" ~ "Early farmers",
                       p2_l0 == "Europen Farmers" ~ "Neolithic farmers",
                       p2_l0 == "Steppe" ~ "Steppe pastoralists",
@@ -259,7 +263,7 @@ copy_number_long %>%
     ## # Groups:   epoch [6]
     ##   epoch               CHG        EHG   WHG   `Early farmers` `Neolithic farmers`
     ##   <fct>               <chr>      <chr> <chr> <chr>           <chr>              
-    ## 1 after EHG WHG split 8 2 2 ( n… 4.2 … 6.4 … 4.5 2.2 2.3 ( … <NA>               
+    ## 1 after EHG WHG split 8 2 2 ( n… 4.2 … 6 1.… 5.2 2.2 2.3 ( … <NA>               
     ## 2 after NEO formation <NA>       5.9 … 5.5 … 6.1 1.9 2.1 ( … 7.9 2.2 2.1 ( n= 1…
     ## 3 after YAM formation <NA>       3.8 … <NA>  4 2 2 ( n= 1 )  6 1.3 2.2 ( n= 6 ) 
     ## 4 after BRO formation <NA>       7 2 … <NA>  <NA>            6.8 2 2.2 ( n= 13 )
@@ -339,7 +343,7 @@ master_table_wide %>%
 set.seed(42)
 sample_age_distribution_plot <- master_table_wide %>%
   distinct(sample, age, p2_for_plot, hap_availability) %>% 
-  filter(!is.na(age)) %>%
+  filter(!is.na(age), age > 0) %>%
   ggplot(aes(x=-age/1000, y=fct_rev(p2_for_plot))) +
   # ggridges::geom_density_ridges(aes(fill=p2_for_plot), alpha=0.3) +
   ggridges::geom_density_ridges(mapping=aes(fill=p2_for_plot), jittered_points = TRUE, position="raincloud", point_size=0.5, alpha=0.5) +
@@ -349,7 +353,7 @@ sample_age_distribution_plot <- master_table_wide %>%
   scale_x_continuous(breaks = -4:0*3, labels = 4:0*3) +
   theme_bw() +
   xlab("kyr BP") +
-  coord_cartesian(ylim=c(1, 8.2), expand = TRUE) +
+  coord_cartesian(ylim=c(1, 7.2), expand = TRUE) +
   theme(legend.position = "none",
         axis.title.y=element_blank(),
         panel.grid.minor = element_blank(),
@@ -387,6 +391,7 @@ sample_distribution_map
 ```
 
 ``` r
+set.seed(42)
 sample_distribution_facet_map <- ancient_map +
   geom_jitter(aes(fill=p2_for_supplement, shape=p2_for_supplement), size=2, color="black", alpha=0.8, height = 0.3, width = 0.3) +
   facet_grid(p2_for_plot~epoch) +
@@ -397,7 +402,8 @@ sample_distribution_facet_map
 ![](selection_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-ggsave("figures/sample_distribution_facet_map.pdf", sample_distribution_facet_map, width=18, height = 18)
+#ggsave("figures/sample_distribution_facet_map.pdf", sample_distribution_facet_map, width=18, height = 18)
+#ggsave("figures/sample_distribution_facet_map.png", sample_distribution_facet_map, width=18, height = 18)
 ```
 
 ``` r
@@ -433,30 +439,51 @@ get_p_val <- function(data){
   aov(copy_number~p2_for_plot, data=data) %>% 
     TukeyHSD() %>%
     tidy() %>%
-    filter(str_detect(contrast, "Present day")) %>%
-    transmute(p2_for_plot=str_remove(contrast, "Present day-"),
-              p_val=adj.p.value%>% format(scientific=TRUE, digits=2),
+    transmute(contrast,
+              adj.p.value,
+              p_val=ifelse(adj.p.value<=0.05,adj.p.value %>% format(scientific=TRUE, digits=2), "N.S."),
               significance=ifelse(adj.p.value<=0.05, "S.", "N.S."))
 }
 copy_number_distribution_p_val <- copy_number_long %>%
   group_by(gene) %>%
   do(get_p_val(.)) %>%
-  dplyr::select(-significance) %>%
+  dplyr::select(contrast, p_val) %>%
   pivot_wider(names_from=gene, values_from = p_val)
 copy_number_distribution_p_val
 ```
 
-    ## # A tibble: 8 × 4
-    ##   p2_for_plot              AMY1    AMY2A   AMY2B  
-    ##   <chr>                    <chr>   <chr>   <chr>  
-    ## 1 Archaic                  2.4e-03 1.0e+00 9.9e-01
-    ## 2 EHG & CHG                5.4e-04 1.5e-07 2.0e-01
-    ## 3 WHG                      3.0e-01 1.6e-01 1.7e-01
-    ## 4 Early farmers            1.6e-02 1.0e+00 1.0e+00
-    ## 5 Neolithic farmers        1.0e+00 9.8e-01 1.0e+00
-    ## 6 Steppe pastoralists      6.0e-01 9.9e-01 9.4e-01
-    ## 7 Bronze age               9.8e-01 9.0e-01 9.8e-01
-    ## 8 Iron age to early modern 9.1e-01 7.0e-01 5.8e-01
+    ## # A tibble: 36 × 4
+    ##    contrast                         AMY1    AMY2A AMY2B
+    ##    <chr>                            <chr>   <chr> <chr>
+    ##  1 EHG & CHG-Archaic                N.S.    N.S.  N.S. 
+    ##  2 WHG-Archaic                      N.S.    N.S.  N.S. 
+    ##  3 Early farmers-Archaic            N.S.    N.S.  N.S. 
+    ##  4 Neolithic farmers-Archaic        3.8e-03 N.S.  N.S. 
+    ##  5 Steppe pastoralists-Archaic      3.4e-04 N.S.  N.S. 
+    ##  6 Bronze age-Archaic               1.3e-02 N.S.  N.S. 
+    ##  7 Iron age to early modern-Archaic 1.2e-03 N.S.  N.S. 
+    ##  8 Present day-Archaic              2.4e-03 N.S.  N.S. 
+    ##  9 WHG-EHG & CHG                    N.S.    N.S.  N.S. 
+    ## 10 Early farmers-EHG & CHG          N.S.    N.S.  N.S. 
+    ## # ℹ 26 more rows
+
+``` r
+copy_number_distribution_p_val %>%
+  filter(str_detect(contrast, "Present day")) %>%
+  mutate(p2_for_plot=str_remove(contrast, "Present day-"))
+```
+
+    ## # A tibble: 8 × 5
+    ##   contrast                             AMY1    AMY2A   AMY2B p2_for_plot        
+    ##   <chr>                                <chr>   <chr>   <chr> <chr>              
+    ## 1 Present day-Archaic                  2.4e-03 N.S.    N.S.  Archaic            
+    ## 2 Present day-EHG & CHG                5.4e-04 1.5e-07 N.S.  EHG & CHG          
+    ## 3 Present day-WHG                      N.S.    N.S.    N.S.  WHG                
+    ## 4 Present day-Early farmers            N.S.    N.S.    N.S.  Early farmers      
+    ## 5 Present day-Neolithic farmers        N.S.    N.S.    N.S.  Neolithic farmers  
+    ## 6 Present day-Steppe pastoralists      N.S.    N.S.    N.S.  Steppe pastoralists
+    ## 7 Present day-Bronze age               N.S.    N.S.    N.S.  Bronze age         
+    ## 8 Present day-Iron age to early modern N.S.    N.S.    N.S.  Iron age to early …
 
 ``` r
 copy_number_summary <- copy_number_long %>%
@@ -495,6 +522,52 @@ copy_number_distribution_plot
 ``` r
 # ggsave("figures/copy_number_distribution.pdf", copy_number_distribution_plot, width=9, height = 3)
 ```
+
+``` r
+lmp <- function (modelobject) {
+    if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+    f <- summary(modelobject)$fstatistic
+    p <- pf(f[1],f[2],f[3],lower.tail=F)
+    attributes(p) <- NULL
+    return(p)
+}
+for (curr_gene in c("AMY1", "AMY2A", "AMY2B")){
+  pval = lmp(lm(age~copy_number,copy_number_long %>% filter(gene == curr_gene)))
+  m = lm(copy_number~age,copy_number_long %>% filter(gene == curr_gene) %>% mutate(age=-age))
+  mu_pred = predict(m,data.frame(age=c(-12000,0)))
+  print(curr_gene)
+  print(pval)
+  delta = mu_pred[2]-mu_pred[1]
+  print(c(mu_pred,delta))
+  m2 = mgcv::gam(copy_number ~ s(age, bs = "cs"), data=copy_number_long %>% filter(gene == curr_gene) %>% mutate(age=-age))
+  print(summary(m2)$s.pv)
+  mu_pred_m2 = predict(m2,data.frame(age=c(-12000,0)))
+  delta = mu_pred_m2[2]-mu_pred_m2[1]
+  print(c(mu_pred_m2,delta))
+}
+```
+
+    ## [1] "AMY1"
+    ## [1] 1.126245e-06
+    ##        1        2        2 
+    ## 5.314386 7.137565 1.823179 
+    ## [1] 0
+    ##        1        2        2 
+    ## 4.216100 7.068796 2.852696 
+    ## [1] "AMY2A"
+    ## [1] 1.63424e-06
+    ##         1         2         2 
+    ## 1.6257034 2.0814638 0.4557604 
+    ## [1] 1.992873e-06
+    ##         1         2         2 
+    ## 1.6884772 2.0786727 0.3901955 
+    ## [1] "AMY2B"
+    ## [1] 0.003233963
+    ##         1         2         2 
+    ## 2.0036581 2.1860922 0.1824341 
+    ## [1] 0.002630572
+    ##         1         2         2 
+    ## 2.0752332 2.1892630 0.1140298
 
 ``` r
 plot_copy_number_trend_inset <- function(amy){
@@ -594,6 +667,7 @@ copy_number_distribution_plot_for_supplement
 
 ``` r
 #ggsave("figures/copy_number_distribution_for_supplement.pdf", copy_number_distribution_plot_for_supplement, width=15, height = 5)
+#ggsave("figures/copy_number_distribution_for_supplement.png", copy_number_distribution_plot_for_supplement, width=15, height = 5)
 ```
 
 ``` r
@@ -606,7 +680,6 @@ total_copy_number_summary <- copy_number_long %>%
   ungroup() %>%
   mutate(y_label=str_c(p2_for_plot, " (n=", n, ")"),
          y_label=fct_reorder(y_label, p2_for_plot, function(x){median(as.numeric(x))}))
-
 copy_number_long %>%
   group_by(sample, p2_for_plot, epoch, age) %>%
   summarise(copy_number=sum(copy_number)) %>%
@@ -688,9 +761,11 @@ haplotype_age_distribution_plot
 
 ``` r
 #ggsave("figures/haplotype_age_distribution.pdf", haplotype_age_distribution_plot, width=10, height = 5)
+#ggsave("figures/haplotype_age_distribution.png", haplotype_age_distribution_plot, width=10, height = 5)
 ```
 
 ``` r
+set.seed(42)
 haplotype_summary <- haplotype_long %>%
   group_by(p2_for_plot, y_label) %>%
   summarise(dup_hap=mean(dup_hap))
@@ -726,8 +801,8 @@ haplotype_long %>%
     ##   p2_for_plot  `(-1.2e+04,-8.5e+03]` `(-8.5e+03,-5.5e+03]` `(-5.5e+03,-2.5e+03]`
     ##   <fct>                        <int>                 <int>                 <int>
     ## 1 EHG & CHG                        2                    20                     6
-    ## 2 WHG                              8                    10                    NA
-    ## 3 Early farme…                    24                     4                    NA
+    ## 2 WHG                              6                    10                    NA
+    ## 3 Early farme…                    26                     4                    NA
     ## 4 Neolithic f…                    NA                     2                    10
     ## 5 Steppe past…                    NA                    NA                     6
     ## 6 Bronze age                      NA                    NA                    24
@@ -776,12 +851,14 @@ haplotype_trend_plot
 
 ``` r
 #ggsave("figures/haplotype_trend.pdf", haplotype_trend_plot, width=8, height = 5)
+#ggsave("figures/haplotype_trend.png", haplotype_trend_plot, width=8, height = 5)
 ```
 
 ``` r
 haplotype_binned %>%
   filter(haplotype=="dup_hap_H1") %>% 
-  transmute(pop=p2_for_simulation, generation) %>%
+  transmute(pop=p2_for_simulation, generation, epoch) %>%
+  arrange(-generation, pop) %>%
   write_tsv("slim/sampled_populations.tsv")
 haplotype_binned_frequency %>%
   write_tsv("slim/binned_frequency.tsv")
@@ -886,7 +963,7 @@ cd /global/scratch/users/nicolas931010/amylase_diversity_project/src/bmws/src/bm
 ## estimate s
 python /global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/bmws/amy.1.py
 ## run 1000 bootstraps
-for SEED in {10..999}; do
+for SEED in {0..999}; do
 echo '#!/bin/bash
 source ~/.bashrc
 conda activate bmws
@@ -1033,7 +1110,6 @@ haplotype_binned_frequency <- read_tsv("slim/binned_frequency.tsv")
 # starting_frequency_vector <- 0.3
 # selection_coeff_vector <- "0.04"
 starting_frequency_vector <- seq(from=0.05, to=0.8, length.out=31)
-# starting_frequency_vector <- seq(from=0.05, to=0.55, length.out=21)
 selection_coeff_vector <- seq(from=-0.01, to=0.04, length.out=21)
 selection_onset_vector <- seq(from=1000, to=1400, length.out=21)
 
@@ -1055,13 +1131,55 @@ simulated_binned_frequency <- expand.grid(starting_frequency_vector, selection_c
 n_simulation <- dim(simulation_summary)[1]
 acceptance_rate <- 0.001
 n_acceptance <- round(n_simulation*acceptance_rate)
+top_simulations <- simulation_summary %>%
+  slice_min(delta, n=n_acceptance)
+top_simulations %>% 
+  count(selection_coeff) %>% 
+  slice_max(n, n = 3)
+```
 
-starting_frequency_histogram <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
+    ## # A tibble: 3 × 2
+    ##   selection_coeff     n
+    ##             <dbl> <int>
+    ## 1          0.015    287
+    ## 2          0.0175   286
+    ## 3          0.02     228
+
+``` r
+top_simulations %>% 
+  count(selection_onset) %>% 
+  slice_max(n, n = 3)
+```
+
+    ## # A tibble: 3 × 2
+    ##   selection_onset     n
+    ##             <dbl> <int>
+    ## 1            1200   195
+    ## 2            1180   186
+    ## 3            1160   155
+
+``` r
+top_simulations %>% 
+  count(selection_coeff, selection_onset) %>% 
+  slice_max(n, n = 5)
+```
+
+    ## # A tibble: 5 × 3
+    ##   selection_coeff selection_onset     n
+    ##             <dbl>           <dbl> <int>
+    ## 1          0.015             1200    41
+    ## 2          0.015             1160    40
+    ## 3          0.015             1180    40
+    ## 4          0.0175            1200    40
+    ## 5          0.0175            1180    37
+
+``` r
+starting_frequency_histogram <-  top_simulations %>%
   ggplot(aes(x=starting_frequency, y=..prop..)) +
   geom_bar() +
   xlim(c(min(starting_frequency_vector), max(starting_frequency_vector))) +
   ylab("density") +
+  xlab("starting frequency") +
   theme_bw() +
   theme()
 starting_frequency_histogram
@@ -1076,9 +1194,8 @@ starting_frequency_histogram
 ![](selection_analysis_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 ``` r
-top_histogram <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
-  ggplot(aes(x=selection_coeff, y=..prop..)) +
+top_histogram <- top_simulations %>%
+  ggplot(aes(x=selection_coeff, y=after_stat(prop))) +
   geom_bar() +
   scale_x_continuous(expand = c(0.0025, 0.0025)) +
   scale_y_continuous(n.breaks = 3) +
@@ -1088,8 +1205,7 @@ top_histogram <- simulation_summary %>%
   theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),
         axis.ticks.x = element_blank())
-right_histogram <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
+right_histogram <- top_simulations %>%
   ggplot(aes(x=(1500-selection_onset)*30/1000)) +
   geom_bar(aes(y=..prop..)) +
   scale_x_continuous(expand = c(0.03, 0.03)) +
@@ -1102,8 +1218,7 @@ right_histogram <- simulation_summary %>%
         axis.title.y = element_blank(),
         axis.ticks.y = element_blank(),
         rect = element_rect(fill="transparent", color="transparent"), plot.background = element_rect(fill="transparent", color="transparent"))
-heatmap <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
+heatmap <- top_simulations %>%
   count(selection_coeff, selection_onset) %>%
   mutate(density=n/sum(n)) %>%
   mutate_all(as.character) %>%
@@ -1120,7 +1235,7 @@ heatmap <- simulation_summary %>%
   coord_cartesian(xlim=c(min(selection_coeff_vector), max(selection_coeff_vector)),
                   ylim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000))) +
   labs(x="selection coefficient", 
-       y="timing of onset of selection (kyr BP)") +
+       y="time of selection onset (kyr BP)") +
   theme_bw() 
 combined_heatmap <- plot_grid(NULL, top_histogram, NULL, NULL, 
           NULL, NULL, NULL, NULL,
@@ -1178,6 +1293,7 @@ best_trajectories_plot
 
 ``` r
 ggsave("figures/starting_frequency_histogram.pdf", starting_frequency_histogram, height=5, width = 8)
+ggsave("figures/starting_frequency_histogram.png", starting_frequency_histogram, height=5, width = 8)
 ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=3.5, width = 4.3)
 ggsave("figures/best_trajectories.pdf", height = 3.2, width=4.8)
 ```
