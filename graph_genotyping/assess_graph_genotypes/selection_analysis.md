@@ -1197,6 +1197,7 @@ starting_frequency_histogram
 top_histogram <- top_simulations %>%
   ggplot(aes(x=selection_coeff, y=after_stat(prop))) +
   geom_bar() +
+  geom_vline(data = summarise(top_simulations, selection_coeff=median(selection_coeff)), mapping=aes(xintercept=selection_coeff), color="red", linetype="dashed", linewidth=0.8) +
   scale_x_continuous(expand = c(0.0025, 0.0025)) +
   scale_y_continuous(n.breaks = 3) +
   coord_cartesian(xlim=c(min(selection_coeff_vector), max(selection_coeff_vector))) +
@@ -1208,6 +1209,7 @@ top_histogram <- top_simulations %>%
 right_histogram <- top_simulations %>%
   ggplot(aes(x=(1500-selection_onset)*30/1000)) +
   geom_bar(aes(y=..prop..)) +
+  geom_vline(data = summarise(top_simulations, selection_onset=median(selection_onset)), mapping=aes(xintercept=(1500-selection_onset)*30/1000), color="red", linetype="dashed", linewidth=0.8) +
   scale_x_continuous(expand = c(0.03, 0.03)) +
   scale_y_continuous(breaks = c(0, 0.1)) +
   coord_cartesian(xlim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000))) +
