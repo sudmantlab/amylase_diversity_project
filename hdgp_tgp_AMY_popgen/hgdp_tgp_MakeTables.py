@@ -26,9 +26,7 @@ rule all:
         expand('groups/{superpopulation}.txt', superpopulation=superpopulations),
         expand('groups/{population}.txt', population =populations),
         expand('groups/{subsistence_type}.txt', subsistence_type =subsistence_types),
-        expand("groups/{anything}.lassip.txt", anything=superpopulations),
-        expand("groups/{anything}.lassip.txt", anything=populations),
-        expand("groups/{anything}.lassip.txt", anything=subsistence_types),
+        expand("groups/{anything}.lassip.txt", anything=superpopulations), ### adjust for other groups accordingly
         
 
     
