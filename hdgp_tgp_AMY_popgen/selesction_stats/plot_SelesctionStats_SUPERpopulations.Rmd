@@ -1,0 +1,523 @@
+---
+title: "SELECTION SCANS ON DIFFERENT GROUPS"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r eval=TRUE}
+setwd("/Users/joanocha/Desktop/AMYLASE/AMY_PCA_LD/selection/")
+library(ggplot2)
+library(RColorBrewer)
+library(dplyr)
+library(cowplot)
+library(readr)
+library(ggpubr)
+library(data.table)
+```
+
+# Function definition
+
+#### genome-wide manhattan 
+
+```{r}
+gwide_manhattan <- function(dataset, selstat, ytitle, colorhighlight){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  threshold <- quantile(dataset[[selstat]], 0.9995, na.rm = TRUE) ###  99.95%  percentile of the empirical distribution
+  dataset$Window <- seq_len(nrow(dataset))
+  dataset$region2 <- ifelse(
+    !dataset$region %in% c('LCT region', 'AMY region'),
+    'genome-wide',
+    dataset$region
+  )
+  highlighted_regions <- dataset[dataset$region2 %in% c('LCT region', 'AMY region'), ]
+  label_positions <- highlighted_regions %>%
+    group_by(region2) %>%
+    summarize(label_x = mean(Window), label_y = max(!!selstat) + 0.01) %>%
+    ungroup()
+  
+  test <- c("grey", "lightgrey")
+  n_of_chr <- length(unique(dataset$chr))
+  
+  ggplot(dataset, aes(x = Window, y = !!selstat, color = chr)) + 
+    ylab(ytitle) + 
+    xlab("Chromosomes") +
+    geom_point(size = 0.5) + 
+    theme_cowplot() + 
+    geom_hline(yintercept = threshold, linetype = "dashed") +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(size = 8),
+      legend.key.size = unit(0.6, "cm"),
+      legend.text = element_text(size = 6),
+      strip.background = element_blank(),
+      strip.placement = "outside",
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text.y = element_text(size = 10)
+    ) + 
+    scale_color_manual(values = rep(test, n_of_chr)) +
+    geom_point(data = highlighted_regions, aes(x = Window, y = !!selstat), color = colorhighlight, size = 1) +
+    geom_text(data = label_positions, aes(x = label_x, y = label_y, label = region2), color = "black", size = 3, hjust = 0.5)
+}
+
+gwide_manhattan_absolute <- function(dataset, selstat, ytitle, colorhighlight){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  threshold <- quantile(abs(dataset[[selstat]]), 0.9995, na.rm = TRUE) ###  99.95%  percentile of the empirical distribution
+  dataset$Window <- seq_len(nrow(dataset))
+  dataset$region2 <- ifelse(
+    !dataset$region %in% c('LCT region', 'AMY region'),
+    'genome-wide',
+    dataset$region
+  )
+  highlighted_regions <- dataset[dataset$region2 %in% c('LCT region', 'AMY region'), ]
+  label_positions <- highlighted_regions %>%
+    group_by(region2) %>%
+    summarize(label_x = mean(Window), label_y = max(abs(!!selstat)) + 0.01) %>%
+    ungroup()
+  test <- c("grey", "lightgrey")
+  n_of_chr <- length(unique(dataset$chr))
+  ggplot(dataset, aes(x = Window, y = abs(!!selstat), color = chr)) + 
+    ylab(ytitle) + 
+    xlab("Chromosomes") +
+    geom_point(size = 0.5) + 
+    theme_cowplot() + 
+    geom_hline(yintercept = threshold, linetype = "dashed") +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(size = 8),
+      legend.key.size = unit(0.6, "cm"),
+      legend.text = element_text(size = 6),
+      strip.background = element_blank(),
+      strip.placement = "outside",
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text.y = element_text(size = 10)
+    ) + 
+    scale_color_manual(values = rep(test, n_of_chr)) +
+    geom_point(data = highlighted_regions, aes(x = Window, y = abs(!!selstat)), color = colorhighlight, size = 1) +
+    geom_text(data = label_positions, aes(x = label_x, y = label_y, label = region2), color = "black", size = 3, hjust = 0.5)
+}
+
+
+gwide_manhattan_position <- function(dataset, selstat, ytitle, colorhighlight){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  threshold <- quantile(dataset[[selstat]], 0.9995, na.rm = TRUE) ###  99.95%  percentile of the empirical distribution
+  dataset$Window <- seq_len(nrow(dataset))
+  dataset$region2 <- ifelse(
+    !dataset$region %in% c('LCT region', 'AMY region'),
+    'genome-wide',
+    dataset$region
+  )
+  highlighted_regions <- dataset[dataset$region2 %in% c('LCT region', 'AMY region'), ]
+  label_positions <- highlighted_regions %>%
+    group_by(region2) %>%
+    summarize(label_x = mean(Window), label_y = max(!!selstat) + 0.01) %>%
+    ungroup()
+  
+  test <- c("grey", "lightgrey")
+  n_of_chr <- length(unique(dataset$chr))
+  
+  ggplot(dataset, aes(x = pos, y = !!selstat, color = chr)) + 
+    ylab(ytitle) + 
+    xlab("Chromosomes") +
+    geom_point(size = 0.5) + 
+    theme_cowplot() + 
+    geom_hline(yintercept = threshold, linetype = "dashed") +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(size = 8),
+      legend.key.size = unit(0.6, "cm"),
+      legend.text = element_text(size = 6),
+      strip.background = element_blank(),
+      strip.placement = "outside",
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text.y = element_text(size = 10)
+    ) + 
+    scale_color_manual(values = rep(test, n_of_chr)) +
+    geom_point(data = highlighted_regions, aes(x = Window, y = !!selstat), color = colorhighlight, size = 1) +
+    geom_text(data = label_positions, aes(x = label_x, y = label_y, label = region2), color = "black", size = 3, hjust = 0.5)
+}
+```
+
+#### mean+sd 
+
+```{r}
+plot_stats <- function(dataset, selstat, custom_palette, xlabel){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(!!selstat, na.rm = TRUE))
+  ggplot(dataset, aes(x = !!selstat, y = region, color = Superpopulation_Region)) +
+    stat_summary(aes(fill = Superpopulation_Region, color = Superpopulation_Region), fun = mean) +
+    scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+    scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+    xlab(xlabel) + ylab("") +
+    facet_grid(rows = vars(Superpopulation), scales = "free_y", space = "free_y", switch = "y") + # Facet by Superpopulation
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = "none",  # Hide the legend
+          legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+          legend.text = element_text(size = 6),  # Adjust size of legend text
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8)) +
+    geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) 
+}
+
+
+plot_stats_absolute <- function(dataset, selstat, custom_palette, xlabel){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(abs(!!selstat), na.rm = TRUE))
+  ggplot(dataset, aes(x = abs(!!selstat), y = region, color = Superpopulation_Region)) +
+    stat_summary(aes(fill = Superpopulation_Region, color = Superpopulation_Region), fun = mean) +
+    scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+    scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+    xlab(xlabel) + ylab("") +
+    facet_grid(rows = vars(Superpopulation), scales = "free_y", space = "free_y", switch = "y") + # Facet by Superpopulation
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = "none",  # Hide the legend
+          legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+          legend.text = element_text(size = 6),  # Adjust size of legend text
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8)) +
+    geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) 
+}
+```
+
+#### plot density
+
+```{r}
+plot_density <- function(dataset, selstat, fill_choice, custom_palette, xlabel, mytitle){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  fill_choice <- rlang::ensym(fill_choice) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(!!selstat, na.rm = TRUE))
+  
+  ggplot(dataset, aes(x = !!selstat, fill = !!fill_choice)) +  geom_density() + 
+  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  xlab(xlabel) + ylab("Density") +
+  facet_wrap(~ Superpopulation, nrow = 7, strip.position = "right", scales = "free_y") + # Facet by Superpopulation
+  theme_cowplot() +
+  theme(panel.border = element_rect(color="black"),
+        legend.position = "none",  # Hide the legend
+        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+        legend.text = element_text(size = 6),  # Adjust size of legend text
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        plot.title = element_text(size = 8)) +
+  labs(fill = NULL)  +
+  geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) + ggtitle(mytitle)
+  
+}
+
+plot_density_absolute <- function(dataset, selstat, fill_choice, custom_palette, xlabel, mytitle){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  fill_choice <- rlang::ensym(fill_choice) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(abs(!!selstat), na.rm = TRUE))
+  
+  ggplot(dataset, aes(x = abs(!!selstat), fill = !!fill_choice)) +  geom_density() + 
+  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  xlab(xlabel) + ylab("Density") +
+  facet_wrap(~ Superpopulation, nrow = 7, strip.position = "right") + # Facet by Superpopulation
+  theme_cowplot() +
+  theme(panel.border = element_rect(color="black"),
+        legend.position = "none",  # Hide the legend
+        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+        legend.text = element_text(size = 6),  # Adjust size of legend text
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        plot.title = element_text(size = 8)) +
+  labs(fill = NULL)  +
+  geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) + ggtitle(mytitle)
+  
+}
+```
+
+
+#### pallets
+```{r}
+my_custom_palette <- c("AFR AMY region" = "#EDB829",
+                    "WEA AMY region" = "#94B669",
+                    "OCN AMY region" = "purple",
+                    "AMR AMY region" = "#DD4124",
+                    "EA AMY region" = "#0C7996",
+                    "CAS AMY region" = "#00496F",
+                    "SA AMY region" = "#E97C07",
+                    "AFR LCT region" = adjustcolor("#EDB829", alpha.f = 0.5),
+                    "WEA LCT region" = adjustcolor("#94B669", alpha.f = 0.5),
+                    "OCN LCT region" = adjustcolor("purple", alpha.f = 0.5),
+                    "AMR LCT region" = adjustcolor("#DD4124", alpha.f = 0.5),
+                    "EA LCT region" = adjustcolor("#0C7996", alpha.f = 0.5),
+                    "CAS LCT region" = adjustcolor("#00496F", alpha.f = 0.5),
+                    "SA LCT region" = adjustcolor("#E97C07", alpha.f = 0.5),
+                    "AFR genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "WEA genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "OCN genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "AMR genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "EA genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "CAS genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "SA genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+)
+
+
+my_custom_palette_AMY <- c("AFR AMY region" = "#EDB829",
+                    "WEA AMY region" = "#94B669",
+                    "OCN AMY region" = "purple",
+                    "AMR AMY region" = "#DD4124",
+                    "EA AMY region" = "#0C7996",
+                    "CAS AMY region" = "#00496F",
+                    "SA AMY region" = "#E97C07",
+                    "AFR genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "WEA genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "OCN genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "AMR genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "EA genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "CAS genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "SA genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+)
+
+
+my_custom_palette_LCT <- c("AFR LCT region" = adjustcolor("#EDB829", alpha.f = 0.5),
+                    "WEA LCT region" = adjustcolor("#94B669",alpha.f = 0.5),
+                    "OCN LCT region" = adjustcolor("purple",alpha.f = 0.5),
+                    "AMR LCT region" = adjustcolor("#DD4124",alpha.f = 0.5),
+                    "EA LCT region" = adjustcolor("#0C7996",alpha.f = 0.5),
+                    "CAS LCT region" = adjustcolor("#00496F",alpha.f = 0.5),
+                    "SA LCT region" = adjustcolor("#E97C07",alpha.f = 0.5),
+                    "AFR genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "WEA genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "OCN genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "AMR genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "EA genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "CAS genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                    "SA genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+)
+
+```
+
+
+# iHS  + nSL + HSTATS  
+```{r}
+ihsbins<-fread("SUPERPOPULATIONS/genomewide_combined.pmap.ihs.100bins.tsv.gz", header=TRUE, sep="\t")
+#ihsbins$Superpopulation<-ihsbins$superpop
+#ihsbins$chr<-ihsbins$CHR
+#ihsbins$absiHS<-abs(ihsbins$IHS)
+ihsbins$Superpopulation_Region <- paste(ihsbins$Superpopulation,ihsbins$region, sep=" ")
+```
+
+# iHS  + nSL + HSTATS  + salti
+
+```{r}
+ihsbins<-fread("SUPERPOPULATIONS/genomewide_combined.pmap.ihs.100bins.tsv.gz", header=TRUE, sep="\t")
+ihsbins$Superpopulation<-ihsbins$superpopulation
+ihsbins$Superpopulation_Region <- paste(ihsbins$Superpopulation,ihsbins$region, sep=" ")
+
+nslbins<-fread("SUPERPOPULATIONS/genomewide_combined.nsl.100bins.tsv.gz", header=TRUE, sep="\t")
+nslbins$Superpopulation<-nslbins$superpopulation
+nslbins$Superpopulation_Region <- paste(nslbins$Superpopulation,nslbins$region, sep=" ")
+
+
+hstats<-fread("SUPERPOPULATIONS/genomewide_combined.lassip.hap.stats.v2.gz", header=TRUE, sep="\t")
+hstats$Superpopulation_Region <- paste(hstats$Superpopulation,hstats$region, sep=" ")
+
+
+lassi<-fread("SUPERPOPULATIONS/genomewide.lassi.lassip.hap.stats.gz", header=TRUE, sep="\t")
+lassi$Superpopulation_Region <- paste(lassi$Superpopulation,lassi$region, sep=" ")
+
+salti<-fread("SUPERPOPULATIONS/genomewide.salti.lassip.hap.stats.gz", header=TRUE, sep="\t")
+salti$Superpopulation_Region <- paste(salti$Superpopulation,salti$region, sep=" ")
+```
+
+
+
+####  iHS, nsL, Hstats: stats and density
+
+####  iHS stats and density
+```{r eval=FALSE, fig.width=8, fig.height=8}
+ihs_stats<-plot_stats_absolute(ihsbins, iHS, my_custom_palette , "|iHS|") ### score positions 
+ihs_density_plot_AMY<-plot_density_absolute(ihsbins, iHS, Superpopulation_Region1, my_custom_palette_AMY, "|iHS|", 'AMY vs genome-wide')
+ihs_density_plot_LCT<-plot_density_absolute(ihsbins, iHS, Superpopulation_Region2, my_custom_palette_LCT, "|iHS|", 'LCT vs genome-wide')
+ihs_stats_density<-ggarrange(ihs_stats, ihs_density_plot_AMY, ihs_density_plot_LCT, nrow=1, labels = c("A.", "B", ""))
+ggsave('SUPERPOPULATIONS/ihs_stats_density.pdf', ihs_stats_density, dpi=300, width=12, height=16)
+ggsave('SUPERPOPULATIONS/ihs_stats_density.png', ihs_stats_density, dpi=300, width=12, height=16)
+ihs_stats_density
+```
+
+
+### nSL stats and density
+```{r eval=FALSE, fig.width=12, fig.height=14}
+nslstats<-plot_stats_absolute(nslbins, nSL, my_custom_palette , "|nSL|") ### score positions 
+nsldensity_plot_AMY<-plot_density_absolute(nslbins, nSL, Superpopulation_Region1, my_custom_palette_AMY, "|nSL|", 'AMY vs genome-wide')
+nsldensity_plot_LCT<-plot_density_absolute(nslbins, nSL, Superpopulation_Region2, my_custom_palette_LCT, "|nSL|", 'LCT vs genome-wide')
+nsL_stats_density<-ggarrange(nslstats, nsldensity_plot_AMY, nsldensity_plot_LCT, nrow=1, labels = c("A.", "B", ""))
+nsL_stats_density
+ggsave('SUPERPOPULATIONS/nsL_stats_density.pdf', nsL_stats_density, dpi=300, width=12, height=16)
+ggsave('SUPERPOPULATIONS/nsL_stats_density.png', nsL_stats_density, dpi=300, width=12, height=16)
+```
+
+
+
+
+```{r, fig.width=12, fig.height=16}
+hstats <- hstats %>%
+      filter(Superpopulation != "OCN")
+h12<-plot_stats(hstats, h12, my_custom_palette , "H12")
+h2h1<-plot_stats(hstats, h2h1, my_custom_palette , "H2/H1")
+density_plot_AMY<-plot_density(hstats, h12, Superpopulation_Region1, my_custom_palette_AMY, "H12", 'AMY vs genome-wide') 
+density_plot_LCT<-plot_density(hstats, h12, Superpopulation_Region2, my_custom_palette_LCT, "H12", 'LCT vs genome-wide')
+density_plot_AMY2<-plot_density(hstats, h2h1, Superpopulation_Region1, my_custom_palette_AMY, "H2/H1", 'AMY vs genome-wide')
+density_plot_LCT2<-plot_density(hstats, h2h1, Superpopulation_Region2, my_custom_palette_LCT, "H2/H1", 'LCT vs genome-wide')
+
+
+h12_stats_density<-ggarrange(h12, density_plot_AMY, density_plot_LCT, nrow=1, labels = c("A.", "B.", ""))
+h12_stats_density
+h2h1_stats_density<-ggarrange(h2h1, density_plot_AMY2, density_plot_LCT2,  nrow=1, labels = c("A.", "B.", ""))
+h2h1_stats_density
+ggsave('SUPERPOPULATIONS/h12_stats_density.pdf', h12_stats_density, dpi=300, width=12, height=16)
+ggsave('SUPERPOPULATIONS/h12_stats_density.png', h12_stats_density, dpi=300, width=12, height=16)
+ggsave('SUPERPOPULATIONS/h2h1_stats_density.pdf', h2h1_stats_density, dpi=300, width=12, height=16)
+ggsave('SUPERPOPULATIONS/h2h1_stats_density.png', h2h1_stats_density, dpi=300, width=12, height=16)
+```
+
+
+
+##### lassi
+
+
+```{r, fig.width=12, fig.height=16}
+lassi <- lassi %>%
+      filter(Superpopulation != "OCN")
+lassi <- lassi %>%
+      filter(region != "amy genes")
+lassi_m<-plot_stats(lassi, m, my_custom_palette , "m")
+lassi_t<-plot_stats(lassi, T, my_custom_palette , "T")
+lassi_m_density_plot_AMY<-plot_density(lassi, m, Superpopulation_Region1, my_custom_palette_AMY, "m", 'AMY vs genome-wide') 
+lassi_m_density_plot_LCT<-plot_density(lassi, m, Superpopulation_Region2, my_custom_palette_LCT, "m", 'LCT vs genome-wide')
+lassi_t_density_plot_AMY<-plot_density(lassi, T, Superpopulation_Region1, my_custom_palette_AMY, "T", 'AMY vs genome-wide') + xlim(0, 100)
+lassi_t_density_plot_LCT<-plot_density(lassi, T, Superpopulation_Region2, my_custom_palette_LCT, "T", 'LCT vs genome-wide') + ylim(0, 200)
+lassi_m_stats_density<-ggarrange(lassi_m, lassi_m_density_plot_AMY, lassi_m_density_plot_LCT, nrow=1, labels = c("A.", "B.", ""))
+lassi_m_stats_density
+lassi_t_stats_density<-ggarrange(lassi_t, lassi_t_density_plot_AMY, lassi_t_density_plot_LCT,  nrow=1, labels = c("A.", "B.", ""))
+lassi_t_stats_density
+
+
+ggarrange(lassi_t, lassi_m)
+#ggsave('SUPERPOPULATIONS/h12_stats_density.pdf', h12_stats_density, dpi=300, width=12, height=16)
+#ggsave('SUPERPOPULATIONS/h12_stats_density.png', h12_stats_density, dpi=300, width=12, height=16)
+#ggsave('SUPERPOPULATIONS/h2h1_stats_density.pdf', h2h1_stats_density, dpi=300, width=12, height=16)
+#ggsave('SUPERPOPULATIONS/h2h1_stats_density.png', h2h1_stats_density, dpi=300, width=12, height=16)
+```
+
+
+#### manhattan like exploration  
+
+```{r eval=FALSE, fig.width=14, fig.height=10}
+
+get_pop<-function(dataset, pop){ 
+  popdataset<-dataset %>%
+      filter(Superpopulation == pop)
+  popdataset
+}
+
+AFR_H12<-gwide_manhattan(get_pop(hstats, "AFR"), h12, "H12 AFR", "#EDB829") 
+AMR_H12<-gwide_manhattan(get_pop(hstats, "AMR"), h12, "H12 AMR", "#DD4124") 
+CAS_H12<-gwide_manhattan(get_pop(hstats, "CAS"), h12, "H12 CAS", "#00496F") 
+EA_H12<-gwide_manhattan(get_pop(hstats, "EA"), h12, "H12 EA", "#0C7996") 
+OCN_H12<-gwide_manhattan(get_pop(hstats, "WEA"), h12, "H12 OCN", "purple") 
+SA_H12<-gwide_manhattan(get_pop(hstats, "SA"), h12, "H12 SA", "#E97C07") 
+WEA_H12<-gwide_manhattan(get_pop(hstats, "WEA"), h12, "H12 WEA", "#94B669") 
+H12<-ggarrange(AFR_H12, AMR_H12, CAS_H12, EA_H12, OCN_H12, SA_H12, WEA_H12, nrow=7, ncol=1)
+
+AFR_nsL<-gwide_manhattan_absolute(get_pop(nslbins, "AFR"), nSL, "|nSL| AFR", "#EDB829") 
+AMR_nsL<-gwide_manhattan_absolute(get_pop(nslbins, "AMR"), nSL, "|nSL| AMR", "#DD4124") 
+CAS_nsL<-gwide_manhattan_absolute(get_pop(nslbins, "CAS"), nSL, "|nSL| CAS", "#00496F") 
+EA_nsL<-gwide_manhattan_absolute(get_pop(nslbins, "EA"), nSL, "|nSL| EA", "#0C7996") 
+OCN_nsL<-gwide_manhattan_absolute(get_pop(nslbins, "WEA"), nSL, "|nSL|OCN", "purple") 
+SA_nsL<-gwide_manhattan_absolute(get_pop(nslbins, "SA"), nSL, "|nSL| SA", "#E97C07") 
+WEA_nsL<-gwide_manhattan_absolute(get_pop(nslbins, "WEA"), nSL, "|nSL| WEA", "#94B669") 
+nSL<-ggarrange(AFR_nsL, AMR_nsL, CAS_nsL, EA_nsL, OCN_nsL, SA_nsL, WEA_nsL, nrow=7, ncol=1)
+
+
+AFR_T<-gwide_manhattan(get_pop(lassi, "AFR"), T, "T AFR", "#EDB829") 
+AMR_T<-gwide_manhattan(get_pop(lassi, "AMR"), T, "T AMR", "#DD4124") 
+CAS_T<-gwide_manhattan(get_pop(lassi, "CAS"), T, "T CAS", "#00496F") 
+EA_T<-gwide_manhattan(get_pop(lassi, "EA"), T, "T EA", "#0C7996") 
+OCN_T<-gwide_manhattan(get_pop(lassi, "WEA"), T, "T OCN", "purple") 
+SA_T<-gwide_manhattan(get_pop(lassi, "SA"), T, "T SA", "#E97C07") 
+WEA_T<-gwide_manhattan(get_pop(lassi, "WEA"), T, "T WEA", "#94B669") 
+T<-ggarrange(AFR_T, AMR_T, CAS_T, EA_T, OCN_T, SA_T, WEA_T, nrow=7, ncol=1)
+
+ggarrange(nSL, H12, T, ncol = 3, nrow = 1)
+```
+
+
+
+
+
+
+
+

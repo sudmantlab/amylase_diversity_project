@@ -1,0 +1,1823 @@
+---
+title: "SELECTION SCANS ON DIFFERENT GROUPS"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r eval=TRUE}
+setwd("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/")
+library(ggplot2)
+library(RColorBrewer)
+library(dplyr)
+library(cowplot)
+library(readr)
+library(data.table)
+library(Cairo)
+```
+
+# Function definition
+
+#### genome-wide manhattan 
+
+```{r}
+gwide_manhattan <- function(dataset, selstat, ytitle, colorhighlight){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  #threshold <- quantile(dataset[[selstat]], 0.9995, na.rm = TRUE) ###  99.95%  percentile of the empirical distribution
+  threshold <- quantile(dataset[[selstat]], 0.9950, na.rm = TRUE) ###  99.95%  percentile of the empirical distribution
+  dataset$Window <- seq_len(nrow(dataset))
+  dataset$region2 <- ifelse(
+    !dataset$region %in% c('LCT region', 'AMY region'),
+    'genome-wide',
+    dataset$region
+  )
+  highlighted_regions <- dataset[dataset$region2 %in% c('LCT region', 'AMY region'), ]
+  label_positions <- highlighted_regions %>%
+    group_by(region2) %>%
+    summarize(label_x = mean(Window), label_y = max(!!selstat) + 0.01) %>%
+    ungroup()
+  
+  test <- c("grey", "lightgrey")
+  n_of_chr <- length(unique(dataset$chr))
+  
+  ggplot(dataset, aes(x = Window, y = !!selstat, color = chr)) + 
+    ylab(ytitle) + 
+    xlab("Chromosomes") +
+    geom_point(size = 0.5) + 
+    theme_cowplot() + 
+    geom_hline(yintercept = threshold, linetype = "dashed") +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(size = 8),
+      legend.key.size = unit(0.6, "cm"),
+      legend.text = element_text(size = 6),
+      strip.background = element_blank(),
+      strip.placement = "outside",
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text.y = element_text(size = 10)
+    ) + 
+    scale_color_manual(values = rep(test, n_of_chr)) +
+    geom_point(data = highlighted_regions, aes(x = Window, y = !!selstat), color = colorhighlight, size = 1) +
+    geom_text(data = label_positions, aes(x = label_x, y = label_y, label = region2), color = "black", size = 3, hjust = 0.5)
+}
+
+gwide_manhattan_absolute <- function(dataset, selstat, ytitle, colorhighlight){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  threshold <- quantile(abs(dataset[[selstat]]), 0.9995, na.rm = TRUE) ###  99.95%  percentile of the empirical distribution
+  dataset$Window <- seq_len(nrow(dataset))
+  dataset$region2 <- ifelse(
+    !dataset$region %in% c('LCT region', 'AMY region'),
+    'genome-wide',
+    dataset$region
+  )
+  highlighted_regions <- dataset[dataset$region2 %in% c('LCT region', 'AMY region'), ]
+  label_positions <- highlighted_regions %>%
+    group_by(region2) %>%
+    summarize(label_x = mean(Window), label_y = max(abs(!!selstat)) + 0.01) %>%
+    ungroup()
+  test <- c("grey", "lightgrey")
+  n_of_chr <- length(unique(dataset$chr))
+  ggplot(dataset, aes(x = Window, y = abs(!!selstat), color = chr)) + 
+    ylab(ytitle) + 
+    xlab("Chromosomes") +
+    geom_point(size = 0.5) + 
+    theme_cowplot() + 
+    geom_hline(yintercept = threshold, linetype = "dashed") +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(size = 8),
+      legend.key.size = unit(0.6, "cm"),
+      legend.text = element_text(size = 6),
+      strip.background = element_blank(),
+      strip.placement = "outside",
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text.y = element_text(size = 10)
+    ) + 
+    scale_color_manual(values = rep(test, n_of_chr)) +
+    geom_point(data = highlighted_regions, aes(x = Window, y = abs(!!selstat)), color = colorhighlight, size = 1) +
+    geom_text(data = label_positions, aes(x = label_x, y = label_y, label = region2), color = "black", size = 3, hjust = 0.5)
+}
+
+
+gwide_manhattan_position <- function(dataset, selstat, ytitle, colorhighlight){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  threshold <- quantile(dataset[[selstat]], 0.9995, na.rm = TRUE) ###  99.95%  percentile of the empirical distribution
+  dataset$Window <- seq_len(nrow(dataset))
+  dataset$region2 <- ifelse(
+    !dataset$region %in% c('LCT region', 'AMY region'),
+    'genome-wide',
+    dataset$region
+  )
+  highlighted_regions <- dataset[dataset$region2 %in% c('LCT region', 'AMY region'), ]
+  label_positions <- highlighted_regions %>%
+    group_by(region2) %>%
+    summarize(label_x = mean(Window), label_y = max(!!selstat) + 0.01) %>%
+    ungroup()
+  
+  test <- c("grey", "lightgrey")
+  n_of_chr <- length(unique(dataset$chr))
+  
+  ggplot(dataset, aes(x = pos, y = !!selstat, color = chr)) + 
+    ylab(ytitle) + 
+    xlab("Chromosomes") +
+    geom_point(size = 0.5) + 
+    theme_cowplot() + 
+    geom_hline(yintercept = threshold, linetype = "dashed") +
+    theme(
+      legend.position = "none",
+      plot.title = element_text(size = 8),
+      legend.key.size = unit(0.6, "cm"),
+      legend.text = element_text(size = 6),
+      strip.background = element_blank(),
+      strip.placement = "outside",
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.text.y = element_text(size = 10)
+    ) + 
+    scale_color_manual(values = rep(test, n_of_chr)) +
+    geom_point(data = highlighted_regions, aes(x = Window, y = !!selstat), color = colorhighlight, size = 1) +
+    geom_text(data = label_positions, aes(x = label_x, y = label_y, label = region2), color = "black", size = 3, hjust = 0.5)
+}
+```
+
+#### mean+sd 
+
+```{r}
+plot_stats <- function(dataset, selstat, custom_palette, xlabel){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(!!selstat, na.rm = TRUE))
+  ggplot(dataset, aes(x = !!selstat, y = region, color = Superpopulation_Region)) +
+    stat_summary(aes(fill = Superpopulation_Region, color = Superpopulation_Region), fun = mean) +
+    scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+    scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+    xlab(xlabel) + ylab("") +
+    facet_grid(rows = vars(Superpopulation), scales = "free_y", space = "free_y", switch = "y") + # Facet by Superpopulation
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = "none",  # Hide the legend
+          legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+          legend.text = element_text(size = 6),  # Adjust size of legend text
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8)) +
+    geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) 
+}
+
+
+plot_stats_absolute <- function(dataset, selstat, custom_palette, xlabel){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(abs(!!selstat), na.rm = TRUE))
+  ggplot(dataset, aes(x = abs(!!selstat), y = region, color = Superpopulation_Region)) +
+    stat_summary(aes(fill = Superpopulation_Region, color = Superpopulation_Region), fun = mean) +
+    scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+    scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+    xlab(xlabel) + ylab("") +
+    facet_grid(rows = vars(Superpopulation), scales = "free_y", space = "free_y", switch = "y") + # Facet by Superpopulation
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = "none",  # Hide the legend
+          legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+          legend.text = element_text(size = 6),  # Adjust size of legend text
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8)) +
+    geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) 
+}
+
+
+plot_stats2 <- function(dataset, selstat, custom_palette, xlabel){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset <- dataset %>%
+    mutate(type = case_when(
+      Superpopulation %in% c("Biaka", "Mbuti") ~ "Hunting",
+      Superpopulation == "Yakut" ~ "Pastoralism",
+      TRUE ~ "Agriculture"
+      ))
+  dataset <-dataset %>%
+    mutate(combined_label = paste(type, Superpopulation, sep = ": "))
+  dataset <-  dataset %>%
+    mutate(combined_label_region = paste(combined_label, region, sep = " "))
+  dataset$Superpopulation_Region1 <- paste(dataset$combined_label, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$combined_label,dataset$genomeLCT, sep=" ")
+  superpop_mapping <- data.frame(
+    Superpopulation = c("Sindhi", "Burusho", "Druze", "Japanese2", "Pima", "Miao", "Tu", "Mbuti", "Biaka", "Yakut", "BEB", "MSL"),
+    Continental_Region = c("SA", "SA", "WEA", "EA", "AMR", "EA", "EA", "AFR", "AFR", "CAS", "SA", "AFR"),
+    samplesize = c("n=24", "n=24", "n=42", "n=129", "n=14", "n=10", "n=10", "n=14", "n=26", "n=25", "n=86", "n=85")
+  )
+  dataset <- dataset %>%
+    filter(Superpopulation != "Tu")  %>%
+    filter(Superpopulation != "Miao") 
+  dataset <- dataset %>%
+    left_join(superpop_mapping, by = "Superpopulation") %>%
+    mutate(Continental_Region = coalesce(Continental_Region, "Unknown")) 
+  dataset$type <- factor(dataset$type, levels = c("Agriculture", "Pastoralism", "Hunting"))
+  desired_order <- c(paste0('chr', 1:22), 'LCT region', 'AMY region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  dataset <- dataset %>%
+    group_by(type, Continental_Region, Superpopulation) %>%
+    mutate(mean_selstat = mean(!!selstat, na.rm = TRUE)) %>%
+    ungroup()
+  head(dataset)
+  ggplot(dataset, aes(x = !!selstat, y = region, color = combined_label_region)) +
+    stat_summary(aes(fill = combined_label_region, color = combined_label_region), fun = mean) +
+    scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+    scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+    xlab(xlabel) + ylab("") +
+    facet_grid(type+Continental_Region+Superpopulation+samplesize ~ ., scales = "free_y", space = "free_y", switch = 'y') +
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = "none",  # Hide the legend
+          legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+          legend.text = element_text(size = 6),  # Adjust size of legend text
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8)) +
+    geom_vline(aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2)
+  #return(list(plot = plot, dataset = dataset))
+}
+
+
+plot_stats2_absolute <- function(dataset, selstat, custom_palette, xlabel){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset <- dataset %>%
+    mutate(type = case_when(
+      Superpopulation %in% c("Biaka", "Mbuti") ~ "Hunting",
+      Superpopulation == "Yakut" ~ "Pastoralism",
+      TRUE ~ "Agriculture"
+      ))
+  dataset <-dataset %>%
+    mutate(combined_label = paste(type, Superpopulation, sep = ": "))
+  dataset <-  dataset %>%
+    mutate(combined_label_region = paste(combined_label, region, sep = " "))
+  dataset$Superpopulation_Region1 <- paste(dataset$combined_label, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$combined_label,dataset$genomeLCT, sep=" ")
+  superpop_mapping <- data.frame(
+    Superpopulation = c("Sindhi", "Burusho", "Druze", "Japanese2", "Pima", "Miao", "Tu", "Mbuti", "Biaka", "Yakut", "BEB", "MSL"),
+    Continental_Region = c("SA", "SA", "WEA", "EA", "AMR", "EA", "EA", "AFR", "AFR", "CAS", "SA", "AFR"),
+    samplesize = c("n=24", "n=24", "n=42", "n=129", "n=14", "n=10", "n=10", "n=14", "n=26", "n=25", "n=86", "n=85")
+  )
+  dataset <- dataset %>%
+    filter(Superpopulation != "Tu")  %>%
+    filter(Superpopulation != "Miao") 
+  dataset <- dataset %>%
+    left_join(superpop_mapping, by = "Superpopulation") %>%
+    mutate(Continental_Region = coalesce(Continental_Region, "Unknown")) 
+  dataset$type <- factor(dataset$type, levels = c("Agriculture", "Pastoralism", "Hunting"))
+  desired_order <- c(paste0('chr', 1:22), 'LCT region', 'AMY region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  dataset <- dataset %>%
+    group_by(type, Continental_Region, Superpopulation) %>%
+    mutate(mean_selstat = mean(abs(!!selstat), na.rm = TRUE)) %>%
+    ungroup()
+  head(dataset)
+  ggplot(dataset, aes(x = abs(!!selstat), y = region, color = combined_label_region)) +
+    stat_summary(aes(fill = combined_label_region, color = combined_label_region), fun = mean) +
+    scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+    scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+    xlab(xlabel) + ylab("") +
+    facet_grid(type+Continental_Region+Superpopulation+samplesize ~ ., scales = "free_y", space = "free_y", switch = 'y') +
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = "none",  # Hide the legend
+          legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+          legend.text = element_text(size = 6),  # Adjust size of legend text
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8)) +
+    geom_vline(aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2)
+  #return(list(plot = plot, dataset = dataset))
+}
+
+
+plot_stats3<- function(dataset, selstat, custom_palette, xlabel){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation,dataset$genomeLCT, sep=" ")
+  superpop_mapping <- data.frame(
+    Superpopulation = c("Sindhi_Biaka", "Sindhi_Mbuti", "Sindhi_Yakut",
+                        "Burusho_Biaka", "Burusho_Mbuti", "Burusho_Yakut",
+                        "Druze_Biaka", "Druze_Mbuti", "Druze_Yakut",
+                        "BEB_Biaka", "BEB_Mbuti", "BEB_Yakut",
+                        "Japanese2_Biaka", "Japanese2_Mbuti", "Japanese2_Yakut", 
+                        "Pima_Biaka", "Pima_Mbuti", "Pima_Yakut",     
+                        "Miao_Biaka", "Miao_Mbuti", "Miao_Yakut",   
+                        "Tu_Biaka", "Tu_Mbuti", "Tu_Yakut",      
+                        "MSL_Biaka", "MSL_Mbuti", "MSL_Yakut"),
+    Continental_Region = c("SA vs AFR", "SA vs AFR", "SA vs CAS", 
+                           "SA vs AFR", "SA vs AFR", "SA vs CAS",
+                           "WEA vs AFR", "WEA vs AFR", "WEA vs CAS",
+                           "SA vs AFR", "SA vs AFR", "SA vs CAS",
+                           "EA vs AFR",  "EA vs AFR", "EA vs CAS",
+                           "AMR vs AFR", "AMR vs AFR", "AMR vs CAS",
+                           "EA vs AFR",  "EA vs AFR", "EA vs CAS", 
+                           "EA vs AFR",  "EA vs AFR", "EA vs CAS",
+                           "AFR vs AFR", "AFR vs AFR", "AFR vs CAS"),
+    Comparison = c("AGR vs HG", "AGR vs HG", "AGR vs PAST", 
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST")
+  )
+  dataset <- dataset %>%
+    filter(Superpopulation != "Tu_Mbuti")  %>%
+    filter(Superpopulation != "Tu_Biaka") %>%
+    filter(Superpopulation != "Tu_Yakut")  %>%
+    filter(Superpopulation != "Miao_Mbuti")  %>%
+    filter(Superpopulation != "Miao_Yakut")  %>%
+    filter(Superpopulation != "Miao_Biaka")
+  dataset <- dataset %>%
+    left_join(superpop_mapping, by = "Superpopulation") %>%
+    mutate(Continental_Region = coalesce(Continental_Region, "Unknown")) 
+  dataset$Comparison <- factor(dataset$Comparison, levels = c("AGR vs HG", "AGR vs PAST"))
+  desired_order <- c(paste0('chr', 1:22), 'LCT region', 'AMY region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  dataset <- dataset %>%
+    group_by(Comparison, Continental_Region, Superpopulation) %>%
+    mutate(mean_selstat = mean(!!selstat), na.rm = TRUE) %>%
+    ungroup()
+  head(dataset)
+  ggplot(dataset, aes(x = !!selstat, y = region, color = Superpopulation_Region)) +
+    stat_summary(aes(fill = Superpopulation_Region, color = Superpopulation_Region), fun = mean) +
+    scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+    scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+    xlab(xlabel) + ylab("") +
+    facet_grid(Comparison+Continental_Region+Superpopulation ~ ., scales = "free_y", space = "free_y", switch = 'y') +
+    theme_cowplot() +
+    theme(panel.border = element_rect(color="black"),
+          legend.position = "none",  # Hide the legend
+          legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+          legend.text = element_text(size = 6),  # Adjust size of legend text
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8)) +
+    geom_vline(aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2)
+  #return(list(plot = plot, dataset = dataset))
+}
+```
+
+#### plot density
+
+```{r}
+plot_density <- function(dataset, selstat, fill_choice, custom_palette, xlabel, mytitle){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  fill_choice <- rlang::ensym(fill_choice) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(!!selstat, na.rm = TRUE))
+  
+  ggplot(dataset, aes(x = !!selstat, fill = !!fill_choice)) +  geom_density() + 
+  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  xlab(xlabel) + ylab("Density") +
+  facet_wrap(~ Superpopulation, nrow = 12, strip.position = "right", scales = 'free_y') + # Facet by Superpopulation
+  theme_cowplot() +
+  theme(panel.border = element_rect(color="black"),
+        legend.position = "none",  # Hide the legend
+        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+        legend.text = element_text(size = 6),  # Adjust size of legend text
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        plot.title = element_text(size = 8)) +
+  labs(fill = NULL)  +
+  geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) + ggtitle(mytitle)
+  
+}
+
+plot_density_absolute <- function(dataset, selstat, fill_choice, custom_palette, xlabel, mytitle){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  fill_choice <- rlang::ensym(fill_choice) # Convert string to symbol for NSE
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region_final <- ifelse(
+    !dataset$Superpopulation_Region %in% c('YRI LCT region', 'YRI AMY region', 'CEU LCT region', 'CEU AMY region'),
+    'genome-wide',
+    dataset$Superpopulation_Region
+  )
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation, dataset$genomeLCT, sep=" ")
+  desired_order <- c(paste0('chr', 1:22), 'AMY region', 'LCT region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  mean_selstat_per_superpopulation <- dataset %>%
+    group_by(Superpopulation) %>%
+    summarize(mean_selstat = mean(abs(!!selstat), na.rm = TRUE))
+  
+  ggplot(dataset, aes(x = abs(!!selstat), fill = !!fill_choice)) +  geom_density() + 
+  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  xlab(xlabel) + ylab("Density") +
+  facet_wrap(~ Superpopulation, nrow = 7, strip.position = "right") + # Facet by Superpopulation
+  theme_cowplot() +
+  theme(panel.border = element_rect(color="black"),
+        legend.position = "none",  # Hide the legend
+        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+        legend.text = element_text(size = 6),  # Adjust size of legend text
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        plot.title = element_text(size = 8)) +
+  labs(fill = NULL)  +
+  geom_vline(data = mean_selstat_per_superpopulation, aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2) + ggtitle(mytitle)
+  
+}
+
+plot_density2 <- function(dataset, selstat, fill_choice, custom_palette, xlabel, mytitle){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  fill_choice <- rlang::ensym(fill_choice) 
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset <- dataset %>%
+    mutate(type = case_when(
+      Superpopulation %in% c("Biaka", "Mbuti") ~ "Hunting",
+      Superpopulation == "Yakut" ~ "Pastoralism",
+      TRUE ~ "Agriculture"
+      ))
+  dataset <-dataset %>%
+    mutate(combined_label = paste(type, Superpopulation, sep = ": "))
+  dataset <-  dataset %>%
+    mutate(combined_label_region = paste(combined_label, region, sep = " "))
+  dataset$Superpopulation_Region1 <- paste(dataset$combined_label, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$combined_label,dataset$genomeLCT, sep=" ")
+  superpop_mapping <- data.frame(
+    Superpopulation = c("Sindhi", "Burusho", "Druze", "Japanese2", "Pima", "Miao", "Tu", "Mbuti", "Biaka", "Yakut", "BEB", "MSL"),
+    Continental_Region = c("SA", "SA", "WEA", "EA", "AMR", "EA", "EA", "AFR", "AFR", "CAS", "SA", "AFR"),
+    samplesize = c("n=24", "n=24", "n=42", "n=129", "n=14", "n=10", "n=10", "n=14", "n=26", "n=25", "n=86", "n=85")
+  )
+  dataset <- dataset %>%
+    filter(Superpopulation != "Tu")  %>%
+    filter(Superpopulation != "Miao") 
+  dataset <- dataset %>%
+    left_join(superpop_mapping, by = "Superpopulation") %>%
+    mutate(Continental_Region = coalesce(Continental_Region, "Unknown")) 
+  dataset$type <- factor(dataset$type, levels = c("Agriculture", "Pastoralism", "Hunting"))
+  desired_order <- c(paste0('chr', 1:22), 'LCT region', 'AMY region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  dataset <- dataset %>%
+    group_by(type, Continental_Region, Superpopulation) %>%
+    mutate(mean_selstat = mean(!!selstat, na.rm = TRUE)) %>%
+    ungroup()
+  ggplot(dataset, aes(x = !!selstat, fill = !!fill_choice)) +  geom_density() + 
+  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  xlab(xlabel) + ylab("Density") +
+  facet_wrap(~ type+Continental_Region+Superpopulation+samplesize, nrow = 12, strip.position = "right", scales = "free_y") + # Facet by Superpopulation
+  theme_cowplot() +
+   theme(panel.border = element_rect(color="black"),
+        legend.position = "none",  # Hide the legend
+        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+        legend.text = element_text(size = 6),  # Adjust size of legend text
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        plot.title = element_text(size = 8)) +
+  labs(fill = NULL)  +
+  geom_vline(aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2)  + ggtitle(mytitle)
+}
+
+
+plot_density2_absolute <- function(dataset, selstat, fill_choice, custom_palette, xlabel, mytitle){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  fill_choice <- rlang::ensym(fill_choice) 
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset <- dataset %>%
+    mutate(type = case_when(
+      Superpopulation %in% c("Biaka", "Mbuti") ~ "Hunting",
+      Superpopulation == "Yakut" ~ "Pastoralism",
+      TRUE ~ "Agriculture"
+      ))
+  dataset <-dataset %>%
+    mutate(combined_label = paste(type, Superpopulation, sep = ": "))
+  dataset <-  dataset %>%
+    mutate(combined_label_region = paste(combined_label, region, sep = " "))
+  dataset$Superpopulation_Region1 <- paste(dataset$combined_label, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$combined_label,dataset$genomeLCT, sep=" ")
+  superpop_mapping <- data.frame(
+    Superpopulation = c("Sindhi", "Burusho", "Druze", "Japanese2", "Pima", "Miao", "Tu", "Mbuti", "Biaka", "Yakut", "BEB", "MSL"),
+    Continental_Region = c("SA", "SA", "WEA", "EA", "AMR", "EA", "EA", "AFR", "AFR", "CAS", "SA", "AFR"),
+    samplesize = c("n=24", "n=24", "n=42", "n=129", "n=14", "n=10", "n=10", "n=14", "n=26", "n=25", "n=86", "n=85")
+  )
+  dataset <- dataset %>%
+    filter(Superpopulation != "Tu")  %>%
+    filter(Superpopulation != "Miao") 
+  dataset <- dataset %>%
+    left_join(superpop_mapping, by = "Superpopulation") %>%
+    mutate(Continental_Region = coalesce(Continental_Region, "Unknown")) 
+  dataset$type <- factor(dataset$type, levels = c("Agriculture", "Pastoralism", "Hunting"))
+  desired_order <- c(paste0('chr', 1:22), 'LCT region', 'AMY region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  dataset <- dataset %>%
+    group_by(type, Continental_Region, Superpopulation) %>%
+    mutate(mean_selstat = mean(abs(!!selstat), na.rm = TRUE)) %>%
+    ungroup()
+  ggplot(dataset, aes(x = abs(!!selstat), fill = !!fill_choice)) +  geom_density() + 
+  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  xlab(xlabel) + ylab("Density") +
+  facet_wrap(~ type+Continental_Region+Superpopulation+samplesize, nrow = 12, strip.position = "right", scales = "free_y") + # Facet by Superpopulation
+  theme_cowplot() +
+   theme(panel.border = element_rect(color="black"),
+        legend.position = "none",  # Hide the legend
+        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+        legend.text = element_text(size = 6),  # Adjust size of legend text
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        plot.title = element_text(size = 8)) +
+  labs(fill = NULL)  +
+  geom_vline(aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2)  + ggtitle(mytitle)
+}
+
+
+
+
+plot_density3 <- function(dataset, selstat, fill_choice, custom_palette, xlabel, mytitle){
+  selstat <- rlang::ensym(selstat) # Convert string to symbol for NSE
+  fill_choice <- rlang::ensym(fill_choice) 
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$genomeAMY <- ifelse(dataset$region == 'AMY region', dataset$region, 'genome-wide')
+  dataset$genomeLCT <- ifelse(dataset$region == 'LCT region', dataset$region, 'genome-wide')
+  dataset$Superpopulation_Region1 <- paste(dataset$Superpopulation, dataset$genomeAMY, sep=" ")
+  dataset$Superpopulation_Region2 <- paste(dataset$Superpopulation,dataset$genomeLCT, sep=" ")
+superpop_mapping <- data.frame(
+    Superpopulation = c("Sindhi_Biaka", "Sindhi_Mbuti", "Sindhi_Yakut",
+                        "Burusho_Biaka", "Burusho_Mbuti", "Burusho_Yakut",
+                        "Druze_Biaka", "Druze_Mbuti", "Druze_Yakut",
+                        "BEB_Biaka", "BEB_Mbuti", "BEB_Yakut",
+                        "Japanese2_Biaka", "Japanese2_Mbuti", "Japanese2_Yakut", 
+                        "Pima_Biaka", "Pima_Mbuti", "Pima_Yakut",     
+                        "Miao_Biaka", "Miao_Mbuti", "Miao_Yakut",   
+                        "Tu_Biaka", "Tu_Mbuti", "Tu_Yakut",      
+                        "MSL_Biaka", "MSL_Mbuti", "MSL_Yakut"),
+    Continental_Region = c("SA vs AFR", "SA vs AFR", "SA vs CAS", 
+                           "SA vs AFR", "SA vs AFR", "SA vs CAS",
+                           "WEA vs AFR", "WEA vs AFR", "WEA vs CAS",
+                           "SA vs AFR", "SA vs AFR", "SA vs CAS",
+                           "EA vs AFR",  "EA vs AFR", "EA vs CAS",
+                           "AMR vs AFR", "AMR vs AFR", "AMR vs CAS",
+                           "EA vs AFR",  "EA vs AFR", "EA vs CAS", 
+                           "EA vs AFR",  "EA vs AFR", "EA vs CAS",
+                           "AFR vs AFR", "AFR vs AFR", "AFR vs CAS"),
+    Comparison = c("AGR vs HG", "AGR vs HG", "AGR vs PAST", 
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST",
+                   "AGR vs HG", "AGR vs HG", "AGR vs PAST")
+  )
+  
+  dataset <- dataset %>%
+    filter(Superpopulation != "Tu_Mbuti")  %>%
+    filter(Superpopulation != "Tu_Biaka") %>%
+    filter(Superpopulation != "Tu_Yakut")  %>%
+    filter(Superpopulation != "Miao_Mbuti")  %>%
+    filter(Superpopulation != "Miao_Yakut")  %>%
+    filter(Superpopulation != "Miao_Biaka")
+dataset <- dataset %>%
+    left_join(superpop_mapping, by = "Superpopulation") %>%
+    mutate(Continental_Region = coalesce(Continental_Region, "Unknown")) 
+  dataset$Comparison <- factor(dataset$Comparison, levels = c("AGR vs HG", "AGR vs PAST"))
+  desired_order <- c(paste0('chr', 1:22), 'LCT region', 'AMY region')
+  dataset$region <- factor(dataset$region, levels = rev(desired_order))
+  dataset <- dataset %>%
+    group_by(Comparison, Continental_Region, Superpopulation) %>%
+    mutate(mean_selstat = mean(!!selstat), na.rm = TRUE) %>%
+    ungroup()
+  ggplot(dataset, aes(x = !!selstat, fill = !!fill_choice)) +  geom_density() + 
+  scale_fill_manual(values = custom_palette) +  # Use custom color palette for filling
+  scale_color_manual(values = custom_palette) +  # Use custom color palette for border
+  xlab(xlabel) + ylab("Density") +
+  facet_wrap(~ Comparison+Continental_Region+Superpopulation, nrow = 30, strip.position = "right", scales = "free_y") + # Facet by Superpopulation
+  theme_cowplot() +
+   theme(panel.border = element_rect(color="black"),
+        legend.position = "none",  # Hide the legend
+        legend.key.size = unit(0.6, "cm"),  # Adjust size of legend keys
+        legend.text = element_text(size = 6),  # Adjust size of legend text
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8),
+        plot.title = element_text(size = 8)) +
+  labs(fill = NULL)  +
+  geom_vline(aes(xintercept = mean_selstat), linetype = "dashed", color = "black", size = 0.2)  + ggtitle(mytitle)
+}
+```
+
+
+
+# Read all different stats for YRI AND CEU
+
+
+#### pallets CEU YRI
+```{r}
+my_custom_palette <- c("CEU AMY region" = "#94B669",
+                     "YRI AMY region" = "#EDB829",
+                     "CEU LCT region" = adjustcolor("#94B669", alpha.f = 0.5),
+                     "YRI LCT region" = adjustcolor("#EDB829", alpha.f = 0.5),
+                     "CEU genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                     "YRI genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+)
+
+my_custom_palette_AMY <- c("CEU AMY region" = "#94B669",
+                     "YRI AMY region" = "#EDB829",
+                     "CEU genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                     "YRI genome-wide" = adjustcolor("grey", alpha.f = 0.5))
+
+my_custom_palette_LCT <- c("CEU LCT region" = adjustcolor("#94B669", alpha.f = 0.5),
+                     "YRI LCT region" = adjustcolor("#EDB829", alpha.f = 0.5),
+                     "CEU genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+                     "YRI genome-wide" = adjustcolor("grey", alpha.f = 0.5))
+
+
+
+my_custom_palette_xpnsl <- c("CEU_YRI AMY region" = "#94B669",
+                     "CEU_YRI LCT region" = adjustcolor("#94B669", alpha.f = 0.5),
+                     "CEU_YRI genome-wide" = adjustcolor("grey", alpha.f = 0.5))
+
+my_custom_palette_xpnsl_AMY <- c("CEU_YRI AMY region" = "#94B669",
+                     "CEU_YRI genome-wide" = adjustcolor("grey", alpha.f = 0.5))
+
+my_custom_palette_xpnsl_LCT <- c("CEU_YRI LCT region" = adjustcolor("#94B669", alpha.f = 0.5),
+                     "CEU_YRI genome-wide" = adjustcolor("grey", alpha.f = 0.5))
+```
+
+
+#### iHS 
+```{r}
+ihsbins<-fread("populations/example_CEU_YRI/genomewide_combined.ihs.tsv", header=TRUE, sep="\t")
+ihsbins$Superpopulation<-ihsbins$superpop
+ihsbins$chr<-ihsbins$CHR
+ihsbins$Superpopulation_Region <- paste(ihsbins$Superpopulation,ihsbins$region, sep=" ")
+
+CEU_ihsbins <- ihsbins %>%
+  filter(Superpopulation == "CEU") 
+YRI_ihsbins <- ihsbins %>%
+  filter(Superpopulation == "YRI") 
+
+ihs<-fread("populations/example_CEU_YRI/genomewide_combined.ihs.100bins.100kb.windows.tsv.gz", header=TRUE, sep="\t")
+ihs$Superpopulation<-ihs$superpopulation
+ihs$Superpopulation_Region <- paste(ihs$Superpopulation,ihs$region, sep=" ")
+
+
+CEU_ihs <- ihs %>%
+  filter(Superpopulation == "CEU") 
+YRI_ihs <- ihs %>%
+  filter(Superpopulation == "YRI") 
+```
+
+#### nSL
+```{r}
+nslbins<-fread("populations/example_CEU_YRI/genomewide_combined.nsl.100bins.tsv", header=TRUE, sep="\t")
+nslbins$Superpopulation<-nslbins$superpopulation
+nslbins$Superpopulation_Region <- paste(nslbins$Superpopulation,nslbins$region, sep=" ")
+CEU_nslbins <- nslbins %>%
+  filter(Superpopulation == "CEU")
+YRI_nslbins <- nslbins %>%
+  filter(Superpopulation == "YRI")
+
+nsl<-fread("populations/example_CEU_YRI/genomewide_combined.nsl.100bins.100kb.windows.tsv", header=TRUE, sep="\t")
+nsl$Superpopulation<-nsl$superpopulation
+nsl$Superpopulation_Region <- paste(nsl$Superpopulation,nsl$region, sep=" ")
+CEU_nsl <- nsl %>%
+  filter(Superpopulation == "CEU")
+YRI_nsl <- nsl  %>%
+  filter(Superpopulation == "YRI")
+
+#CEU_percent_nSL_gwide<-gwide_manhattan_absolute(CEU_nsl, nSL, "% |nSL| >2", "#94B669") + ggtitle('Lactose Tolerant: CEU, WEA') + theme(plot.title = element_text(color = "#94B669"))
+#YRI_percent_nSL_gwide<-gwide_manhattan_absolute(YRI_nsl, nSL, "% |nSL| >2", "#EDB829") + ggtitle('Lactose intolerant: YRI, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+#plot_grid(CEU_percent_nSL_gwide, YRI_percent_nSL_gwide, nrow=2)
+
+```
+
+
+
+
+#### hstats H12, H2/H1, and others 
+```{r}
+hstats<-fread("populations/example_CEU_YRI/genomewide.salti.lassip.hap.stats.gz", header=TRUE, sep="\t")
+hstats$Superpopulation_Region <- paste(hstats$Superpopulation,hstats$region, sep=" ")
+hstats <- hstats  %>%
+  filter(region != "amy genes") 
+
+CEU_hstats <- hstats %>%
+  filter(Superpopulation == "CEU")
+YRI_hstats <- hstats %>%
+  filter(Superpopulation == "YRI")
+```
+
+#### xpnsl
+```{r}
+xpnslbins<-fread("populations/example_CEU_YRI/genomewide_combined.xpnsl.100bins.tsv", header=TRUE, sep="\t")
+xpnslbins$Superpopulation<-xpnslbins$superpopulation
+xpnslbins$Superpopulation_Region <- paste(xpnslbins$Superpopulation,xpnslbins$region, sep=" ")
+
+xpnsl<-fread("populations/example_CEU_YRI/genomewide_combined.xpnsl.100bins.100kb.windows.tsv", header=TRUE, sep="\t")
+xpnsl$Superpopulation<-xpnsl$superpopulation
+xpnsl$Superpopulation_Region <- paste(xpnsl$Superpopulation,xpnsl$region, sep=" ")
+```
+
+#### xpehh
+```{r}
+xpehhbins<-fread("populations/example_CEU_YRI/genomewide_combined.xpehh.100bins.tsv.gz", header=TRUE, sep="\t")
+xpehhbins$Superpopulation<-xpehhbins$superpopulation
+xpehhbins$Superpopulation_Region <- paste(xpehhbins$Superpopulation,xpehhbins$region, sep=" ")
+
+xpehh<-fread("populations/example_CEU_YRI/genomewide_combined.xpehh.100bins.100kb.windows.tsv.gz", header=TRUE, sep="\t")
+xpehh$Superpopulation<-xpehh$superpopulation
+xpehh$Superpopulation_Region <- paste(xpehh$Superpopulation,xpehh$region, sep=" ")
+```
+
+
+### STATS AND DENSITY ####
+
+####  iHS stats and density
+```{r eval=FALSE, fig.width=8, fig.height=6}
+ihs_stats<-plot_stats_absolute(ihsbins, IHS, my_custom_palette , "|iHS|") ### score positions 
+ihs_density_plot_AMY<-plot_density_absolute(ihsbins, IHS, Superpopulation_Region1, my_custom_palette_AMY, "|iHS|", 'AMY vs genome-wide')
+ihs_density_plot_LCT<-plot_density_absolute(ihsbins, IHS, Superpopulation_Region2, my_custom_palette_LCT, "|iHS|", 'LCT vs genome-wide')
+ihs_stats_density<-plot_grid(ihs_stats, ihs_density_plot_AMY, ihs_density_plot_LCT, nrow=1)
+ihs_stats_density
+```
+
+
+### percentage |nSL| > 2
+```{r eval=FALSE, fig.width=8, fig.height=6}
+frac_nslstats<-plot_stats_absolute(nsl, nSL, my_custom_palette , "|nSL|") + xlim(0, 2)### score positions 
+frac_nsldensity_plot_AMY<-plot_density_absolute(nsl, nSL, Superpopulation_Region1, my_custom_palette_AMY, "fraction |nSL| > 2", 'AMY vs genome-wide')
+frac_nsldensity_plot_LCT<-plot_density_absolute(nsl, nSL, Superpopulation_Region2, my_custom_palette_LCT, "fraction |nSL| > 2", 'LCT vs genome-wide')
+frac_nsL_stats_density<-plot_grid(frac_nslstats, frac_nsldensity_plot_AMY, frac_nsldensity_plot_LCT, nrow=1)
+frac_nsL_stats_density
+```
+
+
+### nSL stats and density
+```{r eval=FALSE, fig.width=8, fig.height=6}
+nslstats<-plot_stats_absolute(nslbins, nSL, my_custom_palette , "|nSL|") ### score positions 
+nsldensity_plot_AMY<-plot_density_absolute(nslbins, nSL, Superpopulation_Region1, my_custom_palette_AMY, "|nSL|", 'AMY vs genome-wide')
+nsldensity_plot_LCT<-plot_density_absolute(nslbins, nSL, Superpopulation_Region2, my_custom_palette_LCT, "|nSL|", 'LCT vs genome-wide')
+nsL_stats_density<-plot_grid(nslstats, nsldensity_plot_AMY, nsldensity_plot_LCT, nrow=1)
+nsL_stats_density
+
+```
+
+### hstats stats and density
+
+```{r, fig.width=8, fig.height=6}
+h12_CEUYRI<-plot_stats(hstats, h12, my_custom_palette , "H12")
+h12_density_plot_AMY_CEUYRI<-plot_density(hstats, h12, Superpopulation_Region1, my_custom_palette_AMY, "H12", 'AMY vs genome-wide')
+h12_density_plot_LCT_CEUYRI<-plot_density(hstats, h12, Superpopulation_Region2, my_custom_palette_LCT, "H12", 'LCT vs genome-wide')
+h12_stats_density<-plot_grid(h12_CEUYRI, h12_density_plot_AMY_CEUYRI, h12_density_plot_LCT_CEUYRI, ncol=3)
+h12_stats_density
+```
+
+
+```{r, fig.width=8, fig.height=6}
+h2h1_CEUYRI<-plot_stats(hstats, h2h1, my_custom_palette , "H2/H1")
+h2h1_density_plot_AMY_CEUYRI<-plot_density(hstats, h2h1, Superpopulation_Region1, my_custom_palette_AMY, "H2/H1", 'AMY vs genome-wide')
+h2h1_density_plot_LCT_CEUYRI<-plot_density(hstats, h2h1, Superpopulation_Region2, my_custom_palette_LCT, "H2/H1", 'LCT vs genome-wide')
+h2h1_stats_density<-plot_grid(h2h1_CEUYRI, h2h1_density_plot_AMY_CEUYRI, h2h1_density_plot_LCT_CEUYRI, ncol=3)
+h2h1_stats_density
+```
+
+
+```{r, fig.width=8, fig.height=8}
+L_CEUYRI<-plot_stats(hstats, L, my_custom_palette , "Λ")
+L_density_plot_AMY_CEUYRI<-plot_density(hstats, L, Superpopulation_Region1, my_custom_palette_AMY, "Λ", 'AMY vs genome-wide') + xlim (0,50)
+L_density_plot_LCT_CEUYRI<-plot_density(hstats, L, Superpopulation_Region2, my_custom_palette_LCT, "Λ", 'LCT vs genome-wide') + xlim (0,100)
+L_stats_density<-plot_grid(L_CEUYRI, L_density_plot_AMY_CEUYRI, L_density_plot_LCT_CEUYRI, ncol =3)
+L_stats_density
+
+A_CEUYRI<-plot_stats(hstats, A, my_custom_palette , "A")
+A_density_plot_AMY_CEUYRI<-plot_density(hstats, A, Superpopulation_Region1, my_custom_palette_AMY, "sweep width", 'AMY vs genome-wide') + xlim (0,6000000)
+A_density_plot_LCT_CEUYRI<-plot_density(hstats, A, Superpopulation_Region2, my_custom_palette_LCT, "sweep width", 'LCT vs genome-wide') + xlim (0,6000000)
+A_stats_density<-plot_grid(A_CEUYRI, A_density_plot_AMY_CEUYRI, A_density_plot_LCT_CEUYRI, ncol =3)
+A_stats_density
+
+plot_grid(L_stats_density, A_stats_density,ncol = 2)
+```
+
+
+
+### xp-nSL stats and density and manhattan
+```{r eval=FALSE, fig.width=8, fig.height=3}
+xpnslstats<-plot_stats(xpnslbins, xpnsl, my_custom_palette_xpnsl , "XP-nSL") ### score positions 
+xpnsldensity_plot_AMY<-plot_density_absolute(xpnslbins, xpnsl, Superpopulation_Region1, my_custom_palette_xpnsl_AMY, "XP-nSL", 'AMY vs genome-wide')
+xpnsldensity_plot_LCT<-plot_density_absolute(xpnslbins, xpnsl, Superpopulation_Region2, my_custom_palette_xpnsl_LCT, "XP-nSL", 'LCT vs genome-wide')
+xpnsl_stats_density<-plot_grid(xpnslstats, xpnsldensity_plot_AMY, xpnsldensity_plot_LCT, nrow=1)
+xpnsl_stats_density
+
+```
+
+
+
+### percentage |nSL| > 2
+```{r eval=FALSE, fig.width=8, fig.height=3}
+
+xpnsl <- xpnsl %>%
+  filter(nsites > 30) 
+CEU_YRI_xpnsl_gwide<-gwide_manhattan(xpnsl, fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#94B669") + ggtitle('CEU vs YRI') + theme(plot.title = element_text(color = "#94B669"))
+
+frac_xpnslstats<-plot_stats(xpnsl, fracsites_xpnsl_gt_2, my_custom_palette_xpnsl , "fraction XP-nSL >2") ### score positions 
+frac_xpnsldensity_plot_AMY<-plot_density(xpnsl, fracsites_xpnsl_gt_2, Superpopulation_Region1, my_custom_palette_xpnsl_AMY, "fraction XP-nSL > 2", 'AMY vs genome-wide')
+frac_xpnsldensity_plot_LCT<-plot_density(xpnsl, fracsites_xpnsl_gt_2, Superpopulation_Region2, my_custom_palette_xpnsl_LCT, "fraction XP-nSL > 2", 'LCT vs genome-wide')
+CEU_YRI_frac_xpnsL_stats_density<-plot_grid(frac_xpnslstats, frac_xpnsldensity_plot_AMY, frac_xpnsldensity_plot_LCT, nrow=1)
+
+
+CEU_YRI_xpnsl_gwide
+CEU_YRI_frac_xpnsL_stats_density
+```
+
+
+
+
+### xp-ehh stats and density and manhattan
+```{r eval=FALSE, fig.width=8, fig.height=6}
+xpehhstats<-plot_stats(xpehhbins, xpehh, my_custom_palette_xpnsl , "XP-EHH") ### score positions 
+xpehhdensity_plot_AMY<-plot_density_absolute(xpehhbins, xpehh, Superpopulation_Region1, my_custom_palette_xpnsl, "XP-EHH", 'AMY vs genome-wide')
+xpehhdensity_plot_LCT<-plot_density_absolute(xpehhbins, xpehh, Superpopulation_Region2, my_custom_palette_xpnsl, "XP-EHH", 'LCT vs genome-wide')
+xpehh_stats_density<-plot_grid(xpehhstats, xpehhdensity_plot_AMY, xpehhdensity_plot_LCT, nrow=1)
+xpehh_stats_density
+
+
+xpehh <- xpehh %>%
+  filter(nsites > 30) 
+xpehh_chr1 <- xpehh  %>%
+  filter(chr == "chr1")
+xpehh_chr2 <- xpehh  %>%
+  filter(chr == "chr2")
+chrom_theme<-theme(panel.border = element_rect(color="black"), axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 10))
+
+CEU_YRI_xpehh_chr1<-gwide_manhattan(xpehh_chr1, fracsites_xpehh_gt_2, "fraction XP-EHH >2 in CEU", "#94B669") + ggtitle ("CEU vs YRI, AMY region, chromosome 1") + xlab("Window") +  chrom_theme
+CEU_YRI_xpehh_chr2<-gwide_manhattan(xpehh_chr2, fracsites_xpehh_gt_2, "fraction XP-EHH >2 in CEU", "#94B669") + ggtitle ("CEU vs YRI, LCT region, chromosome 2") + xlab("Window") +  chrom_theme
+
+xpehhbins_chr1 <- xpehhbins  %>%
+  filter(chr == "chr1")
+xpehhbins_chr2 <- xpehhbins  %>%
+  filter(chr == "chr2")
+CEU_YRI_xpehhbins_chr1<-gwide_manhattan(xpehhbins_chr1, xpehh, "XP-EHH CEU vs YRI", "#94B669") + ggtitle ("CEU vs YRI, AMY region, chromosome 1") + xlab("Window") +  chrom_theme
+CEU_YRI_xpehhbins_chr2<-gwide_manhattan(xpehhbins_chr2, xpehh, "XP-EHH CEU vs YRI", "#94B669") + ggtitle ("CEU vs YRI, LCT region, chromosome 2") + xlab("Window") +  chrom_theme
+
+manhattans_bins<-plot_grid(CEU_YRI_xpehhbins_chr1, CEU_YRI_xpehhbins_chr2,  ncol=2)
+plot_grid(manhattans, manhattans_bins, xpehh_stats_density, nrow=3)
+```
+
+# Read all different stats for populations of known subsistence
+
+#### new custom pallets and additional functions
+```{r}
+get_pop<-function(dataset, pop){ 
+  popdataset<-dataset %>%
+      filter(Superpopulation == pop)
+  popdataset
+}
+```
+
+
+
+```{r}
+my_custom_palette <- c(
+  "Agriculture: MSL LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "Agriculture: MSL AMY region" = "#EDB829",
+  "Agriculture: Sindhi LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Agriculture: Sindhi AMY region" = "#E97C07",
+  "Agriculture: Burusho LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Agriculture: Burusho AMY region" = "#E97C07",
+  "Agriculture: BEB LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Agriculture: BEB AMY region" = "#E97C07",
+  "Agriculture: Druze LCT region" = adjustcolor("#94B669", alpha.f = 0.2),
+  "Agriculture: Druze AMY region" = "#94B669",
+  "Agriculture: Pima LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Agriculture: Pima AMY region" = "#DD4124",
+  "Agriculture: Miao LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Agriculture: Japanese2 LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Agriculture: Japanese2 AMY region" = "#0C7996",
+  "Agriculture: Miao AMY region" = "#0C7996",
+  "Agriculture: Tu LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Agriculture: Tu AMY region" = "#0C7996",
+ # "Agriculture: Piapoco LCT region" = adjustcolor("#DD4124", alpha.f = 0.5),
+#  "Agriculture: Piapoco AMY region" = "#DD4124",
+  "Hunting: Mbuti LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "Hunting: Mbuti AMY region" = "#EDB829",
+  "Hunting: Biaka LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "Hunting: Biaka AMY region" = "#EDB829",
+  "Pastoralism: Yakut LCT region" = adjustcolor("#00496F", alpha.f = 0.2),
+  "Pastoralism: Yakut AMY region" = "#00496F"
+)
+
+
+my_custom_palette_AMY <- c("Agriculture: MSL AMY region" = "#EDB829",
+  "Agriculture: Sindhi AMY region" = "#E97C07",
+  "Agriculture: Burusho AMY region" = "#E97C07",
+  "Agriculture: BEB AMY region" = "#E97C07",
+  "Agriculture: Druze AMY region" = "#94B669",
+  "Agriculture: Pima AMY region" = "#DD4124",
+  "Agriculture: Japanese2 AMY region" = "#0C7996",
+  "Hunting: Mbuti AMY region" = "#EDB829",
+  "Hunting: Biaka AMY region" = "#EDB829",
+  "Pastoralism: Yakut AMY region" = "#00496F",
+  "Agriculture: MSL genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Sindhi genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Burusho genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: BEB genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Druze genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Pima genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Japanese2 genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Hunting: Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Hunting: Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pastoralism: Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+  
+)
+
+my_custom_palette_LCT <- c("Agriculture: MSL LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "Agriculture: Sindhi LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Agriculture: Burusho LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Agriculture: BEB LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Agriculture: Druze LCT region" =adjustcolor( "#94B669", alpha.f = 0.2),
+  "Agriculture: Pima LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Agriculture: Japanese2 LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Hunting: Mbuti LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "Hunting: Biaka LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "Pastoralism: Yakut LCT region" = adjustcolor("#00496F", alpha.f = 0.2),
+  "Agriculture: MSL genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Sindhi genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Burusho genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: BEB genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Druze genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Pima genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Agriculture: Japanese2 genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Hunting: Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Hunting: Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pastoralism: Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+  
+)
+
+get_pop<-function(dataset, pop){ 
+  popdataset<-dataset %>%
+      filter(Superpopulation == pop)
+  popdataset
+}
+```
+
+
+```{r}
+# Define the complete custom color palette with grey for all genome-wide comparisons
+my_custom_palette_xpnsl <- c(
+  # MSL comparisons
+  "MSL_Biaka LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "MSL_Mbuti LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "MSL_Yakut LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "MSL_Biaka AMY region" = "#EDB829",
+  "MSL_Mbuti AMY region" = "#EDB829",
+  "MSL_Yakut AMY region" = "#EDB829",
+  "MSL_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "MSL_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "MSL_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  
+  # Druze comparisons
+  "Druze_Biaka LCT region" = adjustcolor("#94B669", alpha.f = 0.2),
+  "Druze_Mbuti LCT region" = adjustcolor("#94B669", alpha.f = 0.2),
+  "Druze_Yakut LCT region" = adjustcolor("#94B669", alpha.f = 0.2),
+  "Druze_Biaka AMY region" = "#94B669",
+  "Druze_Mbuti AMY region" = "#94B669",
+  "Druze_Yakut AMY region" = "#94B669",
+  "Druze_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Druze_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Druze_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Sindhi comparisons
+  "Sindhi_Biaka LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Sindhi_Mbuti LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Sindhi_Yakut LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Sindhi_Biaka AMY region" = "#E97C07",
+  "Sindhi_Mbuti AMY region" = "#E97C07",
+  "Sindhi_Yakut AMY region" = "#E97C07",
+  "Sindhi_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Sindhi_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Sindhi_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Burusho comparisons
+  "Burusho_Biaka LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Burusho_Mbuti LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Burusho_Yakut LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Burusho_Biaka AMY region" = "#E97C07",
+  "Burusho_Mbuti AMY region" = "#E97C07",
+  "Burusho_Yakut AMY region" = "#E97C07",
+  "Burusho_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Burusho_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Burusho_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # BEB comparisons
+  "BEB_Biaka LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "BEB_Mbuti LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "BEB_Yakut LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "BEB_Biaka AMY region" = "#E97C07",
+  "BEB_Mbuti AMY region" = "#E97C07",
+  "BEB_Yakut AMY region" = "#E97C07",
+  "BEB_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "BEB_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "BEB_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Japanese comparisons
+  "Japanese2_Biaka LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Japanese2_Mbuti LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Japanese2_Yakut LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Japanese2_Biaka AMY region" = "#0C7996",
+  "Japanese2_Mbuti AMY region" = "#0C7996",
+  "Japanese2_Yakut AMY region" = "#0C7996",
+  "Japanese2_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Japanese2_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Japanese2_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Miao comparisons
+  "Miao_Biaka LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Miao_Mbuti LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Miao_Yakut LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Miao_Biaka AMY region" = "#0C7996",
+  "Miao_Mbuti AMY region" = "#0C7996",
+  "Miao_Yakut AMY region" = "#0C7996",
+  "Miao_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Miao_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Miao_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Tu comparisons
+  "Tu_Biaka LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Tu_Mbuti LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Tu_Yakut LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Tu_Biaka AMY region" = "#0C7996",
+  "Tu_Mbuti AMY region" = "#0C7996",
+  "Tu_Yakut AMY region" = "#0C7996",
+  "Tu_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Tu_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Tu_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Pima comparisons
+  "Pima_Biaka LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Pima_Mbuti LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Pima_Yakut LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Pima_Biaka AMY region" = "#DD4124",
+  "Pima_Mbuti AMY region" = "#DD4124",
+  "Pima_Yakut AMY region" = "#DD4124",
+  "Pima_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pima_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pima_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+)
+
+
+my_custom_palette_xpnsl_LCT <- c(
+  # MSL comparisons
+  "MSL_Biaka LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "MSL_Mbuti LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "MSL_Yakut LCT region" = adjustcolor("#EDB829", alpha.f = 0.2),
+  "MSL_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "MSL_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "MSL_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  
+  # Druze comparisons
+  "Druze_Biaka LCT region" = adjustcolor("#94B669", alpha.f = 0.2),
+  "Druze_Mbuti LCT region" = adjustcolor("#94B669", alpha.f = 0.2),
+  "Druze_Yakut LCT region" = adjustcolor("#94B669", alpha.f = 0.2),
+  "Druze_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Druze_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Druze_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Sindhi comparisons
+  "Sindhi_Biaka LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Sindhi_Mbuti LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Sindhi_Yakut LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Sindhi_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Sindhi_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Sindhi_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Burusho comparisons
+  "Burusho_Biaka LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Burusho_Mbuti LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Burusho_Yakut LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "Burusho_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Burusho_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Burusho_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # BEB comparisons
+  "BEB_Biaka LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "BEB_Mbuti LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "BEB_Yakut LCT region" = adjustcolor("#E97C07", alpha.f = 0.2),
+  "BEB_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "BEB_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "BEB_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Japanese comparisons
+  "Japanese2_Biaka LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Japanese2_Mbuti LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Japanese2_Yakut LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Japanese2_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Japanese2_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Japanese2_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Miao comparisons
+  "Miao_Biaka LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Miao_Mbuti LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Miao_Yakut LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Miao_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Miao_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Miao_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Tu comparisons
+  "Tu_Biaka LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Tu_Mbuti LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Tu_Yakut LCT region" = adjustcolor("#0C7996", alpha.f = 0.2),
+  "Tu_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Tu_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Tu_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Pima comparisons
+  "Pima_Biaka LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Pima_Mbuti LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Pima_Yakut LCT region" = adjustcolor("#DD4124", alpha.f = 0.2),
+  "Pima_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pima_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pima_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+)
+
+# Define the custom color palette for AMY region and genome-wide comparisons
+my_custom_palette_xpnsl_AMY <- c(
+  # MSL comparisons
+  "MSL_Biaka AMY region" = "#EDB829",
+  "MSL_Mbuti AMY region" = "#EDB829",
+  "MSL_Yakut AMY region" = "#EDB829",
+  "MSL_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "MSL_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "MSL_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  
+  # Druze comparisons
+  "Druze_Biaka AMY region" = "#94B669",
+  "Druze_Mbuti AMY region" = "#94B669",
+  "Druze_Yakut AMY region" = "#94B669",
+  "Druze_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Druze_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Druze_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Sindhi comparisons
+  "Sindhi_Biaka AMY region" = "#E97C07",
+  "Sindhi_Mbuti AMY region" = "#E97C07",
+  "Sindhi_Yakut AMY region" = "#E97C07",
+  "Sindhi_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Sindhi_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Sindhi_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Burusho comparisons
+  "Burusho_Biaka AMY region" = "#E97C07",
+  "Burusho_Mbuti AMY region" = "#E97C07",
+  "Burusho_Yakut AMY region" = "#E97C07",
+  "Burusho_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Burusho_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Burusho_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # BEB comparisons
+  "BEB_Biaka AMY region" = "#E97C07",
+  "BEB_Mbuti AMY region" = "#E97C07",
+  "BEB_Yakut AMY region" = "#E97C07",
+  "BEB_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "BEB_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "BEB_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Japanese comparisons
+  "Japanese2_Biaka AMY region" = "#0C7996",
+  "Japanese2_Mbuti AMY region" = "#0C7996",
+  "Japanese2_Yakut AMY region" = "#0C7996",
+  "Japanese2_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Japanese2_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Japanese2_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Miao comparisons
+  "Miao_Biaka AMY region" = "#0C7996",
+  "Miao_Mbuti AMY region" = "#0C7996",
+  "Miao_Yakut AMY region" = "#0C7996",
+  "Miao_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Miao_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Miao_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Tu comparisons
+  "Tu_Biaka AMY region" = "#0C7996",
+  "Tu_Mbuti AMY region" = "#0C7996",
+  "Tu_Yakut AMY region" = "#0C7996",
+  "Tu_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Tu_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Tu_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+
+  # Pima comparisons
+  "Pima_Biaka AMY region" = "#DD4124",
+  "Pima_Mbuti AMY region" = "#DD4124",
+  "Pima_Yakut AMY region" = "#DD4124",
+  "Pima_Biaka genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pima_Mbuti genome-wide" = adjustcolor("grey", alpha.f = 0.5),
+  "Pima_Yakut genome-wide" = adjustcolor("grey", alpha.f = 0.5)
+)
+                      
+```
+
+
+#### iHS
+
+```{r, fig.width=14, fig.height=12}
+ihsbins<-fread("populations/genomewide_combined.pmap.ihs.100bins.tsv.gz", header=TRUE, sep="\t")
+ihsbins$Superpopulation<-ihsbins$superpopulation
+ihsbins$Superpopulation_Region <- paste(ihsbins$Superpopulation,ihsbins$region, sep=" ")
+
+ihs<-fread("populations/genomewide_combined.ihs.100bins.100kb.windows.tsv.gz", header=TRUE, sep="\t")
+ihs$Superpopulation<-ihs$superpopulation
+ihs$Superpopulation_Region <- paste(ihs$Superpopulation,ihs$region, sep=" ")
+```
+
+
+#### nsL
+```{r, fig.width=14, fig.height=12}
+nslbins<-fread("populations/genomewide_combined.nsl.100bins.tsv.gz", header=TRUE, sep="\t")
+nslbins$Superpopulation<-nslbins$superpopulation
+nslbins$Superpopulation_Region <- paste(nslbins$Superpopulation,nslbins$region, sep=" ")
+
+
+nsl<-fread("populations/genomewide_combined.nsl.100bins.100kb.windows.tsv.gz", header=TRUE, sep="\t")
+nsl$Superpopulation<-nsl$superpopulation
+nsl$Superpopulation_Region <- paste(nsl$Superpopulation,nsl$region, sep=" ")
+```
+
+
+#### xp-nsL
+```{r, fig.width=14, fig.height=12}
+#xpnslbins2<-fread("populations/safekeep/genomewide_combined.xpnsl.100bins.tsv.gz", header=TRUE, sep="\t")
+#xpnslbins2$Superpopulation<-xpnslbins2$superpopulation
+#xpnslbins2$Superpopulation_Region <- paste(xpnslbins2$Superpopulation,xpnslbins2$region, sep=" ")
+
+
+xpnsl<-fread("populations/safekeep/genomewide_combined.xpnsl.100bins.100kb.windows.tsv.gz", header=TRUE, sep="\t")
+xpnsl$Superpopulation<-xpnsl$superpopulation
+xpnsl$Superpopulation_Region <- paste(xpnsl$Superpopulation,xpnsl$region, sep=" ")
+xpnsl <- xpnsl %>%
+  filter(nsites > 10) 
+```
+
+
+
+
+
+
+
+#### hstats
+
+```{r, fig.width=14, fig.height=12}
+hstats<-fread("populations/genomewide.salti.lassip.hap.stats.gz", header=TRUE, sep="\t")
+hstats$Superpopulation_Region <- paste(hstats$Superpopulation,hstats$region, sep=" ")
+```
+
+
+```{r, fig.width=10, fig.height=26}
+ihs_stats <- plot_stats2_absolute(ihsbins, iHS, my_custom_palette, "|iHS|")
+ihs_density_AMY<-plot_density2_absolute(ihsbins, iHS, Superpopulation_Region1, my_custom_palette_AMY, "|iHS|", 'AMY vs genome-wide')
+ihs_density_LCT<-plot_density2_absolute(ihsbins, iHS, Superpopulation_Region2, my_custom_palette_LCT, "|iHS|", 'LCT vs genome-wide')
+ihs_stats_density_populations<-plot_grid(ihs_stats, ihs_density_AMY, ihs_density_LCT, nrow=1)
+
+ihs_stats_density_populations_FINAL <- plot_grid(ihs_stats_density, ihs_stats_density_populations, nrow=2, rel_heights=c(0.5, 2.5))
+ihs_stats_density_populations_FINAL
+ggsave('populations/ihs_plot.pdf', ihs_stats_density_populations_FINAL , dpi=300, width = 10, height = 26)
+```
+
+
+
+```{r, fig.width=10, fig.height=26}
+nsl_stats <- plot_stats2_absolute(nslbins, nSL, my_custom_palette, "|nSL|")
+nsl_density_AMY<-plot_density2_absolute(nslbins, nSL, Superpopulation_Region1, my_custom_palette_AMY, "|nSL|", 'AMY vs genome-wide')
+nsl_density_LCT<-plot_density2_absolute(nslbins, nSL, Superpopulation_Region2, my_custom_palette_LCT, "|nSL|", 'LCT vs genome-wide')
+nsl_stats_density_populations<-plot_grid(nsl_stats, nsl_density_AMY, nsl_density_LCT, nrow=1)
+nsl_stats_density_populations_FINAL <- plot_grid(nsL_stats_density, nsl_stats_density_populations, nrow=2, rel_heights=c(0.5, 2.5))
+nsl_stats_density_populations_FINAL
+ggsave('populations/nsl_plot.pdf', nsl_stats_density_populations_FINAL, dpi=300, width = 10, height = 26)
+```
+
+# fraction fracsites_xpnsl_gt_2
+```{r, fig.width=15, fig.height=46}
+#CEU_YRI_xpnsl_gwide
+#CEU_YRI_frac_xpnsL_stats_density
+
+xpnsl_stats <- plot_stats3(xpnsl, fracsites_xpnsl_gt_2, my_custom_palette_xpnsl, "fraction XP-nSL > 2")
+xpnsl_density_AMY<-plot_density3(xpnsl, fracsites_xpnsl_gt_2, Superpopulation_Region1, my_custom_palette_xpnsl_AMY, "fraction XP-nSL > 2", 'AMY vs genome-wide') + xlim(0, 0.4)
+xpnsl_density_LCT<-plot_density3(xpnsl, fracsites_xpnsl_gt_2, Superpopulation_Region2, my_custom_palette_xpnsl_LCT, "fraction XP-nSL > 2", 'LCT vs genome-wide') + xlim(0, 0.4)
+xpnsl_stats_density_populations<-plot_grid(xpnsl_stats, xpnsl_density_AMY, xpnsl_density_LCT, nrow=1)
+xpnsl_stats_density_populations_FINAL <- plot_grid(CEU_YRI_frac_xpnsL_stats_density, xpnsl_stats_density_populations, nrow=2, rel_heights=c(0.2, 2.8))
+xpnsl_stats_density_populations_FINAL
+ggsave('populations/xpnsl_part2.pdf', xpnsl_stats_density_populations_FINAL, dpi=300, width = 15, height = 45)
+
+CairoPNG(
+  'populations/xpnsl_part2.png', width = 15, height = 45, units = 'in', dpi = 800)
+print(xpnsl_stats_density_populations_FINAL)
+dev.off()
+```
+
+
+```{r, fig.width=10, fig.height=26}
+h12_stats <- plot_stats2(hstats, h12, my_custom_palette, "H12")
+h12_density_AMY<-plot_density2(hstats, h12, Superpopulation_Region1, my_custom_palette_AMY, "H12", 'AMY vs genome-wide')
+h12_density_LCT<-plot_density2(hstats, h12, Superpopulation_Region2, my_custom_palette_LCT, "H12", 'LCT vs genome-wide')
+h12_stats_density_populations<-plot_grid(h12_stats, h12_density_AMY, h12_density_LCT, nrow=1)
+h12_stats_density_populations_FINAL <- plot_grid(h12_stats_density, h12_stats_density_populations, nrow=2, rel_heights=c(0.5, 2.5))
+h12_stats_density_populations_FINAL
+ggsave('populations/h12_plot.pdf', h12_stats_density_populations_FINAL, dpi=300, width = 10, height = 26)
+```
+
+```{r, fig.width=10, fig.height=26}
+h2h1_stats <- plot_stats2(hstats, h2h1, my_custom_palette, "H2/H1")
+h2h1_density_AMY<-plot_density2(hstats, h2h1, Superpopulation_Region1, my_custom_palette_AMY, "H2/H1", 'AMY vs genome-wide')
+h2h1_density_LCT<-plot_density2(hstats, h2h1, Superpopulation_Region2, my_custom_palette_LCT, "H2/H1", 'LCT vs genome-wide')
+h2h1_stats_density_populations<-plot_grid(h2h1_stats, h2h1_density_AMY, h2h1_density_LCT, nrow=1)
+h2h1_stats_density_populations_FINAL <- plot_grid(h2h1_stats_density, h2h1_stats_density_populations, nrow=2, rel_heights=c(0.5, 2.5))
+h2h1_stats_density_populations_FINAL
+ggsave('populations/h2h1_plot.pdf', h2h1_stats_density_populations_FINAL, dpi=300, width = 10, height = 26)
+```
+
+#### saltilassi
+
+```{r, fig.width=10, fig.height=26}
+L_stats <- plot_stats2(hstats, L, my_custom_palette, "Λ")
+L_density_AMY<-plot_density2(hstats, L, Superpopulation_Region1, my_custom_palette_AMY, "Λ", 'AMY vs genome-wide') + xlim (0,50)
+L_density_LCT<-plot_density2(hstats, L, Superpopulation_Region2, my_custom_palette_LCT, "Λ", 'LCT vs genome-wide') + xlim (0,100)
+L_stats_density_populations<-plot_grid(L_stats, L_density_AMY, L_density_LCT, nrow=1)
+L_stats_density_populations_FINAL <- plot_grid(L_stats_density, L_stats_density_populations, nrow=2, rel_heights=c(0.5, 2.5))
+L_stats_density_populations_FINAL
+ggsave('populations/L_plot.pdf', L_stats_density_populations_FINAL, dpi=300, width = 10, height = 26)
+```
+
+####  iHS 
+```{r, fig.width=6, fig.height=22}
+CEU_ihs <- CEU_ihs %>%
+  filter(nsites > 30) 
+YRI_ihs  <- YRI_ihs  %>%
+  filter(nsites > 30) 
+ihs  <- ihs %>%
+  filter(nsites > 30) 
+
+CEU_iHS_gwide<-gwide_manhattan_absolute(CEU_ihs, iHS, "fraction |iHS| >2", "#94B669") + ggtitle('Lactose Tolerant: CEU, WEA') + theme(plot.title = element_text(color = "#94B669"))
+YRI_iHS_gwide<-gwide_manhattan_absolute(YRI_ihs, iHS, "fraction |iHS| >2", "#EDB829") + ggtitle('Lactose intolerant: YRI, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+Druze_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Druze"), iHS, "fraction |iHS| >2", "#94B669") + ggtitle('Modern Agricultural: Druze, WEA') + theme(plot.title = element_text(color = "#94B669"))
+Pima_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Pima"), iHS, "fraction |iHS| >2", "#DD4124") + ggtitle('Modern Agricultural: Pima, AMR') +  theme(plot.title = element_text(color = "#DD4124"))
+Japanese2_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Japanese2"), iHS, "|iHS|", "#0C7996") + ggtitle('Modern Agricultural: Japanese, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Miao_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Miao"), iHS, "fraction |iHS| >2", "#0C7996") + ggtitle('Modern Agricultural: Miao, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Tu_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Tu"), iHS, "fraction |iHS| >2", "#0C7996") + ggtitle('Modern Agricultural: Tu, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Sindhi_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Sindhi"), iHS, "fraction |iHS| >2", "#E97C07") + ggtitle('Modern Agricultural: Sindhi, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Burusho_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Burusho"), iHS, "fraction |iHS| >2", "#E97C07") + ggtitle('Modern Agricultural: Burusho, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+BEB_ihs<-gwide_manhattan_absolute(get_pop(ihs, "BEB"), iHS, "fraction |iHS| >2", "#E97C07") + ggtitle('Modern Agricultural: Bengali, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Yakut_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Yakut"), iHS, "fraction |iHS| >2", "#00496F") + ggtitle('Modern Pastoralist: Yakut, CAS') +  theme(plot.title = element_text(color = "#00496F"))
+Biaka_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Biaka"), iHS, "fraction |iHS| >2", "#EDB829") + ggtitle('Modern Hunting: Biaka, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mbuti_ihs<-gwide_manhattan_absolute(get_pop(ihs, "Mbuti"), iHS, "fraction |iHS| >2", "#EDB829") + ggtitle('Modern Hunting: Mbuti, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mende_ihs<-gwide_manhattan_absolute(get_pop(ihs, "MSL"), iHS, "fraction |iHS| >2", "#EDB829") + ggtitle('Modern Agricultural: Mende, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+
+
+ihs_pop_substance<-plot_grid(CEU_iHS_gwide, 
+                             YRI_iHS_gwide, 
+                             Mende_ihs, 
+                             Pima_ihs, 
+                             Japanese2_ihs, 
+                             BEB_ihs, 
+                             Burusho_ihs, 
+                             Sindhi_ihs, 
+                             Druze_ihs, 
+                             Yakut_ihs, 
+                             Biaka_ihs, 
+                             Mbuti_ihs,  nrow=12)
+ihs_pop_substance
+CairoPNG('populations/ihs_pop_substance.png', width = 5, height = 22, units = 'in', dpi = 300)
+print(ihs_pop_substance)
+dev.off()
+```
+
+```{r, fig.width=18, fig.height=24}
+ihs_pop_substance_annotated <- ihs_pop_substance + 
+  annotate("text", x = -Inf, y = Inf, label = "A.", hjust = -0.1, vjust = 1, size = 5)
+ihs_stats_density_populations_FINAL_annotated <- ihs_stats_density_populations_FINAL + 
+  annotate("text", x = -Inf, y = Inf, label = "B.", hjust = -0.1, vjust = 1, size = 5)
+ihs_final <- plot_grid(ihs_pop_substance_annotated, ihs_stats_density_populations_FINAL_annotated, 
+                       ncol = 2, rel_widths = c(1, 2.5))
+
+ihs_final 
+
+ggsave('populations/ihs_final.pdf', ihs_final, dpi=300, width = 18, height = 24)
+CairoPNG('populations/ihs_final.png', width = 18, height = 24, units = 'in', dpi = 300)
+print(ihs_final)
+dev.off()
+```
+
+
+
+
+
+####  nSL
+```{r, fig.width=6, fig.height=22}
+CEU_nsl <- CEU_nsl %>%
+  filter(nsites > 30) 
+YRI_nsl <- YRI_nsl %>%
+  filter(nsites > 30) 
+nsl <- nsl %>%
+  filter(nsites > 30) 
+
+
+CEU_nSL_gwide<-gwide_manhattan_absolute(CEU_nsl, nSL, "fraction |nSL| >2", "#94B669") + ggtitle('Lactose Tolerant: CEU, WEA') + theme(plot.title = element_text(color = "#94B669"))
+YRI_nSL_gwide<-gwide_manhattan_absolute(YRI_nsl, nSL, "fraction |nSL| >2", "#EDB829") + ggtitle('Lactose intolerant: YRI, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+Druze_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Druze"), nSL, "fraction |nSL| >2", "#94B669") + ggtitle('Modern Agricultural: Druze, WEA') + theme(plot.title = element_text(color = "#94B669"))
+Pima_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Pima"), nSL, "fraction |nSL| >2", "#DD4124") + ggtitle('Modern Agricultural: Pima, AMR') +  theme(plot.title = element_text(color = "#DD4124"))
+Japanese2_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Japanese2"), nSL, "fraction |nSL| >2", "#0C7996") + ggtitle('Modern Agricultural: Japanese, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Miao_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Miao"), nSL, "fraction |nSL| >2", "#0C7996") + ggtitle('Modern Agricultural: Miao, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Tu_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Tu"), nSL, "fraction |nSL| >2", "#0C7996") + ggtitle('Modern Agricultural: Tu, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Sindhi_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Sindhi"), nSL, "fraction |nSL| >2", "#E97C07") + ggtitle('Modern Agricultural: Sindhi, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Burusho_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Burusho"), nSL, "fraction |nSL| >2", "#E97C07") + ggtitle('Modern Agricultural: Burusho, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+BEB_nsl<-gwide_manhattan_absolute(get_pop(nsl, "BEB"), nSL, "fraction |nSL| >2", "#E97C07") + ggtitle('Modern Agricultural: Bengali, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Yakut_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Yakut"), nSL, "fraction |nSL| >2", "#00496F") + ggtitle('Modern Pastoralist: Yakut, CAS') +  theme(plot.title = element_text(color = "#00496F"))
+Biaka_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Biaka"), nSL, "fraction |nSL| >2", "#EDB829") + ggtitle('Modern Hunting: Biaka, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mbuti_nsl<-gwide_manhattan_absolute(get_pop(nsl, "Mbuti"), nSL, "fraction |nSL| >2", "#EDB829") + ggtitle('Modern Hunting: Mbuti, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mende_nsl<-gwide_manhattan_absolute(get_pop(nsl, "MSL"), nSL, "fraction |nSL| >2", "#EDB829") + ggtitle('Modern Agricultural: Mende, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+
+nsl_pop_substance<-plot_grid(CEU_nSL_gwide, 
+                             YRI_nSL_gwide, 
+                             Mende_nsl, 
+                             Pima_nsl, 
+                             Japanese2_nsl, 
+                             BEB_nsl, 
+                             Burusho_nsl, 
+                             Sindhi_nsl, 
+                             Druze_nsl, 
+                             Yakut_nsl, 
+                             Biaka_nsl, 
+                             Mbuti_nsl,  nrow=12)
+nsl_pop_substance
+CairoPNG('populations/nsl_pop_substance.png', width = 6, height = 22, units = 'in', dpi = 300)
+print(nsl_pop_substance)
+dev.off()
+```
+
+```{r, fig.width=18, fig.height=24}
+nsl_pop_substance_annotated <- nsl_pop_substance + 
+  annotate("text", x = -Inf, y = Inf, label = "A.", hjust = -0.1, vjust = 1, size = 5)
+nsl_stats_density_populations_FINAL_annotated <- nsl_stats_density_populations_FINAL + 
+  annotate("text", x = -Inf, y = Inf, label = "B.", hjust = -0.1, vjust = 1, size = 5)
+nsl_final <- plot_grid(nsl_pop_substance_annotated, nsl_stats_density_populations_FINAL_annotated, 
+                       ncol = 2, rel_widths = c(1, 2.5))
+
+nsl_final 
+
+ggsave('populations/nsl_final.pdf', nsl_final, dpi=300, width = 18, height = 24)
+
+
+CairoPNG('populations/nsl_final.png', width = 18, height = 24, units = 'in', dpi = 300)
+print(nsl_final)
+dev.off()
+```
+
+
+
+
+
+#### xp-nsL
+```{r, fig.width=14, fig.height=22}
+Sindhi_Biaka<-gwide_manhattan(get_pop(xpnsl, "Sindhi_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Sindhi (SA) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#E97C07"))
+Sindhi_Mbuti<-gwide_manhattan(get_pop(xpnsl, "Sindhi_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Sindhi (SA) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#E97C07"))
+Sindhi_Yakut<-gwide_manhattan(get_pop(xpnsl, "Sindhi_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Sindhi (SA) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#E97C07"))
+
+Burusho_Biaka<-gwide_manhattan(get_pop(xpnsl, "Burusho_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Burusho (SA) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#E97C07"))
+Burusho_Mbuti<-gwide_manhattan(get_pop(xpnsl, "Burusho_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Burusho (SA) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#E97C07"))
+Burusho_Yakut<-gwide_manhattan(get_pop(xpnsl, "Burusho_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Burusho (SA) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#E97C07"))
+
+BEB_Biaka<-gwide_manhattan(get_pop(xpnsl, "BEB_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Bengali (SA) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#E97C07"))
+BEB_Mbuti<-gwide_manhattan(get_pop(xpnsl, "BEB_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Bengali(SA) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#E97C07"))
+BEB_Yakut<-gwide_manhattan(get_pop(xpnsl, "BEB_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#E97C07") +  ggtitle('Agricultural:Bengali (SA) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#E97C07"))
+
+Druze_Biaka<-gwide_manhattan(get_pop(xpnsl, "Druze_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#94B669") +  ggtitle('Agricultural:Druze (WEA) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#94B669"))
+Druze_Mbuti<-gwide_manhattan(get_pop(xpnsl, "Druze_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#94B669") +  ggtitle('Agricultural:Druze (WEA) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#94B669"))
+Druze_Yakut<-gwide_manhattan(get_pop(xpnsl, "Druze_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#94B669") +  ggtitle('Agricultural:Druze (WEA) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#94B669"))
+
+Japanese2_Biaka<-gwide_manhattan(get_pop(xpnsl, "Japanese2_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Japanese (EA) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#0C7996"))
+Japanese2_Mbuti<-gwide_manhattan(get_pop(xpnsl, "Japanese2_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Japanese (EA) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#0C7996"))
+Japanese2_Yakut<-gwide_manhattan(get_pop(xpnsl, "Japanese2_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Japanese (EA) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#0C7996"))
+
+Miao_Biaka<-gwide_manhattan(get_pop(xpnsl, "Miao_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Miao (EA) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#0C7996"))
+Miao_Mbuti<-gwide_manhattan(get_pop(xpnsl, "Miao_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Miao (EA) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#0C7996"))
+Miao_Yakut<-gwide_manhattan(get_pop(xpnsl, "Miao_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Miao (EA) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#0C7996"))
+
+Tu_Biaka<-gwide_manhattan(get_pop(xpnsl, "Tu_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Tu (EA) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#0C7996"))
+Tu_Mbuti<-gwide_manhattan(get_pop(xpnsl, "Tu_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Tu (EA) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#0C7996"))
+Tu_Yakut<-gwide_manhattan(get_pop(xpnsl, "Tu_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#0C7996") +  ggtitle('Agricultural:Tu (EA) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#0C7996"))
+
+Pima_Biaka<-gwide_manhattan(get_pop(xpnsl, "Pima_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#DD4124") +  ggtitle('Agricultural:Pima (AMR) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#DD4124"))
+Pima_Mbuti<-gwide_manhattan(get_pop(xpnsl, "Pima_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#DD4124") +  ggtitle('Agricultural:Pima (AMR) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#DD4124"))
+Pima_Yakut<-gwide_manhattan(get_pop(xpnsl, "Pima_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#DD4124") +  ggtitle('Agricultural:Pima (AMR) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#DD4124"))
+
+MSL_Biaka<-gwide_manhattan(get_pop(xpnsl, "MSL_Biaka"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#EDB829") +  ggtitle('Agricultural:Mende (AFR) vs rainforest hunter-gatherer:Biaka (AFR)') +  theme(plot.title = element_text(color = "#EDB829"))
+MSL_Mbuti<-gwide_manhattan(get_pop(xpnsl, "MSL_Mbuti"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#EDB829") +  ggtitle('Agricultural:Mende (AFR) vs rainforest hunter-gatherer:Mbuti (AFR)') +  theme(plot.title = element_text(color = "#EDB829"))
+MSL_Yakut<-gwide_manhattan(get_pop(xpnsl, "MSL_Yakut"), fracsites_xpnsl_gt_2, "fraction XP-nSL >2", "#EDB829") +  ggtitle('Agricultural:Mende (AFR) vs pastoralist:Yakut (CAS)') +  theme(plot.title = element_text(color = "#EDB829"))
+
+xpnsl_pop_substance <- plot_grid(CEU_YRI_xpnsl_gwide, 
+                                  Druze_Biaka,
+                                  Druze_Mbuti,
+                                  Druze_Yakut,   
+                                  Sindhi_Biaka,
+                                  Sindhi_Mbuti,
+                                  Sindhi_Yakut,
+                                  Burusho_Biaka, 
+                                  Burusho_Mbuti, 
+                                  Burusho_Yakut,
+                                  BEB_Biaka,
+                                  BEB_Mbuti,      
+                                  BEB_Yakut, 
+                                  Japanese2_Biaka,
+                                  Japanese2_Mbuti,
+                                  Japanese2_Yakut,
+                                  Pima_Biaka,    
+                                  Pima_Mbuti,    
+                                  Pima_Yakut,   
+                                  Miao_Biaka,
+                                  Miao_Mbuti,    
+                                  Miao_Yakut,    
+                                  Tu_Biaka,      
+                                  Tu_Mbuti,      
+                                  Tu_Yakut,      
+                                  MSL_Biaka,      
+                                  MSL_Mbuti,      
+                                  MSL_Yakut, ncol=2)
+xpnsl_pop_substance 
+```
+
+
+####  HSTATS
+
+```{r, fig.width=6, fig.height=22}
+CEU_H12_gwide<-gwide_manhattan(CEU_hstats, h12, "H12", "#94B669") + ggtitle('Lactose Tolerant: CEU, WEA') + theme(plot.title = element_text(color = "#94B669"))
+Druze_H12<-gwide_manhattan(get_pop(hstats, "Druze"), h12, "H12", "#94B669") + ggtitle('Modern Agricultural: Druze, WEA') + theme(plot.title = element_text(color = "#94B669"))
+Pima_H12<-gwide_manhattan(get_pop(hstats, "Pima"), h12, "H12", "#DD4124") + ggtitle('Modern Agricultural: Pima, AMR') +  theme(plot.title = element_text(color = "#DD4124"))
+Japanese2_H12<-gwide_manhattan(get_pop(hstats, "Japanese2"), h12, "H12", "#0C7996") + ggtitle('Modern Agricultural: Japanese, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Miao_H12<-gwide_manhattan(get_pop(hstats, "Miao"), h12, "H12", "#0C7996") + ggtitle('Modern Agricultural: Miao, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Tu_H12<-gwide_manhattan(get_pop(hstats, "Tu"), h12, "H12", "#0C7996") + ggtitle('Modern Agricultural: Tu, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Sindhi_H12<-gwide_manhattan(get_pop(hstats, "Sindhi"), h12, "H12", "#E97C07") + ggtitle('Modern Agricultural: Sindhi, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Burusho_H12<-gwide_manhattan(get_pop(hstats, "Burusho"), h12, "H12", "#E97C07") + ggtitle('Modern Agricultural: Burusho, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+BEB_H12<-gwide_manhattan(get_pop(hstats, "BEB"), h12, "H12", "#E97C07") + ggtitle('Modern Agricultural: Bengali, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Yakut_H12<-gwide_manhattan(get_pop(hstats, "Yakut"), h12, "H12", "#00496F") + ggtitle('Modern Pastoralist: Yakut, CAS') +  theme(plot.title = element_text(color = "#00496F"))
+Biaka_H12<-gwide_manhattan(get_pop(hstats, "Biaka"), h12, "H12", "#EDB829") + ggtitle('Modern Hunting: Biaka, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mbuti_H12<-gwide_manhattan(get_pop(hstats, "Mbuti"), h12, "H12", "#EDB829") + ggtitle('Modern Hunting: Mbuti, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mende_H12<-gwide_manhattan(get_pop(hstats, "MSL"), h12, "H12", "#EDB829") + ggtitle('Modern Agricultural: Mende, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+YRI_H12_gwide<-gwide_manhattan(YRI_hstats, h12, "H12", "#EDB829") + ggtitle('Lactose intolerant: YRI, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+
+
+H12_pop_substance<-plot_grid(CEU_H12_gwide, 
+                             YRI_H12_gwide, 
+                             Mende_H12, 
+                             Pima_H12, 
+                             Japanese2_H12, 
+                             BEB_H12, 
+                             Burusho_H12, 
+                             Sindhi_H12, 
+                             Druze_H12, 
+                             Yakut_H12, 
+                             Biaka_H12, 
+                             Mbuti_H12,  nrow=12)
+H12_pop_substance
+CairoPNG('populations/H12_pop_substance.png', width = 6, height = 22, units = 'in', dpi = 300)
+print(H12_pop_substance)
+dev.off()
+```
+
+
+```{r, fig.width=18, fig.height=24}
+H12_pop_substance_annotated <- H12_pop_substance + 
+  annotate("text", x = -Inf, y = Inf, label = "A.", hjust = -0.1, vjust = 1, size = 5)
+H12_stats_density_populations_FINAL_annotated <- h12_stats_density_populations_FINAL + 
+  annotate("text", x = -Inf, y = Inf, label = "B.", hjust = -0.1, vjust = 1, size = 5)
+H12_final <- plot_grid(H12_pop_substance_annotated, H12_stats_density_populations_FINAL_annotated, 
+                       ncol = 2, rel_widths = c(1, 2.5))
+
+H12_final 
+
+ggsave('populations/H12_final.pdf', H12_final, dpi=300, width = 18, height = 24)
+CairoPNG('populations/H12_final.png', width = 18, height = 24, units = 'in', dpi = 300)
+print(H12_final)
+dev.off()
+```
+
+
+
+
+
+```{r, fig.width=6, fig.height=22}
+CEU_h2h1_gwide<-gwide_manhattan(CEU_hstats, h2h1, "H2/H1", "#94B669") + ggtitle('Lactose Tolerant: CEU, WEA') + theme(plot.title = element_text(color = "#94B669"))
+Druze_h2h1<-gwide_manhattan(get_pop(hstats, "Druze"), h2h1, "H2/H1", "#94B669") + ggtitle('Modern Agricultural: Druze, WEA') + theme(plot.title = element_text(color = "#94B669"))
+Pima_h2h1<-gwide_manhattan(get_pop(hstats, "Pima"), h2h1, "H2/H1", "#DD4124") + ggtitle('Modern Agricultural: Pima, AMR') +  theme(plot.title = element_text(color = "#DD4124"))
+Japanese2_h2h1<-gwide_manhattan(get_pop(hstats, "Japanese2"), h2h1, "H2/H1", "#0C7996") + ggtitle('Modern Agricultural: Japanese, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Miao_h2h1<-gwide_manhattan(get_pop(hstats, "Miao"), h2h1, "H2/H1", "#0C7996") + ggtitle('Modern Agricultural: Miao, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Tu_h2h1<-gwide_manhattan(get_pop(hstats, "Tu"), h2h1, "H2/H1", "#0C7996") + ggtitle('Modern Agricultural: Tu, EA') +  theme(plot.title = element_text(color = "#0C7996"))
+Sindhi_h2h1<-gwide_manhattan(get_pop(hstats, "Sindhi"), h2h1, "H2/H1", "#E97C07") + ggtitle('Modern Agricultural: Sindhi, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Burusho_h2h1<-gwide_manhattan(get_pop(hstats, "Burusho"), h2h1, "H2/H1", "#E97C07") + ggtitle('Modern Agricultural: Burusho, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+BEB_h2h1<-gwide_manhattan(get_pop(hstats, "BEB"), h2h1, "H2/H1", "#E97C07") + ggtitle('Modern Agricultural: Bengali, SA') +  theme(plot.title = element_text(color = "#E97C07"))
+Yakut_h2h1<-gwide_manhattan(get_pop(hstats, "Yakut"), h2h1, "H2/H1", "#00496F") + ggtitle('Modern Pastoralist: Yakut, CAS') +  theme(plot.title = element_text(color = "#00496F"))
+Biaka_h2h1<-gwide_manhattan(get_pop(hstats, "Biaka"), h2h1, "H2/H1", "#EDB829") + ggtitle('Modern Hunting: Biaka, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mbuti_h2h1<-gwide_manhattan(get_pop(hstats, "Mbuti"), h2h1, "H2/H1", "#EDB829") + ggtitle('Modern Hunting: Mbuti, AFR') +  theme(plot.title = element_text(color = "#EDB829"))
+Mende_h2h1<-gwide_manhattan(get_pop(hstats, "MSL"), h2h1, "H2/H1", "#EDB829") + ggtitle('Modern Agricultural: Mende, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+YRI_h2h1_gwide<-gwide_manhattan(YRI_hstats, h2h1, "H2/H1", "#EDB829") + ggtitle('Lactose intolerant: YRI, AFR') + theme(plot.title = element_text(color = "#EDB829"))
+
+h2h1_pop_substance<-plot_grid(CEU_h2h1_gwide, 
+                             YRI_h2h1_gwide, 
+                             Mende_h2h1, 
+                             Pima_h2h1, 
+                             Japanese2_h2h1, 
+                             BEB_h2h1, 
+                             Burusho_h2h1, 
+                             Sindhi_h2h1, 
+                             Druze_h2h1, 
+                             Yakut_h2h1, 
+                             Biaka_h2h1, 
+                             Mbuti_h2h1,  nrow=12)
+h2h1_pop_substance
+CairoPNG('populations/h2h1_pop_substance.png', width = 6, height = 22, units = 'in', dpi = 300)
+print(h2h1_pop_substance)
+dev.off()
+
+```
+
+
+```{r, fig.width=18, fig.height=24}
+h2h1_pop_substance_annotated <- h2h1_pop_substance + 
+  annotate("text", x = -Inf, y = Inf, label = "A.", hjust = -0.1, vjust = 1, size = 5)
+h2h1_stats_density_populations_FINAL_annotated <- h2h1_stats_density_populations_FINAL + 
+  annotate("text", x = -Inf, y = Inf, label = "B.", hjust = -0.1, vjust = 1, size = 5)
+h2h1_final <- plot_grid(h2h1_pop_substance_annotated, h2h1_stats_density_populations_FINAL_annotated, 
+                       ncol = 2, rel_widths = c(1, 2.5))
+
+h2h1_final 
+
+ggsave('populations/h2h1_final.pdf', h2h1_final, dpi=300, width = 18, height = 24)
+CairoPNG('populations/h2h1_final.png', width = 18, height = 24, units = 'in', dpi = 300)
+print(h2h1_final)
+dev.off()
+```
+
+
+#### SALTILASSI Lambda Λ
+
+
+
+```{r, fig.width=6, fig.height=22}
+CEU_L_gwide<-gwide_manhattan(CEU_hstats, L, "Λ", "#94B669") + ggtitle('Lactose Tolerant: CEU, WEA') + theme(plot.title = element_text(color = "#94B669")) + ylim(0, 3000)
+Druze_L<-gwide_manhattan(get_pop(hstats, "Druze"), L, "Λ", "#94B669") + ggtitle('Modern Agricultural: Druze, WEA') + theme(plot.title = element_text(color = "#94B669")) 
+Pima_L<-gwide_manhattan(get_pop(hstats, "Pima"), L, "Λ", "#DD4124") + ggtitle('Modern Agricultural: Pima, AMR') +  theme(plot.title = element_text(color = "#DD4124")) 
+Japanese2_L<-gwide_manhattan(get_pop(hstats, "Japanese2"), L, "Λ", "#0C7996") + ggtitle('Modern Agricultural: Japanese, EA') +  theme(plot.title = element_text(color = "#0C7996"))  + ylim(0, 3000)
+Miao_L<-gwide_manhattan(get_pop(hstats, "Miao"), L, "Λ", "#0C7996") + ggtitle('Modern Agricultural: Miao, EA') +  theme(plot.title = element_text(color = "#0C7996"))  + ylim(0, 3000)
+Tu_L<-gwide_manhattan(get_pop(hstats, "Tu"), L, "Λ", "#0C7996") + ggtitle('Modern Agricultural: Tu, EA') +  theme(plot.title = element_text(color = "#0C7996"))  + ylim(0, 3000)
+Sindhi_L<-gwide_manhattan(get_pop(hstats, "Sindhi"), L, "Λ", "#E97C07") + ggtitle('Modern Agricultural: Sindhi, SA') +  theme(plot.title = element_text(color = "#E97C07"))  
+Burusho_L<-gwide_manhattan(get_pop(hstats, "Burusho"), L, "Λ", "#E97C07") + ggtitle('Modern Agricultural: Burusho, SA') +  theme(plot.title = element_text(color = "#E97C07"))  
+BEB_L<-gwide_manhattan(get_pop(hstats, "BEB"), L, "Λ", "#E97C07") + ggtitle('Modern Agricultural: Bengali, SA') +  theme(plot.title = element_text(color = "#E97C07"))  + ylim(0, 3000)
+Yakut_L<-gwide_manhattan(get_pop(hstats, "Yakut"), L, "Λ", "#00496F") + ggtitle('Modern Pastoralist: Yakut, CAS') +  theme(plot.title = element_text(color = "#00496F"))  
+Biaka_L<-gwide_manhattan(get_pop(hstats, "Biaka"), L, "Λ", "#EDB829") + ggtitle('Modern Hunting: Biaka, AFR') +  theme(plot.title = element_text(color = "#EDB829"))  
+Mbuti_L<-gwide_manhattan(get_pop(hstats, "Mbuti"), L, "Λ", "#EDB829") + ggtitle('Modern Hunting: Mbuti, AFR') +  theme(plot.title = element_text(color = "#EDB829"))  
+Mende_L<-gwide_manhattan(get_pop(hstats, "MSL"), L, "Λ", "#EDB829") + ggtitle('Modern Agricultural: Mende, AFR') + theme(plot.title = element_text(color = "#EDB829"))  + ylim(0, 3000)
+YRI_L_gwide<-gwide_manhattan(YRI_hstats, L, "Λ", "#EDB829") + ggtitle('Lactose intolerant: YRI, AFR') + theme(plot.title = element_text(color = "#EDB829"))  + ylim(0, 3000)
+
+L_pop_substance<-plot_grid(CEU_L_gwide, 
+                             YRI_L_gwide, 
+                             Mende_L, 
+                             Pima_L, 
+                             Japanese2_L, 
+                             BEB_L, 
+                             Burusho_L, 
+                             Sindhi_L, 
+                             Druze_L, 
+                             Yakut_L, 
+                             Biaka_L, 
+                             Mbuti_L,  nrow=12)
+L_pop_substance
+CairoPNG('populations/L_pop_substance.png', width = 6, height = 22, units = 'in', dpi = 300)
+print(L_pop_substance)
+dev.off()
+```
+
+
+```{r, fig.width=18, fig.height=24}
+L_pop_substance_annotated <- L_pop_substance + 
+  annotate("text", x = -Inf, y = Inf, label = "A.", hjust = -0.1, vjust = 1, size = 5)
+L_stats_density_populations_FINAL_annotated <- L_stats_density_populations_FINAL + 
+  annotate("text", x = -Inf, y = Inf, label = "B.", hjust = -0.1, vjust = 1, size = 5)
+L_final <- plot_grid(L_pop_substance_annotated, L_stats_density_populations_FINAL_annotated, 
+                       ncol = 2, rel_widths = c(1, 2.5))
+
+L_final 
+
+ggsave('populations/L_final.pdf', L_final, dpi=300, width = 18, height = 24)
+CairoPNG('populations/L_final.png', width = 18, height = 24, units = 'in', dpi = 800)
+print(L_final)
+dev.off()
+```
+
+
+
+
+
+
+
+
+##### genome-wide manhattan plots 
+
+```{r}
+threshold_b <- quantile(xpnslbins$xpnsl, 0.0001, na.rm = TRUE) 
+#gwide_manhattan(xpnslbins, xpnsl, "XP-nSL Druze vs Biaka", "#94B669") + geom_hline(yintercept = threshold_b, linetype = "dashed")
+gwide_manhattan(xpnslbins, xpnsl, "XP-nSL Druze vs Yakut", "#94B669") + geom_hline(yintercept = threshold_b, linetype = "dashed")
+```
+
+
+
+
+
+#### manhattan like exploration  chromosomes
+
+##### CEU
+
+```{r eval=FALSE, fig.width=10, fig.height=5}
+CEU_hstats_chr1 <- CEU_hstats  %>%
+  filter(chr == "chr1")
+CEU_hstats_chr2 <- CEU_hstats  %>%
+  filter(chr == "chr2")
+chrom_theme<-theme(panel.border = element_rect(color="black"), axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 10))
+CEU_H12_chr1<-gwide_manhattan(CEU_hstats_chr1, h12, "H12 CEU", "darkgreen") + ggtitle ("AMY region, chromosome 1") + xlab("Window") +  chrom_theme
+CEU_H12_chr2<-gwide_manhattan(CEU_hstats_chr2, h12, "H12 CEU", "#94B669") + ggtitle ("LCT region, chromosome 2") + xlab("Window") +  chrom_theme
+CEU_H2H1_chr1<-gwide_manhattan(CEU_hstats_chr1, h2h1, "H2/H1 CEU", "darkgreen") + ggtitle ("AMY region, chromosome 1") + xlab("Window") +  chrom_theme 
+CEU_H2H1_chr2<-gwide_manhattan(CEU_hstats_chr2, h2h1, "H2/H1 CEU",  "#94B669") + ggtitle ("LCT region, chromosome 2")  + xlab("Window") +  chrom_theme
+```
+
+##### YRI
+
+```{r eval=FALSE, fig.width=10, fig.height=5}
+YRI_hstats_chr1 <- YRI_hstats  %>%
+  filter(chr == "chr1")
+YRI_hstats_chr2 <- YRI_hstats  %>%
+  filter(chr == "chr2")
+chrom_theme<-theme(panel.border = element_rect(color="black"), axis.text.y = element_text(size = 10), axis.text.x = element_text(size = 10))
+YRI_H12_chr1<-gwide_manhattan(YRI_hstats_chr1, h12, "H12 YRI", "darkorange") + ggtitle ("AMY region, chromosome 1") + xlab("Window") +  chrom_theme
+YRI_H12_chr2<-gwide_manhattan(YRI_hstats_chr2, h12, "H12 YRI", "#EDB829") + ggtitle ("LCT region, chromosome 2") + xlab("Window") +  chrom_theme
+YRI_H2H1_chr1<-gwide_manhattan(YRI_hstats_chr1, h2h1, "H2/H1 YRI", "darkorange") + ggtitle ("AMY region, chromosome 1") + xlab("Window") +  chrom_theme
+YRI_H2H1_chr2<-gwide_manhattan(YRI_hstats_chr2, h2h1, "H2/H1 YRI",  "#EDB829") + ggtitle ("LCT region, chromosome 2") + xlab("Window") +  chrom_theme
+```
