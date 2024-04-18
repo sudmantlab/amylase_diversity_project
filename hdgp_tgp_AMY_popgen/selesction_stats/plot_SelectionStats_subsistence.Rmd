@@ -452,34 +452,3 @@ within_group_stats
 
 
 
-
-```{r, fig.width=6, fig.height=7}
-salti <- salti %>%
-  filter(region != "amy genes") 
-L<-plot_stats(salti, L, my_custom_palette , "Λ")
-#m<-plot_stats(salti, m, my_custom_palette , "m")
-density_plot_AMY<-plot_density(salti, L, Superpopulation_Region1, my_custom_palette_AMY, "Λ", 'AMY vs genome-wide') 
-ggarrange(L, density_plot_AMY)
-density_plot_AMY2<-plot_density(hstats, h2h1, Superpopulation_Region1, my_custom_palette_AMY, "H2/H1", 'AMY vs genome-wide')
-h12_density_h1h2<-ggarrange(h12, density_plot_AMY, h2h1, density_plot_AMY2,  ncol = 4, nrow=1, labels = c("C.", "", "D."))
-h12_density_h1h2
-```
-
-
-
-
-
-```{r, fig.width=6, fig.height=7}
-Agriculture_salti <- salti %>%
-  filter(Superpopulation == "Agriculture") 
-Pastoralism_salti <- salti %>%
-  filter(Superpopulation == "Pastoralism") 
-Hunting_salti <- salti %>%
-  filter(Superpopulation == "Hunting") 
-Agriculture<-gwide_manhattan(Agriculture_salti, L, "Agriculture Λ", "lightsalmon") 
-Pastoralism<-gwide_manhattan(Pastoralism_salti, L, "Pastoralism Λ", "darksalmon") 
-Hunting<-gwide_manhattan(Hunting_salti, L, "Hunting Λ", "salmon") 
-ggarrange(Agriculture, Pastoralism, Hunting, nrow=3)
-```
-
-
