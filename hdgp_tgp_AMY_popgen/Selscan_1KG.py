@@ -42,19 +42,19 @@ lassipstats = [
     'salti'
 ]
 
-ruleorder: lassip_salti > salti_genomewide > add_to_salti > concat_lassisalti > concat_withingroup_tables > concat_tables_genomewide
+#ruleorder: lassip_salti > salti_genomewide > add_to_salti > concat_lassisalti > concat_withingroup_tables > concat_tables_genomewide
 
 rule all:
     input: 
         expand('hgdp.tgp.gwaspy.merged.{anything}.merged.rsecode.vcf', anything=chromosomes),        
         expand('hgdp.tgp.gwaspy.merged.{anything_chrom}.merged.{anything_group}.recode.vcf',  anything_chrom=chromosomes, anything_group=superpopulations), ## recoded for superpops  with CN estimates not trios
-        expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/SUPERPOPS/genomewide_combined.{anything}", anything=extensions),
-        expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/SUPERPOPS/genomewide.{lassipstat}.lassip.hap.stats.gz", lassipstat=lassipstats),
+        expand("selection_stats/SUPERPOPS/genomewide_combined.{anything}", anything=extensions),
+        expand("selection_stats/SUPERPOPS/genomewide.{lassipstat}.lassip.hap.stats.gz", lassipstat=lassipstats),
 
     
 rule bcf2vcf_chromosomes: #  convert to vcf and if with -r option subset vcf per chrom of interest 
     input:
-        bcf='/global/scratch/users/joana_rocha/AMY/phased_haplotypes/hgdp.tgp.gwaspy.merged.{chrom}.merged.bcf',
+        bcf='phased_haplotypes/hgdp.tgp.gwaspy.merged.{chrom}.merged.bcf',
     output:
         vcf=temp('hgdp.tgp.gwaspy.merged.{chrom}.merged.vcf')
     params:
@@ -97,7 +97,7 @@ rule vcf_all_genotype_anything:  # subset vcf per pop of interest with CN estima
 rule lassip_Hstats: 
     input:
         vcf = "hgdp.tgp.gwaspy.merged.{chrom}.merged.{superpopulation}.recode.vcf",
-        popfile = "/global/scratch/users/joana_rocha/AMY/GWAS/groups/{superpopulation}.lassip.txt"
+        popfile = "groups/{superpopulation}.lassip.txt"
     output:
         outfile = temp("{chrom}.{superpopulation}.lassip.hap.stats.gz")
     params:
@@ -147,7 +147,7 @@ rule add_to_Hstats:
 rule lassip_salti: 
     input:
         vcf = "hgdp.tgp.gwaspy.merged.{chrom}.merged.{superpopulation}.recode.vcf",
-        popfile = "/global/scratch/users/joana_rocha/AMY/GWAS/groups/{superpopulation}.lassip.txt"
+        popfile = "groups/{superpopulation}.lassip.txt"
     output:
         outfile = temp("{chrom}.{superpopulation}.lassip.hap.spectra.gz")
     params:
@@ -659,7 +659,7 @@ rule concat_lassisalti:
     input:
         expand("{superpopulation}.{{lassipstat}}.lassip.hap.stats.gz", superpopulation=superpopulations),
     output:
-        "/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/SUPERPOPS/genomewide.{lassipstat}.lassip.hap.stats.gz",
+        "selection_stats/SUPERPOPS/genomewide.{lassipstat}.lassip.hap.stats.gz",
     run:
         pd.concat([pd.read_csv(path, sep="\t") for path in input], ignore_index=True).to_csv(output[0], sep="\t", compression='gzip', index=False)
 
@@ -668,7 +668,7 @@ rule concat_withingroup_tables:
     input:
         expand("{{chrom}}_{superpopulation}.{{anything}}", superpopulation=superpopulations),
     output:
-        temp("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/SUPERPOPS/{chrom}_combined.{anything}"),
+        temp("selection_stats/SUPERPOPS/{chrom}_combined.{anything}"),
     run:
         pd.concat([pd.read_csv(path, sep="\t") for path in input], ignore_index=True).to_csv(output[0], sep="\t", compression='gzip', index=False)
 
@@ -676,14 +676,14 @@ rule concat_betweengroups_tables:
     input:
         expand("{{chrom}}_{pair[0]}_{pair[1]}.{{anything}}", pair=unique_pairs_superpopulations),
     output:
-       temp("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/SUPERPOPS/{chrom}_combined.{anything}"),
+       temp("selection_stats/SUPERPOPS/{chrom}_combined.{anything}"),
     run:
         pd.concat([pd.read_csv(path, sep="\t") for path in input], ignore_index=True).to_csv(output[0], sep="\t", compression='gzip', index=False)
 
 rule concat_tables_genomewide:
     input:
-        expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/SUPERPOPS/{chrom}_combined.{{anything}}", chrom=chromosomes),
+        expand("selection_stats/SUPERPOPS/{chrom}_combined.{{anything}}", chrom=chromosomes),
     output:
-        "/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/SUPERPOPS/genomewide_combined.{anything}",
+        "selection_stats/SUPERPOPS/genomewide_combined.{anything}",
     run:
         pd.concat([pd.read_csv(path, sep="\t") for path in input], ignore_index=True).to_csv(output[0], sep="\t", compression='gzip', index=False)
