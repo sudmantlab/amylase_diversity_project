@@ -12,6 +12,8 @@ A repo for code and methods related to analyses and figures. This code is deposi
 
 [Trio-based recombination rate visualization](https://github.com/sudmantlab/amylase_diversity_project/blob/main/HPRC_AMY_Sequences/recombination_rate/recombination_rate.md)
 
+[Variant effect prediction](https://github.com/sudmantlab/amylase_diversity_project/blob/main/HPRC_AMY_Sequences/variant_effect_prediction/variant_effect_prediction.md)
+
 [Population genetics of flanking loci](https://github.com/sudmantlab/amylase_diversity_project/tree/main/hdgp_tgp_AMY_popgen)
 
 [Read depth genotyping](https://github.com/sudmantlab/amylase_diversity_project/tree/main/read_depth_genotyping)
