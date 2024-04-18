@@ -13,9 +13,8 @@ name_to_region = {v: k for k, v in region_mapping.items()}
 
 rule all:
     input: 
-        "CN_metadata_filtered.tsv",
         expand('groups/{superpopulation}.txt', superpopulation=superpopulations),
-        "groups/all_genotyped_individuals.txt",
+        "groups/all_genotyped_individuals.txt", # concatenation of all individuals
         expand('hgdp.tgp.gwaspy.merged.{region}.merged.recode.vcf', region=region_mapping.values()), # recoded for regions with individuals with CN estimates not trios
         "hgdp.tgp.gwaspy.merged.b0_start_to_b0_end.merged.eigenvec",
         "hgdp.tgp.gwaspy.merged.b0_start_to_b0_end.merged.eigenval",
@@ -25,84 +24,7 @@ rule all:
         expand('maf_filtered_hgdp.tgp.gwaspy.merged.b0_start_to_b1_end.merged.{superpopulation}.recode.vcf', superpopulation=superpopulations), ### filtered for minmaf 0.05  with CN estimates not trios
         "chr1_combined.ld2.tsv.gz",
         "chr1_combined.PI.tsv.gz",
-        "chr1_combined.iHs.tsv",
        
-rule make_CN_table_from_likelihoods_metadata:
-    input: 
-        'genotypes.likelihoods.tsv',
-        'METADATA.tsv',
-    output: 
-        temp('CN_metadata.tsv'),
-    run:
-        CN_likelihood = pd.read_csv(input[0], sep='\t')
-        grouped = CN_likelihood.groupby(["sample", "label"])
-        def filter_rows(group):
-            max_r = group["r"].max()
-            max_cp = group.loc[group["r"] == max_r, "cp"].iloc[0]
-            filtered_group = group.loc[group["cp"] == max_cp]
-            return filtered_group
-        CN_likelihood_max = pd.concat([filter_rows(group) for name, group in grouped])
-        CN_likelihood_max[['ID', 'p1', 'p2']] = CN_likelihood_max['sample'].str.split('.', expand=True)[[1, 2, 3]]
-        CN = CN_likelihood_max.pivot(index=['ID'], columns='label', values='cp')
-        CN.columns.name = None
-        CN_likelihood_max_2 = CN_likelihood_max.drop_duplicates(subset=['sample', 'ID', 'p1', 'p2'])
-        CN_likelihood_max_2 = CN_likelihood_max_2[['sample', 'ID', 'p1', 'p2']]
-        CN = CN.merge(CN_likelihood_max_2, on='ID', how='inner') 
-        #CN.to_csv('CN.tsv', sep='\t', index=False)
-        metadata = pd.read_csv(input[1], sep='\t')   
-        merged_metadata = metadata.merge(CN, on="ID", how="left")
-        #metadata = metadata.rename(columns={'project_meta.sample_id': 'ID'})
-        metadata = metadata[['ID', 'hgdp_tgp_meta.Population', 'hgdp_tgp_meta.Genetic.region', 'hgdp_tgp_meta.Study.region','hgdp_tgp_meta.Latitude', 'hgdp_tgp_meta.Longitude','hgdp_tgp_meta.Continent.colors','hgdp_tgp_meta.n','hgdp_tgp_meta.Pop.colors','project_meta.sex','sex_imputation.is_female']]
-        metadata_CN = metadata.merge(CN, on=["ID"], how='left') #left if to keep ancients
-        column_order = ['ID', 'AMY1', 'AMY2A', 'AMY2B', 'sample', 'p1', 'p2',
-                'hgdp_tgp_meta.Population', 'hgdp_tgp_meta.Genetic.region',
-                'hgdp_tgp_meta.Study.region', 'hgdp_tgp_meta.Latitude',
-                'hgdp_tgp_meta.Longitude', 'hgdp_tgp_meta.Continent.colors',
-                'hgdp_tgp_meta.n', 'hgdp_tgp_meta.Pop.colors', 'project_meta.sex',
-                'sex_imputation.is_female']
-        metadata_CN = metadata_CN[column_order]
-        metadata_CN.to_csv(output[0], sep='\t', index=False)
-
-rule filter_1KGtrios_absentCN_and_list:
-    input:
-        metadata="CN_metadata.tsv"
-    output:
-        filtered_metadata="CN_metadata_filtered.tsv",
-        trios_list="CN_trio_samples_list.txt",
-        all_genotyped_individuals="groups/all_genotyped_individuals.txt",
-    run:
-        df = pd.read_csv(input.metadata, sep='\t')
-        trio_samples = df[df['sample'].str.contains('1KG_trio', na=False)]['sample'].tolist()
-        print("Samples containing '1KG_trio':")
-        for sample in trio_samples:
-            print(sample)
-        with open(output.trios_list, 'w') as f:
-            for sample in trio_samples:
-                f.write(sample + '\n')
-        df_filtered = df[~df['sample'].str.contains('1KG_trio', na=False)]
-        df_filtered['AMY1'] = pd.to_numeric(df_filtered['AMY1'], errors='coerce')
-        df_filtered['AMY2A'] = pd.to_numeric(df_filtered['AMY2A'], errors='coerce')
-        df_filtered['AMY2B'] = pd.to_numeric(df_filtered['AMY2B'], errors='coerce')
-        df_final = df_filtered.dropna(subset=['AMY1', 'AMY2A', 'AMY2B'])
-        df_final.to_csv(output.filtered_metadata, sep='\t', index=False)
-        all_genotyped_individuals = df_final['ID'].tolist()
-        with open(output.all_genotyped_individuals, 'w') as f:
-            for individual in all_genotyped_individuals:
-                f.write(individual + '\n')
-
-
-sample_table = pd.read_csv('CN_metadata_filtered.tsv', sep='\t') #has the correspondence between sample names and all other details
-superpopulations = sample_table['p2'].unique() 
-#superpopulations = ['AFR', 'AMR', 'CAS', 'EA', 'OCN', 'SA', 'WEA']
-
-
-rule split_by_superpopulation_with_CN_estimates:
-    output: 'groups/{superpopulation}.txt'
-    run:
-        grouped = sample_table.groupby('p2')
-        group = sample_table[sample_table['p2']==wildcards["superpopulation"]]
-        group.to_csv(output[0], columns=['ID'], index=False, header = False)
-
 
 rule bcf2vcf_regions: #  convert to vcf and if with -r option subset vcf per region of interest 
     input:
@@ -167,21 +89,6 @@ rule run_Pi:
     shell: """
     vcftools --vcf {input[0]}  --window-pi  20000 --out {params} 
     """
-
-rule calculate_ihs: #the script filters for maf 0.05
-    input:
-        hap_file = "{superpopulation}_chr1.filtered.recode.norm.vcf"
-    output:
-        output_file = "chr1_{superpopulation}.ihs.tsv"
-    params:
-        b0_start = 103456163,
-        b0_end = 103571526,
-        b1a_start = 103760698,
-        b1a_end = 103826698,
-        b1b_start = 103833698,
-        b1b_end = 103863980
-    script:
-        "./calculate_ihs.R"
 
 rule run_LD: 
     input:
@@ -277,23 +184,6 @@ rule concat_Pi_tables:
         for file in {params.files_to_concat}
         do
             zcat $file | tail -n +2 >> {output}
-        done
-        """
-
-rule concat_iHs_tables:
-    input:
-        expand("chr1_{superpopulation}.ihs.tsv", superpopulation=superpopulations)
-    output:
-        "chr1_combined.iHs.tsv"
-    params:
-        files_to_concat=" ".join(expand("chr1_{superpopulation}.ihs.tsv", superpopulation=superpopulations))
-    shell:
-        """
-        #!/bin/bash
-        cat {input[0]} > {output}
-        for file in {params.files_to_concat}
-        do
-            cat $file | tail -n +2 >> {output}
         done
         """
 
