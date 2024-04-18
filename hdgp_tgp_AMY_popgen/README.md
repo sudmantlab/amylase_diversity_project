@@ -2,7 +2,7 @@
 
 
 
-## Creating input tables and input files for different target populations/regions/subsistence types
+## Creating input tables and files for different target populations/regions/subsistence types
 
 ```
 snakemake -s hgdp_tgp_MakeTables.py --cores all --rerun-incomplete 
