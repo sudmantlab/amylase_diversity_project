@@ -203,7 +203,6 @@ additional_info_df = data.frame(p1=c("Tubular",
                                       "Hunting",
                                       "Hunting"))
 
-
 t_subsistence = rbind(t_subsistence,additional_info_df) %>% unique()
 
 t_data_by_sub = t_gt %>% 
@@ -272,7 +271,7 @@ p_A1 = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY1"))$p.value
 p_A2A = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2A"))$p.value
 p_A2B = t.test(cp~simple_type, t_data_by_sub %>% filter(label=="AMY2B"))$p.value
 
-p.adjust(c(lmp(m1),lmp(m2A),lmp(m2B)))
+#p.adjust(c(lmp(m1),lmp(m2A),lmp(m2B)))
 
 df_labs = data.frame(label = c("AMY1","AMY2A","AMY2B"),
                      ps = c(p_A1, p_A2A, p_A2B),

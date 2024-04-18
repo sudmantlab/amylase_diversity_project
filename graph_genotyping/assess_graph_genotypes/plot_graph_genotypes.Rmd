@@ -321,7 +321,7 @@ g=g+geom_bar(aes(y=order,fill=p2,x=proportion),stat='identity',position='dodge',
   theme(strip.background = element_blank(),
         strip.text = element_text(angle=0))+
   theme(legend.position="None")+
-  geom_blank(aes(x=mxs),data=hacked_min_max)+
+  #geom_blank(aes(x=mxs),data=hacked_min_max)+
   scale_y_discrete("")+
   scale_x_continuous("allele frequency")
 
@@ -340,7 +340,7 @@ print(g)
 g=ggplot(t_plot)
 g=g+geom_bar(aes(x=order,fill=p2,y=proportion),stat='identity',position='dodge',alpha=.8)+
   geom_text(aes(x=order,label=p2,y=proportion),size=.75,hjust=0.5,position=position_nudge(y=0.01,x=0),angle=0)+
-  geom_text(aes(x=0.5,y=0.5,label=cluster),size=2,hjust=0,data=hacked_min_max,parse=TRUE)+
+  #geom_text(aes(x=0.5,y=0.5,label=cluster),size=2,hjust=0,data=hacked_min_max,parse=TRUE)+
   theme_bw(base_size=6)+
   scale_fill_manual(values=colors)+
   facet_wrap(~hap_names,scales="free_x",ncol=2,strip.position = "bottom",labeller = label_parsed)+
@@ -561,11 +561,6 @@ t_sum_sus = t_data_by_sus %>%
             summarize(count = n()) %>%
             mutate(proportion=count/n_total)
 
-contingency_table = t_sum_sus %>%
-                    ungroup() %>% 
-                    dplyr::select(type, cluster, count) %>%
-                    pivot_wider(names_from=cluster,values_from=count) %>% 
-                    column_to_rownames("type")
 
 t_sum_sus = t_sum_sus %>% ungroup() %>% dplyr::select(type,hap_names,proportion) %>%
   pivot_wider(names_from = hap_names, values_from = proportion) %>%
@@ -613,6 +608,12 @@ pdf(fout, width=3 ,height=1)
 print(g)
 dev.off()
 
+contingency_table = t_data_by_sus %>% 
+                    mutate(dup = ifelse(hap_names %in% c("H1^a","H2A0"), "not_dup", "dup")) %>%
+                    group_by(type,dup) %>%
+                    summarize(n = n()) %>%
+                    pivot_wider(names_from=type,values_from=n) %>% 
+                    column_to_rownames("dup")
 
 chisq.test(contingency_table)
 
