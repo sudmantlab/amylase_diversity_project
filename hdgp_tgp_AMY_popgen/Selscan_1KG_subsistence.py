@@ -492,135 +492,7 @@ rule add_to_normalized_iHS:
         # Write the dataframe to the output file
         df.to_csv(output[0], sep="\t", compression='gzip', index=False)
 
-#rule calculate_xpehh: #default filters for maf 0.05
-#    input:
-#        vcf1="{superpop1}_{chrom}.filtered.recode.norm.vcf",
-#        vcf2="{superpop2}_{chrom}.filtered.recode.norm.vcf"
-#    output:
-#        outfile = temp("{chrom}_{superpop1}_{superpop2}.xpehh.out")
-#    params:
-#        outname="{chrom}_{superpop1}_{superpop2}"
-#    shell:
-#        "../selscan --xpehh --vcf {input.vcf1} --vcf-ref {input.vcf2} --pmap  --ehh-win 1000000000 --max-extend -1 --max-gap 1000000000 --threads 24 --out {params.outname}"
 
-
-#../selscan --xpehh --vcf Agriculture_chr1.filtered.recode.norm.vcf --vcf-ref Hunting_chr1.filtered.recode.norm.vcf --pmap  --ehh-win 1000000000 --max-extend -1 --max-gap 1000000000 --threads 56 --out chr1_Agriculture_Hunting 
-
-#rule normalize_xpehh:
-#    input:
-#        infile = "{chrom}_{superpopulation}.xpnsl.out"
-#    output:
-#        outfile=temp("{chrom}_{superpopulation}.xpnsl.out.norm")
-#    params:
-#        log="{chrom}_{superpopulation}_xpnsl_norm_100bins.log"
-#    shell: """
-#    ../norm --xpnsl --bins 100  --files {input.infile} --log {params.log}
-#    """ 
-
-rule calculate_xpnsl: #default filters for maf 0.05
-    input:
-        vcf1="{superpop1}_{chrom}.filtered.recode.norm.vcf",
-        vcf2="{superpop2}_{chrom}.filtered.recode.norm.vcf"
-    output:
-        outfile = temp("{chrom}_{superpop1}_{superpop2}.xpnsl.out")
-    params:
-        outname="{chrom}_{superpop1}_{superpop2}"
-    shell:
-        "../selscan --xpnsl --vcf {input.vcf1} --vcf-ref {input.vcf2} --threads 24 --out {params.outname}"
-
-rule normalize_xpnsl:
-    input:
-        infile = "{chrom}_{superpopulation}.xpnsl.out"
-    output:
-        outfile1=temp("{chrom}_{superpopulation}.xpnsl.out.norm.100kb.windows"),
-        outfile2=temp("{chrom}_{superpopulation}.xpnsl.out.norm")
-    params:
-        log1="{chrom}_{superpopulation}_xpnsl_norm_100kbwindows.log",
-        log2="{chrom}_{superpopulation}_xpnsl_norm_100bins.log"
-    shell: """
-    ../norm --xpnsl --bins 100  --bp-win --winsize 100000 --qbins 10 --min-snps 10 --files {input.infile} --log {params.log1} &&
-    ../norm --xpnsl --bins 100  --files {input.infile} --log {params.log2}
-    """ 
-
-
-rule add_to_normalized_xpnsl:
-    input:
-        "{chrom}_{superpop1}_{superpop2}.xpnsl.out.norm",
-    output:
-        temp("{chrom}_{superpop1}_{superpop2}.xpnsl.100bins.tsv.gz"),
-    wildcard_constraints:
-        chrom="|".join(chromosomes),
-    run:
-        # Read the input file without header and assign column names
-        df = pd.read_csv(input[0], sep="\t", skiprows=1, header=None, names=["chr", "pos", "gpos", "pop1_freq", "sl1", "pop2_freq", "sl2","xpnsl_unstanderdized", "xpnsl", "boolean"])
-        # Replace the 'chr' values with the chromosome id from the input wildcard
-        df["chr"] = wildcards.chrom
-        df["superpopulation"] = f"{wildcards.superpop1}_{wildcards.superpop2}"
-
-        def assign_region(row):
-            if row['chr'] == 'chr1':
-                b0start, b0end = 103456163, 103571526
-                amyst, amyend = 103571527, 103760697
-                b1astart, b1aend = 103760698, 103826698
-                if b0start <= row['pos'] <= b0end or b1astart <= row['pos'] <= b1aend:
-                    return 'AMY region'
-                elif amyst <= row['pos'] <= amyend:
-                    return 'amy genes'
-                else:
-                    return 'chr1'
-            elif row['chr'] == 'chr2':
-                start, end = 135000000, 138000000
-                if start <= row['pos'] <= end:
-                    return 'LCT region'
-                else:
-                    return 'chr2'
-            else:
-                return row['chr']
-        df['region'] = df.apply(assign_region, axis=1)
-        if wildcards.chrom == 'chr1':
-            df = df[df['region'] != 'amy genes']
-        df.to_csv(output[0], sep="\t", compression='gzip', index=False)
-
-
-rule add_to_normalized_xpnsl_WINDOWS:
-    input:
-        "{chrom}_{superpop1}_{superpop2}.xpnsl.out.norm.100kb.windows",
-    output:
-        temp("{chrom}_{superpop1}_{superpop2}.xpnsl.100bins.100kb.windows.tsv.gz"),
-    wildcard_constraints:
-        chrom="|".join(chromosomes),
-    run:
-        # Read the input file without header and assign column names
-        df = pd.read_csv(input[0], sep="\t", skiprows=1, header=None, 
-        names=["winstart", "winend", "nsites", "fracsites_xpnsl_gt_2", "fracsites_xpnsl_lt_2", "top_percent_wins_gt2", "top_percent_wins_lt2", "max_xpnsl", "min_xpnsl"])
-        # Replace the 'chr' values with the chromosome id from the input wildcard
-        df["chr"] = wildcards.chrom
-        df["superpopulation"] = f"{wildcards.superpop1}_{wildcards.superpop2}"
-        def assign_region(row):
-            if row['chr'] == 'chr1':
-                b0start, b0end = 103456163, 103571526
-                amyst, amyend = 103571527, 103760697
-                b1astart, b1aend = 103760698, 103826698
-                if b0start <= row['winstart'] <= b0end or b1astart <= row['winstart'] <= b1aend:
-                    return 'AMY region'
-                elif amyst <= row['winstart'] <= amyend and amyst <= row['winend'] <= amyend:
-                    return 'amy genes'
-                else:
-                    return 'chr1'
-            elif row['chr'] == 'chr2':
-                start, end = 135000000, 138000000
-                if start <= row['winstart'] <= end and start  <= row['winend'] <= end:
-                    return 'LCT region'
-                else:
-                    return 'chr2'
-            else:
-                return row['chr']
-        df['region'] = df.apply(assign_region, axis=1)
-        # Apply filtering only for chr1
-        if wildcards.chrom == 'chr1':
-            df = df[df['region'] != 'amy genes']
-        # Write the dataframe to the output file
-        df.to_csv(output[0], sep="\t", compression='gzip', index=False)
 
 rule concat_withingroup_tables:
     input:
@@ -645,7 +517,6 @@ rule concat_tables_genomewide:
        "selection_stats/SUBSISTENCE/genomewide_combined.{anything}",
     run:
         pd.concat([pd.read_csv(path, sep="\t") for path in input], ignore_index=True).to_csv(output[0], sep="\t", compression='gzip', index=False)
-
 
 rule concat_lassisalti:
     input:
