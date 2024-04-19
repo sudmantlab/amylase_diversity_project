@@ -24,8 +24,8 @@ populations = [ 'Sindhi', # n= 24
                 'Japanese2', ## cat of Japanese.txt and JPT.txt, n=129
                 'Pima', # n= 14
                 #'Piapoco', #n=2
-                'Miao', # n=10
-                'Tu', # n=10
+                #'Miao', # n=10
+                #'Tu', # n=10
                 'MSL', # Mende, n=85
                 'Mbuti', # n=14
                 'Biaka', #n=26
@@ -34,41 +34,39 @@ populations = [ 'Sindhi', # n= 24
                 ] 
 #populations = ['CEU', 'YRI']
 
-unique_pairs_populations = list(combinations(populations, 2))
+#unique_pairs_populations = list(combinations(populations, 2))
 
 chromosomes = ["chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22"]
 
 
 extensions=[
-    #'windowed.pi2.gz',
-    #'Tajima.Dv2.gsz',
+    'windowed.pi2.gz',
+    'Tajima.Dv2.gsz',
     'ihs.tsv.gz',
-    #'pmap.ihs.100bins.tsv.gz',
-    #'ihs.100bins.100kb.windows.tsv.gz',
-    #'nsl.100bins.tsv.gz',
-    #'nsl.100bins.100kb.windows.tsv.gz',
+    'pmap.ihs.100bins.tsv.gz',
+    'ihs.100bins.100kb.windows.tsv.gz',
+    'nsl.100bins.tsv.gz',
+    'nsl.100bins.100kb.windows.tsv.gz',
 ] 
 
 extensions2 = [
-    #'xpnsl.100bins.100kb.windows.tsv.gz', 
-    #'xpnsl.100bins.tsv.gz',
-    #'xpehh.100bins.tsv.gz'
+    'xpnsl.100bins.100kb.windows.tsv.gz', 
+    'xpnsl.100bins.tsv.gz',
 ]
 
 lassipstats = [
-    #'lassi',
     'salti'
 ]
 
-#ruleorder: lassip_lassi > lassi_genomewide >  add_to_lassi > lassip_salti > salti_genomewide > add_to_salti > concat_lassisalti > concat_withingroup_tables > concat_tables_genomewide
+#ruleorder: lassip_salti > salti_genomewide > add_to_salti > concat_lassisalti > concat_withingroup_tables > concat_tables_genomewide
 
 rule all:
     input: 
         #expand("/global/scratch/users/joana_rocha/AMY/GWAS/groups/populations/{anything}.lassip.txt", anything=populations),
         #expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/populations/{chrom}_combined.{anything}", chrom=chromosomes, anything=extensions),
-        #expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/populations/genomewide_combined.{anything}", anything=extensions),
         expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/populations/genomewide_combined.{anything}", anything=extensions),
         expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/populations/genomewide.{lassipstat}.lassip.hap.stats.gz", lassipstat=lassipstats),
+	expand("/global/scratch/users/joana_rocha/AMY/GWAS/selection_stats/populations/genomewide_combined.{anything}", anything=extensions2),
         
         
         
