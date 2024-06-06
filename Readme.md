@@ -20,7 +20,7 @@ A repo for code and methods related to analyses and figures. This code is deposi
 
 [Graph genotyping](https://github.com/sudmantlab/amylase_diversity_project/tree/main/graph_genotyping)
 
-[Assess graph genotypes](https://github.com/sudmantlab/amylase_diversity_project/tree/main/graph_genotyping/assess_graph_genotypes) (includes selection analyses)
+[Assess graph genotypes (including selection analyses)](https://github.com/sudmantlab/amylase_diversity_project/tree/main/graph_genotyping/assess_graph_genotypes) 
 
 [Expression analyses](https://github.com/sudmantlab/amylase_diversity_project/tree/main/expression_analysis/)
 
