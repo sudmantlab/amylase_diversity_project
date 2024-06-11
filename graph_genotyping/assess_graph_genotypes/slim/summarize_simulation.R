@@ -16,12 +16,18 @@ haplotype_binned_frequency <- read_tsv("/global/scratch/users/nicolas931010/amyl
 selection_onset_vector <- seq(from=1000, to=1400, length.out=21)
 simulated_binned_frequency <- NULL
 for (selection_onset in selection_onset_vector){
-  for(rep_id in 1:100){
-    frequency_trajectory <- read_delim(str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency, "/s_", selection_coeff, "/t_", selection_onset, "/rep_", rep_id, "_allele_frequency.tsv"), col_names = FALSE, delim = " ") %>%
-      transmute(pop_slim=X4, generation=X2, allele_count=X12) %>%
-      left_join(pop_info_expanded,., by=c("pop_slim", "generation")) %>%
-      mutate(allele_count=ifelse(is.na(allele_count), 0, allele_count)) %>%
-      mutate(allele_frequency=allele_count/ne/2)
+  for(rep_id in 1:1000){
+    input_file <- str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency, "/s_", selection_coeff, "/t_", selection_onset, "/rep_", rep_id, "_allele_frequency.tsv")
+    if(file.size(input_file)>0){
+      frequency_trajectory <- read_delim(input_file, col_names = FALSE, delim = " ") %>%
+        transmute(pop_slim=X4, generation=X2, allele_count=X12) %>%
+        left_join(pop_info_expanded,., by=c("pop_slim", "generation")) %>%
+        mutate(allele_count=ifelse(is.na(allele_count), 0, allele_count)) %>%
+        mutate(allele_frequency=allele_count/ne/2)
+    } else {
+      frequency_trajectory <- pop_info_expanded %>%
+        mutate(allele_count=0L, allele_frequency=0.0)
+    }
     simulated_binned_frequency_tmp <- sampled_populations %>% 
       left_join(frequency_trajectory, by=c("pop", "generation"))  %>%
       group_by(epoch) %>%

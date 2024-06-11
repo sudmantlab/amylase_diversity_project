@@ -1120,19 +1120,18 @@ simulation_summary <- expand.grid(starting_frequency_vector, selection_coeff_vec
   transmute(path=str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency_vector, "/s_", selection_coeff_vector, "/simulation_summary.tsv")) %>%
   pull(path) %>%
   read_tsv()
-
-simulated_binned_frequency <- expand.grid(starting_frequency_vector, selection_coeff_vector) %>%
-  transmute(starting_frequency_vector=Var1,
-            selection_coeff_vector=as.character(Var2),
-            selection_coeff_vector=ifelse(selection_coeff_vector=="0", "0.0", selection_coeff_vector))  %>%
-  transmute(path=str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency_vector, "/s_", selection_coeff_vector, "/simulated_binned_frequency.tsv")) %>%
-  pull(path) %>%
-  read_tsv()
 n_simulation <- dim(simulation_summary)[1]
 acceptance_rate <- 0.001
 n_acceptance <- round(n_simulation*acceptance_rate)
 top_simulations <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance)
+  slice_min(delta, n=n_acceptance, with_ties = FALSE)
+```
+
+``` r
+starting_frequency_vector <- seq(from=0.05, to=0.8, length.out=31)
+selection_coeff_vector <- seq(from=-0.01, to=0.04, length.out=21)
+selection_onset_vector <- seq(from=1000, to=1400, length.out=21)
+top_simulations <- read_tsv("slim/top_simulations.tsv")
 top_simulations %>% 
   count(selection_coeff) %>% 
   slice_max(n, n = 3)
@@ -1141,9 +1140,9 @@ top_simulations %>%
     ## # A tibble: 3 × 2
     ##   selection_coeff     n
     ##             <dbl> <int>
-    ## 1          0.015    287
-    ## 2          0.0175   286
-    ## 3          0.02     228
+    ## 1          0.0175  2737
+    ## 2          0.015   2643
+    ## 3          0.02    2093
 
 ``` r
 top_simulations %>% 
@@ -1154,9 +1153,9 @@ top_simulations %>%
     ## # A tibble: 3 × 2
     ##   selection_onset     n
     ##             <dbl> <int>
-    ## 1            1200   195
-    ## 2            1180   186
-    ## 3            1160   155
+    ## 1            1180  2065
+    ## 2            1200  1895
+    ## 3            1220  1645
 
 ``` r
 top_simulations %>% 
@@ -1167,11 +1166,11 @@ top_simulations %>%
     ## # A tibble: 5 × 3
     ##   selection_coeff selection_onset     n
     ##             <dbl>           <dbl> <int>
-    ## 1          0.015             1200    41
-    ## 2          0.015             1160    40
-    ## 3          0.015             1180    40
-    ## 4          0.0175            1200    40
-    ## 5          0.0175            1180    37
+    ## 1          0.0175            1180   402
+    ## 2          0.015             1180   391
+    ## 3          0.0175            1200   380
+    ## 4          0.015             1200   356
+    ## 5          0.0175            1160   333
 
 ``` r
 starting_frequency_histogram <-  top_simulations %>%
@@ -1191,7 +1190,9 @@ starting_frequency_histogram
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
 
-![](selection_analysis_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+    ## Warning: Removed 1 rows containing missing values (`geom_bar()`).
+
+![](selection_analysis_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 ``` r
 top_histogram <- top_simulations %>%
@@ -1246,7 +1247,7 @@ combined_heatmap <- plot_grid(NULL, top_histogram, NULL, NULL,
 combined_heatmap
 ```
 
-![](selection_analysis_files/figure-gfm/unnamed-chunk-26-2.png)<!-- -->
+![](selection_analysis_files/figure-gfm/unnamed-chunk-27-2.png)<!-- -->
 
 ``` r
 simulation_summary %>%
@@ -1259,23 +1260,36 @@ simulation_summary %>%
   geom_tile() +
   geom_vline(xintercept = 0, color="red", linetype=2) +
   scale_fill_viridis_c(direction = -1)
-```
 
-![](selection_analysis_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
-
-``` r
+best_parameter_combinations <- simulation_summary %>%
+  group_by(selection_coeff==0) %>%
+  slice_min(delta, n=n_acceptance, with_ties = FALSE) %>%
+  distinct(starting_frequency, selection_coeff) %>%
+  mutate(selection_coeff=as.character(selection_coeff)) %>%
+  mutate(selection_coeff=ifelse(selection_coeff=="0", "0.0", selection_coeff))
+  
+simulated_binned_frequency <- best_parameter_combinations %>%
+  transmute(path=str_c("/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_", starting_frequency, "/s_", selection_coeff, "/simulated_binned_frequency.tsv")) %>%
+  pull(path) %>%
+  read_tsv()
 best_trajectories <- simulation_summary %>%
-  slice_min(delta, n=n_acceptance) %>%
+  slice_min(delta, n=1000) %>%
   semi_join(simulated_binned_frequency, .) %>%
   mutate(type="best simulations")
 best_neutral_trajectories <- simulation_summary %>%
   filter(selection_coeff==0) %>%
-  slice_min(delta, n=n_acceptance) %>%
+  slice_min(delta, n=1000) %>%
   semi_join(simulated_binned_frequency, .) %>%
   mutate(type="best neutral simulations")
+```
+
+``` r
+best_trajectories <- read_tsv("slim/best_trajectories.tsv")
+best_neutral_trajectories <- read_tsv("slim/best_neutral_trajectories.tsv")
+haplotype_binned_frequency <- read_tsv("slim/binned_frequency.tsv")
 best_trajectories_plot <- bind_rows(best_trajectories, best_neutral_trajectories) %>% 
   ggplot(aes(x=(generation-1500)*30/1000, y=dup_hap, color=type)) +
-  geom_line(aes(group=str_c(starting_frequency, selection_coeff, selection_onset, rep_id, sep = "_")), size=0.05, alpha=0.1) +
+  geom_line(aes(group=str_c(starting_frequency, selection_coeff, selection_onset, rep_id, sep = "_")), linewidth=0.05, alpha=0.1) +
   geom_line(data=haplotype_binned_frequency, color="black") +
   geom_point(data=haplotype_binned_frequency, color="black", mapping=aes(size=n/2)) +
   annotate(geom = "label", x = c(-7.8, -5.5, -8), y=c(0.9, 0.45, 0.2), label=c("best neutral simulations", "best simulations", "observed"), color=c(MetBrewer::met.brewer(name = 'Archambault', type = "d", n = 2), "black")) +
@@ -1291,13 +1305,61 @@ best_trajectories_plot <- bind_rows(best_trajectories, best_neutral_trajectories
 best_trajectories_plot
 ```
 
-![](selection_analysis_files/figure-gfm/unnamed-chunk-27-2.png)<!-- -->
+![](selection_analysis_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+
+``` r
+observed_frequency_change <- haplotype_binned_frequency$dup_hap[5] - haplotype_binned_frequency$dup_hap[1]
+p <- starting_frequency_vector[1]
+delta_p <- NULL
+for (p in starting_frequency_vector){
+  neutral_sim_frequency_trajectory <- data.table::fread(str_c("slim/p_", p, "/s_0.0/simulated_binned_frequency.tsv"))
+  p_1 <- neutral_sim_frequency_trajectory %>%
+    filter(epoch == 1) %>%
+    pull(dup_hap)
+  p_5 <- neutral_sim_frequency_trajectory %>%
+    filter(epoch == 5) %>%
+    pull(dup_hap)
+  delta_p_tmp <- p_5 - p_1
+  delta_p <- c(delta_p, delta_p_tmp)
+}
+max(delta_p)
+```
+
+    ## [1] 0.3001024
+
+``` r
+length(delta_p)
+```
+
+    ## [1] 651000
+
+``` r
+observed_frequency_change
+```
+
+    ## [1] 0.7068639
+
+``` r
+tibble(delta_p) %>%
+  ggplot(aes(x=delta_p)) +
+  geom_histogram(fill="white", color="black") +
+  geom_vline(aes(xintercept=observed_frequency_change), color="red") +
+  xlab("simulated allele frequency change in neutral simulations") +
+  annotate(geom="text", x=observed_frequency_change*0.7, y=1.5*10^5, label = "observed allele frequency change", color="red") +
+  ylab("count") +
+  theme_bw()
+```
+
+![](selection_analysis_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ``` r
 ggsave("figures/starting_frequency_histogram.pdf", starting_frequency_histogram, height=5, width = 8)
 ggsave("figures/starting_frequency_histogram.png", starting_frequency_histogram, height=5, width = 8)
 ggsave("figures/combined_heatmap.pdf", combined_heatmap, height=3.5, width = 4.3)
 ggsave("figures/best_trajectories.pdf", best_trajectories_plot, height = 3.2, width=4.8)
+write_tsv(top_simulations, "/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/top_simulations.tsv")
+write_tsv(best_trajectories, "/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/best_trajectories.tsv")
+write_tsv(best_neutral_trajectories, "/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/best_neutral_trajectories.tsv")
 ```
 
 ``` r
@@ -1320,7 +1382,6 @@ pop_info_expanded <- pop_info %>%
   do(tibble(pop_slim=.$pop_slim, pop=.$pop, ne=.$ne, generation=(.$starting_gen:.$ending_gen))) %>%
   filter(generation>=1000)
 sampled_populations <- read_tsv("slim/sampled_populations.tsv")
-haplotype_binned_frequency <- read_tsv("slim/binned_frequency.tsv")
 rep_id <- 5
 
 starting_frequency_vector <- 0.3
@@ -1371,12 +1432,12 @@ simulated_binned_frequency %>%
   geom_line(aes(group=rep_id), size=0.1) +
   geom_line(data=haplotype_binned_frequency, color="red")
 
-# frequency_trajectory %>%
-#   ggplot(aes(x=generation, y=allele_frequency, color=pop)) +
-#   geom_line() +
-#   ylim(c(0,1)) +
-#   theme_minimal_grid() +
-#   theme(panel.border = element_rect(color="black"))
+frequency_trajectory %>%
+  ggplot(aes(x=generation, y=allele_frequency, color=pop)) +
+  geom_line() +
+  ylim(c(0,1)) +
+  theme_minimal_grid() +
+  theme(panel.border = element_rect(color="black"))
 ```
 
 ## stdpopsim

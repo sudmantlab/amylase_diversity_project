@@ -36,7 +36,7 @@ rule run_slim:
         '/global/scratch/users/nicolas931010/amylase_diversity_project/graph_genotyping/assess_graph_genotypes/slim/p_{starting_frequency}/s_{selection_coeff}/t_{selection_onset}/run_slim.log',
     shell:
         '''
-        for REP_ID in {{1..100}}; do
+        for REP_ID in {{1..1000}}; do
         slim \
         -d rep_id=$REP_ID \
         -d starting_frequency={wildcards.starting_frequency} \
