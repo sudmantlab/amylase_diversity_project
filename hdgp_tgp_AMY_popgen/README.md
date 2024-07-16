@@ -35,9 +35,9 @@ snakemake -s Selscan_1KG_populations.py --cores all --rerun-incomplete
 snakemake -s Selscan_1KG_subsistence.py --cores all --rerun-incomplete 
 ```
 
-#### Fisher's scores for major continental regions and CEU population, combining the ranked scores of SNPs for two selection statistics:
+#### Fisher's scores:
 
-Example of usase for Selscan_1KG.py output from superpopulations for H12 and H2/H1:
+Using the output for Selscan_1KG.py for output from superpopulations for H12, H2/H1, salitiLassi, this script can be costumized to calculate Fisher's scores combining any two statstics:
 
 ```
 python Fisher_score.py WEA
