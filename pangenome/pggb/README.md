@@ -77,6 +77,12 @@ ls *fa.gz | while read FASTA; do
 done
 ```
 
+Layout without labels:
+
+```shell
+f=selected_indivs_AMY_region.fa.gz.42c7330.417fcdf.8bc4b72.smooth.final.gfa ; odgi draw -i $f -t 16 -c $f.lay -s $f.lay.svg -b <(sed 's/bundle[0-9]//g' haplotype_all_structures_plotinfo.chm13_colors.bed) -w 30 -B 100
+```
+
 
 # Pangenome Year 1 + Year 2 with `AMY1A_region_seq.fa.gz`
 
