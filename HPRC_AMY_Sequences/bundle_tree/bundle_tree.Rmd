@@ -64,10 +64,10 @@ structure_ggtree <- structure_tree %>%
   #ggtree(aes(color=haplotype), linewidth=1) +
   ggtree(color="darkgrey", linewidth=1) +
   scale_color_manual(values = c(group_color), guide="none") +
-  geom_tiplab(align=FALSE, mapping = aes(label=str_pad(max(y)-y+1, 2, pad="0")), size=3, offset = 0.02, color="black") +
+  geom_tiplab(align=FALSE, mapping = aes(label=str_pad(max(y)-y+1, 2, pad="0")), size=4, offset = 0.02, color="black") +
   #geom_tiplab(align=FALSE, mapping = aes(label=haplotype), size=3, offset = 0.02, color="black") +
   geom_tippoint(aes(size=hap_struc_d_n, fill=haplotype), shape=21, color="black") +
-  geom_cladelab(data = cladelab_df, mapping = aes(node = node, label = name, color=name), align=TRUE, geom='text', offset=.06, offset.text=0.02, fontface = 2, parse=TRUE) +
+  geom_cladelab(data = cladelab_df, mapping = aes(node = node, label = name, color=name), align=TRUE, geom='text', offset=.07, offset.text=0.015, fontface = 2, parse=TRUE) +
   scale_fill_manual(values = group_color, guide="none") +
   scale_color_manual(values = group_color, guide="none") +
   #geom_text2(aes(label=node), hjust=-.3, size=2) +
@@ -401,7 +401,7 @@ for (i in 0:1){
 
 Bundle 0
 
-```{r fig.height=12, fig.width=10}
+```{r fig.height=16, fig.width=9}
 ## with haplotype names
 bundle0_tree <- str_c("iqtree/bundle", 0, "_with_outgroup.timetree.nex") %>%
   read.nexus() %>%
@@ -447,21 +447,24 @@ bundle0_histo_dots <- bundle_info %>%
                    index=rep(1:3, times=4)))
 bundle0_histo_dots_plot <- bundle0_histo_dots %>%
   ggplot(aes(x=index, y=label, fill=name, shape=name)) +
-  geom_point(size=2.8) +
+  geom_point(size=3) +
   scale_shape_manual(values = 22:25) +
   scale_fill_manual(values = amy_color) +
-  ggnewscale::new_scale_fill() +
   theme_void() +
   theme(axis.text.y = element_blank(),
+                             legend.title = element_blank(),
         plot.background = element_rect(fill = "transparent", color=NA),
         panel.background = element_blank())
 
 bundle0_tree_with_gene_count <- bundle0_histo_dots_plot %>%
   aplot::insert_left(bundle0_tree +
+                       ggnewscale::new_scale_fill() +
                        geom_tiplab(mapping = aes(label=node_rank), 
-                                   align = TRUE, size = 3, hjust = -0.1, offset = 25000) +
+                                   align = TRUE, size = 4.5, hjust = -0.1, offset = 25000) +
                        xlim_tree(650000) +
-                       theme(axis.text.x = element_text(size=15),
+                       theme(axis.text.x = element_text(size=15), 
+                             plot.caption = element_text(size=15),
+                             plot.title = element_blank(),
                              plot.background = element_rect(fill = "transparent", color=NA),
                              panel.background = element_blank()), 
                      width = 2.5)
@@ -528,7 +531,7 @@ bundle1a_tree_with_gene_count <- bundle1a_histo_dots_plot %>%
                                    align = TRUE, size = 3, hjust = -0.1, offset = 25000) +
                        xlim_tree(650000) +
                        theme(axis.text.x = element_text(size=15),
-                             text = element_text(size=15)), width = 2.5)
+                             text = element_text(size=15)), width = 2.5,)
 bundle1a_tree_with_gene_count
 ```
 

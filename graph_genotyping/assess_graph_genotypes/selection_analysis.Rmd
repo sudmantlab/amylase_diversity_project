@@ -976,7 +976,8 @@ top_histogram <- top_simulations %>%
   theme_bw() +
   theme(axis.text.x = element_blank(),
         axis.title.x = element_blank(),
-        axis.ticks.x = element_blank())
+        axis.ticks.x = element_blank(),
+        text = element_text(size=13),)
 right_histogram <- top_simulations %>%
   ggplot(aes(x=(1500-selection_onset)*30/1000)) +
   geom_bar(aes(y=..prop..)) +
@@ -990,6 +991,7 @@ right_histogram <- top_simulations %>%
   theme(axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         axis.ticks.y = element_blank(),
+        text = element_text(size=13),
         rect = element_rect(fill="transparent", color="transparent"), plot.background = element_rect(fill="transparent", color="transparent"))
 heatmap <- top_simulations %>%
   count(selection_coeff, selection_onset) %>%
@@ -1009,7 +1011,8 @@ heatmap <- top_simulations %>%
                   ylim=c(min((1500-selection_onset_vector)*30/1000), max((1500-selection_onset_vector)*30/1000))) +
   labs(x="selection coefficient", 
        y="time of selection onset (kyr BP)") +
-  theme_bw() 
+  theme_bw() +
+  theme(text = element_text(size=13),)
 combined_heatmap <- plot_grid(NULL, top_histogram, NULL, NULL, 
           NULL, NULL, NULL, NULL,
           get_legend(heatmap), heatmap + theme(legend.position="none"), NULL, right_histogram, 
