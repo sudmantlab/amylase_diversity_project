@@ -1,0 +1,534 @@
+source	sample	p1	p2	AMY1	AMY2B	AMY2A	site	country	region	latitude	longitude	age	data_source	pop_grouping
+ExcoffierAncient	AKT16-2	Turkey	EarlyFarmer	6	3	3	Aktopraklik	Turkey	NA	40.173	28.77283	10570.5	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	Asp6	Austria	EarlyFarmer	6	2	2	Asparn-Schletz	Austria	NA	48.58026	16.46911	9528	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	BAR25-1	Turkey	EarlyFarmer	4	2	2	Barcin	Turkey	NA	40.30122	29.60833	10317.5	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	Dil16	Germany	EarlyFarmer	5	3	2	Dillingen-Steinheim	Germany	NA	48.59503	10.53935	9139.5	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	Herx	Germany	EarlyFarmer	7	2	2	Herxheim	Germany	NA	49.14696	8.21807	9101.5	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	Klein7	Austria	EarlyFarmer	5	3	3	Kleinhadersdorf	Austria	NA	48.66388	16.58963	9000	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	LEPE48-2	Serbia	EarlyFarmer	3	3	2	Lepinski Vir	Serbia	NA	44.55224	22.02736	9955	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	LEPE52-1	Serbia	EarlyFarmer	2	2	2	Lepinski Vir	Serbia	NA	44.55224	22.02736	9835	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	Nea2	Greece	EarlyFarmer	7	2	2	Nea Nikomedeia	Greece	NA	40.5878	22.24991	10121	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	Nea3	Greece	EarlyFarmer	2	2	2	Nea Nikomedeia	Greece	NA	40.5878	22.24991	10206.5	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	STAR1	Serbia	EarlyFarmer	3	2	2	Grad-Starcevo	Serbia	NA	44.82618	20.71596	9555.5	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	VC3-2	Serbia	EarlyFarmer	4	2	2	Vinca-Belo Brdo	Serbia	NA	44.76147	20.62346	9518.5	MarchiCell2022	EarlyFarmer
+ExcoffierAncient	VLASA32-2	Serbia	HunterGathererE	4	2	2	Vlasac	Serbia	NA	44.536351	22.038861	11627.5	MarchiCell2022	HunterGathererE
+ExcoffierAncient	VLASA7-3	Serbia	HunterGathererE	3	2	2	Vlasac	Serbia	NA	44.536351	22.038861	10575	MarchiCell2022	HunterGathererE
+StoneAgeAncient	NEO100	CentralEasternEurope	Hunter-GathererE	3	2	0	Ural River Beach	Russia	CentralEasternEurope	51.57	53.68	9929	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO113	CentralEasternEurope	Hunter-GathererE	7	3	3	Golubaya Krinitsa (Blue Well)?	Russia	CentralEasternEurope	50.07	39.88	7336	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO119	WesternEurope	EarlyFarmer	7	2	2	Grotte Mandrin	France	WesternEurope	44.47	4.77	4382	thisStudy	Early Farmer
+StoneAgeAncient	NEO121	WesternEurope	EarlyFarmer	8	2	2	Grotte Mandrin	France	WesternEurope	44.47	4.77	4531	thisStudy	Early Farmer
+StoneAgeAncient	NEO122	NorthernEurope	Hunter-GathererW	4	2	2	Orehoved Sejlrende	Denmark	NorthernEurope	54.96	11.85	8146	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO123	NorthernEurope	Hunter-GathererW	4	2	2	Orehoved Sejlrende	Denmark	NorthernEurope	54.96	11.85	8182	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO137	CentralEasternEurope	EarlyFarmer	5	2	2	H√∂dmez√∂vasarhely Kotac	Hungary	CentralEasternEurope	46.42	20.33	7591	thisStudy	Early Farmer
+StoneAgeAncient	NEO140	CentralEasternEurope	EarlyFarmer	6	2	1	Gorzsa Cukormajor	Hungary	CentralEasternEurope	46.37	20.42	6718	thisStudy	Early Farmer
+StoneAgeAncient	NEO142	CentralEasternEurope	EarlyFarmer	6	2	2	Gorzsa Cukormajor	Hungary	CentralEasternEurope	46.37	20.42	6641	thisStudy	Early Farmer
+StoneAgeAncient	NEO145	CentralEasternEurope	EarlyFarmer	9	3	2	Gorzsa Cukormajor	Hungary	CentralEasternEurope	46.37	20.42	6744	thisStudy	Early Farmer
+StoneAgeAncient	NEO147	CentralEasternEurope	EarlyFarmer	6	2	2	Gorzsa Cukormajor	Hungary	CentralEasternEurope	46.37	20.42	6724	thisStudy	Early Farmer
+StoneAgeAncient	NEO160	CentralEasternEurope	Hunter-GathererE	2	2	2	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	53	40.4	5269	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO163	CentralEasternEurope	Hunter-GathererE	9	3	0	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	53	40.4	5603	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO166	CentralEasternEurope	Hunter-GathererE	2	2	2	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	53	40.4	5668	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO167	CentralEasternEurope	Hunter-GathererE	2	2	2	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	53	40.4	5657	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO170	CentralEasternEurope	Hunter-GathererE	2	2	2	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	53	40.4	5562	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO171	CentralEasternEurope	Hunter-GathererE	3	2	1	Vasilyevskiy kordon 17	Russia	CentralEasternEurope	53	40.4	5835	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO173	CentralEasternEurope	Hunter-GathererE	11	2	1	Ksizovo 6	Russia	CentralEasternEurope	52.28	38.96	6345	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO174	CentralEasternEurope	Hunter-GathererE	7	2	1	Ksizovo 6	Russia	CentralEasternEurope	52.28	38.96	5306	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO175	CentralEasternEurope	Yamnaya	5	2	2	Ksizovo 6	Russia	CentralEasternEurope	52.28	38.96	4607	thisStudy	Yamnaya
+StoneAgeAncient	NEO178	CentralEasternEurope	Hunter-GathererE	2	2	1	Sakhtish II	Russia	CentralEasternEurope	56.78	40.45	5322	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO179	CentralEasternEurope	Hunter-GathererE	3	2	1	Sakhtish II	Russia	CentralEasternEurope	56.78	40.45	5467	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO17	NorthernEurope	Hunter-GathererE	5	2	1	Hummervikholmen	Norway	NorthernEurope	58.06	7.74	9146	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO180	CentralEasternEurope	Hunter-GathererE	7	2	2	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	5947	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO184	CentralEasternEurope	Hunter-GathererE	3	2	1	Sakhtish 8	Russia	CentralEasternEurope	56.78	40.44	5458	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO185	CentralEasternEurope	Hunter-GathererE	14	2	2	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	7034	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO186	CentralEasternEurope	Hunter-GathererE	7	2	1	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	6922	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO187	CentralEasternEurope	Hunter-GathererE	6	2	2	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	4940	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO189	CentralEasternEurope	Hunter-GathererE	4	2	2	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	5648	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO192	CentralEasternEurope	Hunter-GathererE	8	2	1	Sakhtish II	Russia	CentralEasternEurope	56.78	40.45	6841	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO193	CentralEasternEurope	Hunter-GathererE	10	2	1	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	5453	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO194	CentralEasternEurope	Hunter-GathererE	7	2	2	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	5575	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO195	CentralEasternEurope	Hunter-GathererE	6	2	2	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	5749	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO197	CentralEasternEurope	Hunter-GathererE	2	2	2	Sakhtish IIa	Russia	CentralEasternEurope	56.78	40.45	5245	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO19	NorthernEurope	Hunter-GathererW	12	2	1	R√∏ntesten	Denmark	NorthernEurope	56.27	10.47	8163	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO202	CentralEasternEurope	Hunter-GathererE	5	2	1	Peschanitsa	Russia	CentralEasternEurope	61.27	38.91	10884	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO220	NorthernEurope	Yamnaya	4	2	2	Falk√∂ping 5	Sweden	NorthernEurope	58.17	13.57	3989	thisStudy	Yamnaya
+StoneAgeAncient	NEO224	NorthernEurope	Yamnaya	5	2	2	Falk√∂ping 5	Sweden	NorthernEurope	58.17	13.57	3945	thisStudy	Yamnaya
+StoneAgeAncient	NEO225	NorthernEurope	Yamnaya	6	2	2	Falk√∂ping 5	Sweden	NorthernEurope	58.17	13.57	3750	thisStudy	Yamnaya
+StoneAgeAncient	NEO227	NorthernEurope	Yamnaya	6	2	2	Falk√∂ping 5	Sweden	NorthernEurope	58.17	13.57	3948	thisStudy	Yamnaya
+StoneAgeAncient	NEO228	NorthernEurope	Yamnaya	4	2	2	Falk√∂ping 5	Sweden	NorthernEurope	58.17	13.57	3843	thisStudy	Yamnaya
+StoneAgeAncient	NEO23	NorthernEurope	EarlyFarmer	7	2	2	Jorl√∂se mose	Denmark	NorthernEurope	55.6	11.31	5533	thisStudy	Early Farmer
+StoneAgeAncient	NEO254	NorthernEurope	Hunter-GathererW	6	2	2	Koelbjerg	Denmark	NorthernEurope	55.4	10.13	10463	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO25	NorthernEurope	EarlyFarmer	8	3	3	Kainsbakke II	Denmark	NorthernEurope	56.43	10.79	4956	thisStudy	Early Farmer
+StoneAgeAncient	NEO260	NorthernEurope	Hunter-GathererW	6	2	2	Evens√•s	Sweden	NorthernEurope	58.25	11.49	5825	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO261	NorthernEurope	Yamnaya	6	2	2	Sillvik	Sweden	NorthernEurope	57.74	11.74	3895	thisStudy	Yamnaya
+StoneAgeAncient	NEO270	CentralEasternEurope	Hunter-GathererE	4	2	1	Mamaj Gora	Ukraine	CentralEasternEurope	47.43	34.27	7297	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO27	NorthernEurope	Hunter-GathererE	3	2	2	Bredg√•rden	Sweden	NorthernEurope	57.74	13.4	9694	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO281	WesternAsia	EarlyFarmer	8	2	2	Kotias Klde	Georgia	WesternAsia	42.22	43.32	9724	thisStudy	Early Farmer
+StoneAgeAncient	NEO28	NorthernEurope	EarlyFarmer	14	2	2	Salpetermosen syd 8	Denmark	NorthernEurope	55.91	12.31	5459	thisStudy	Early Farmer
+StoneAgeAncient	NEO29	NorthernEurope	EarlyFarmer	8	2	2	Lohals	Denmark	NorthernEurope	55.13	10.9	5489	thisStudy	Early Farmer
+StoneAgeAncient	NEO300	CentralEasternEurope	Hunter-GathererE	6	2	2	Volnensky	Ukraine	CentralEasternEurope	47.95	35.39	6678	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO302	CentralEasternEurope	Hunter-GathererE	6	2	2	Volnensky	Ukraine	CentralEasternEurope	47.95	35.39	6826	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO304	CentralEasternEurope	Hunter-GathererE	7	2	1	Volnensky	Ukraine	CentralEasternEurope	47.95	35.39	7011	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO306	NorthernEurope	Yamnaya	8	2	2	Sope	Estonia	NorthernEurope	59.41	27.03	4472	thisStudy	Yamnaya
+StoneAgeAncient	NEO307	NorthernEurope	Hunter-GathererW	6	2	2	Zvejnieki	Latvia	NorthernEurope	57.78	25.23	7495	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO310	CentralAsia	EarlyFarmer	5	2	2	Monjukli-Depe	Turkmenistan	CentralAsia	36.85	60.42	7150	thisStudy	Early Farmer
+StoneAgeAncient	NEO39	NorthernEurope	EarlyFarmer	6	2	1	Hindby mosse	Sweden	NorthernEurope	55.57	13.04	5074	thisStudy	Early Farmer
+StoneAgeAncient	NEO43	NorthernEurope	EarlyFarmer	7	2	2	Rude	Denmark	NorthernEurope	55.99	10.25	5067	thisStudy	Early Farmer
+StoneAgeAncient	NEO44	NorthernEurope	Yamnaya	4	2	1	D√∂semarken	Sweden	NorthernEurope	55.56	12.95	4389	thisStudy	Yamnaya
+StoneAgeAncient	NEO498	CentralEasternEurope	Hunter-GathererE	4	2	2	Vovnigi	Ukraine	CentralEasternEurope	48.13	35.08	7059	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO501	CentralEasternEurope	Hunter-GathererE	6	2	2	Vasilevka-I	Ukraine	CentralEasternEurope	48.2	35.22	10623	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO502	CentralEasternEurope	Hunter-GathererE	3	2	1	Vovnigi	Ukraine	CentralEasternEurope	48.13	35.08	6610	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO503	CentralEasternEurope	Hunter-GathererE	10	2	2	Vovnigi	Ukraine	CentralEasternEurope	48.13	35.08	6708	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO507	CentralEasternEurope	Hunter-GathererE	8	2	3	Vovnigi	Ukraine	CentralEasternEurope	48.13	35.08	6885	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO509	CentralEasternEurope	Hunter-GathererE	8	2	2	Igren	Ukraine	CentralEasternEurope	48.4	35.16	4065	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO516	CentralEasternEurope	Hunter-GathererE	6	2	1	Igren	Ukraine	CentralEasternEurope	48.4	35.16	7095	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO518	CentralEasternEurope	Yamnaya	11	2	2	Igren	Ukraine	CentralEasternEurope	48.4	35.16	2156	thisStudy	Yamnaya
+StoneAgeAncient	NEO51	NorthernEurope	Yamnaya	11	2	2	Kastanjeg√•rden	Sweden	NorthernEurope	55.56	13.02	4361	thisStudy	Yamnaya
+StoneAgeAncient	NEO521	CentralEasternEurope	Hunter-GathererE	5	2	2	Igren	Ukraine	CentralEasternEurope	48.4	35.16	8264	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO528	CentralEasternEurope	Hunter-GathererE	5	2	1	Vovnigi	Ukraine	CentralEasternEurope	48.13	35.08	6839	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO52	NorthernEurope	Yamnaya	4	3	1	Vattenledningen	Sweden	NorthernEurope	55.5	13.01	3765	thisStudy	Yamnaya
+StoneAgeAncient	NEO536	CentralEasternEurope	Hunter-GathererE	3	2	2	Minino	Russia	CentralEasternEurope	59.7	39.5	9541	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO539	CentralEasternEurope	Hunter-GathererE	3	2	1	Minino	Russia	CentralEasternEurope	59.7	39.5	10060	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO552	CentralEasternEurope	Hunter-GathererE	5	2	1	Vovnigi	Ukraine	CentralEasternEurope	48.13	35.08	6898	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO555	CentralEasternEurope	Hunter-GathererE	4	2	2	Karavaikha	Russia	CentralEasternEurope	60.41	38.93	8280	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO556	CentralEasternEurope	Hunter-GathererE	8	2	1	Karavaikha	Russia	CentralEasternEurope	60.41	38.93	7036	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO560	CentralEasternEurope	Hunter-GathererE	6	2	2	Karavaikha	Russia	CentralEasternEurope	60.41	38.93	7919	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO563	NorthernEurope	Yamnaya	5	2	1	Bybjerg	Denmark	NorthernEurope	55.76	11.8	3350	thisStudy	Yamnaya
+StoneAgeAncient	NEO568	NorthernEurope	Hunter-GathererW	6	2	2	Erteb√∂lle	Denmark	NorthernEurope	56.81	9.18	6586	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO570	NorthernEurope	Hunter-GathererW	5	2	1	Fannerup E	Denmark	NorthernEurope	56.4	10.72	6369	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO583	NorthernEurope	Hunter-GathererW	4	2	2	Koed	Denmark	NorthernEurope	56.37	10.57	6981	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO586	NorthernEurope	Hunter-GathererW	4	2	2	Koed	Denmark	NorthernEurope	56.37	10.57	7031	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO590	NorthernEurope	Yamnaya	8	2	2	Magle√∂	Denmark	NorthernEurope	55.34	11.16	3290	thisStudy	Yamnaya
+StoneAgeAncient	NEO595	NorthernEurope	EarlyFarmer	8	2	2	Pandebjerg	Denmark	NorthernEurope	55.79	11.29	5452	thisStudy	Early Farmer
+StoneAgeAncient	NEO597	NorthernEurope	EarlyFarmer	5	2	0	Storelyng (√òg√•rde boat III)	Denmark	NorthernEurope	55.59	11.57	5210	thisStudy	Early Farmer
+StoneAgeAncient	NEO598	NorthernEurope	Hunter-GathererW	4	2	2	S√∂lager	Denmark	NorthernEurope	55.95	11.9	6075	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO599	NorthernEurope	EarlyFarmer	6	2	1	Vanl√∂se mose	Denmark	NorthernEurope	55.55	11.68	5134	thisStudy	Early Farmer
+StoneAgeAncient	NEO609	SouthernEurope	EarlyFarmer	10	2	1	Sao Paulo 2	Portugal	SouthernEurope	38.68	-9.16	4333	thisStudy	Early Farmer
+StoneAgeAncient	NEO624	WesternEurope	EarlyFarmer	10	2	2	Banks tomb	UK	WesternEurope	58.73	-2.94	4897	thisStudy	Early Farmer
+StoneAgeAncient	NEO626	WesternEurope	EarlyFarmer	5	3	2	Banks tomb	UK	WesternEurope	58.73	-2.94	5082	thisStudy	Early Farmer
+StoneAgeAncient	NEO627	WesternEurope	EarlyFarmer	7	2	2	Banks tomb	UK	WesternEurope	58.73	-2.94	5132	thisStudy	Early Farmer
+StoneAgeAncient	NEO630	WesternEurope	EarlyFarmer	4	2	2	Banks tomb	UK	WesternEurope	58.73	-2.94	4898	thisStudy	Early Farmer
+StoneAgeAncient	NEO631	SouthernEurope	EarlyFarmer	6	2	2	Gruta do Caldeirao	Portugal	SouthernEurope	39.65	-8.42	7139	thisStudy	Early Farmer
+StoneAgeAncient	NEO640	CentralEasternEurope	EarlyFarmer	2	2	2	Slonowice	Poland	CentralEasternEurope	50.27	20.45	4902	thisStudy	Early Farmer
+StoneAgeAncient	NEO641	CentralEasternEurope	EarlyFarmer	4	2	2	Slonowice	Poland	CentralEasternEurope	50.27	20.45	5132	thisStudy	Early Farmer
+StoneAgeAncient	NEO645	NorthernEurope	Hunter-GathererW	8	2	2	R√∂dhals	Denmark	NorthernEurope	55.91	11.09	5870	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO646	SouthernEurope	Hunter-GathererW	7	2	3	El Mazo	Spain	SouthernEurope	43.4	-4.71	8273	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO648	SouthernEurope	Hunter-GathererW	6	2	2	Toral III	Spain	SouthernEurope	43.4	-4.71	7539	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO649	SouthernEurope	Yamnaya	7	2	1	Toral III	Spain	SouthernEurope	43.4	-4.71	4117	thisStudy	Yamnaya
+StoneAgeAncient	NEO653	SouthernEurope	EarlyFarmer	5	2	2	Toral III	Spain	SouthernEurope	43.4	-4.71	3423	thisStudy	Early Farmer
+StoneAgeAncient	NEO655	CentralEasternEurope	EarlyFarmer	9	2	2	Vlasac	Serbia	CentralEasternEurope	44.54	22.04	8668	thisStudy	Early Farmer
+StoneAgeAncient	NEO658	CentralEasternEurope	Hunter-GathererW	6	2	2	Vlasac	Serbia	CentralEasternEurope	44.54	22.04	8668	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO669	CentralEasternEurope	Hunter-GathererW	9	2	2	Lepenski Vir	Serbia	CentralEasternEurope	44.56	22.03	7950	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO672	CentralEasternEurope	Hunter-GathererW	6	2	2	Schela Cladovei	Romania	CentralEasternEurope	44.64	22.66	8814	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO674	CentralEasternEurope	EarlyFarmer	8	2	2	Baile Herculane	Romania	CentralEasternEurope	44.9	22.43	5570	thisStudy	Early Farmer
+StoneAgeAncient	NEO679	NorthernEurope	Hunter-GathererW	6	2	3	Skateholm I	Sweden	NorthernEurope	55.39	13.48	6834	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO687	CentralEasternEurope	Hunter-GathererE	5	2	2	Kumyshanskaya Cave	Russia	CentralEasternEurope	57.58	58.2	5446	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO694	SouthernEurope	Hunter-GathererW	5	2	1	Santa Maira	Spain	SouthernEurope	38.73	-0.46	9217	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO695	SouthernEurope	EarlyFarmer	4	2	2	Maddalena	Italy	SouthernEurope	43.08	13.06	7299	thisStudy	Early Farmer
+StoneAgeAncient	NEO717	WesternEurope	EarlyFarmer	6	2	2	Banks tomb	UK	WesternEurope	58.73	-2.94	4893	thisStudy	Early Farmer
+StoneAgeAncient	NEO721	SouthernEurope	EarlyFarmer	9	2	2	Camino de las Yeseras	Spain	SouthernEurope	40.44	-3.5	4170	thisStudy	Early Farmer
+StoneAgeAncient	NEO735	NorthernEurope	Yamnaya	6	2	2	Borreby	Denmark	NorthernEurope	55.23	11.3	3972	thisStudy	Yamnaya
+StoneAgeAncient	NEO737	NorthernEurope	Yamnaya	6	2	2	Borreby	Denmark	NorthernEurope	55.23	11.3	4106	thisStudy	Yamnaya
+StoneAgeAncient	NEO738	NorthernEurope	Yamnaya	7	3	2	Kolind	Denmark	NorthernEurope	56.36	10.59	4103	thisStudy	Yamnaya
+StoneAgeAncient	NEO744	NorthernEurope	EarlyFarmer	7	2	2	Femh√∏ve	Denmark	NorthernEurope	55.86	11.59	5333	thisStudy	Early Farmer
+StoneAgeAncient	NEO745	NorthernEurope	Hunter-GathererW	8	2	1	Henriksholm-B√∏gebakken (Vedb√¶k)	Denmark	NorthernEurope	55.85	12.56	6790	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO751	NorthernEurope	Hunter-GathererW	6	2	1	Bj√∏rnsholm	Denmark	NorthernEurope	56.87	9.22	6343	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO753	NorthernEurope	EarlyFarmer	9	2	2	Sigersdal Mose 2	Denmark	NorthernEurope	55.77	12.21	5531	thisStudy	Early Farmer
+StoneAgeAncient	NEO757	NorthernEurope	EarlyFarmer	10	3	4	Sejerby (Sejer√∏)	Denmark	NorthernEurope	55.9	11.12	5452	thisStudy	Early Farmer
+StoneAgeAncient	NEO759	NorthernEurope	Hunter-GathererW	5	2	1	K√∏ge S√∏nakke	Denmark	NorthernEurope	55.4	12.37	9028	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO790	NorthernEurope	EarlyFarmer	6	2	2	Tysmose	Denmark	NorthernEurope	55.71	12.27	5663	thisStudy	Early Farmer
+StoneAgeAncient	NEO806	SouthernEurope	EarlyFarmer	6	2	2	Grotta Delle Mura	Italy	SouthernEurope	40.96	17.29	3015	thisStudy	Early Farmer
+StoneAgeAncient	NEO816	WesternAsia	EarlyFarmer	13	2	2	Tepe Guran	Iran	WesternAsia	33.76	47.1	8700	thisStudy	Early Farmer
+StoneAgeAncient	NEO823	SouthernEurope	EarlyFarmer	7	3	2	Grotta Nisco	Italy	SouthernEurope	40.88	16.73	4665	thisStudy	Early Farmer
+StoneAgeAncient	NEO830	SouthernEurope	EarlyFarmer	14	2	1	Fontenoce	Italy	SouthernEurope	43.38	13.55	5393	thisStudy	Early Farmer
+StoneAgeAncient	NEO852	NorthernEurope	Hunter-GathererW	5	2	2	Norsminde	Denmark	NorthernEurope	56.03	10.26	6308	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO855	NorthernEurope	Hunter-GathererW	4	2	0	Fannerup D	Denmark	NorthernEurope	56.4	10.72	6302	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO856	NorthernEurope	Hunter-GathererW	8	2	1	Nederst	Denmark	NorthernEurope	56.37	10.64	6777	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO860	NorthernEurope	Yamnaya	6	2	1	Mosede Mose	Denmark	NorthernEurope	55.58	12.28	3697	thisStudy	Yamnaya
+StoneAgeAncient	NEO861	NorthernEurope	Yamnaya	6	2	2	Mosede Mose	Denmark	NorthernEurope	55.58	12.28	4102	thisStudy	Yamnaya
+StoneAgeAncient	NEO870	NorthernEurope	Yamnaya	7	2	3	Toftum mose	Denmark	NorthernEurope	55.9	9.99	4240	thisStudy	Yamnaya
+StoneAgeAncient	NEO875	NorthernEurope	Yamnaya	9	2	2	Toftum mose	Denmark	NorthernEurope	55.9	9.99	3970	thisStudy	Yamnaya
+StoneAgeAncient	NEO878	NorthernEurope	Yamnaya	2	2	2	Kyndel√∏se	Denmark	NorthernEurope	55.7	11.86	4026	thisStudy	Yamnaya
+StoneAgeAncient	NEO87	CentralEasternEurope	Hunter-GathererE	3	2	1	Zamostye 2	Russia	CentralEasternEurope	56.67	38.02	8259	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO886	NorthernEurope	EarlyFarmer	4	2	2	Dalmosegaard	Denmark	NorthernEurope	54.99	12.42	5457	thisStudy	Early Farmer
+StoneAgeAncient	NEO88	CentralEasternEurope	Hunter-GathererE	5	2	1	Zamostye 2	Russia	CentralEasternEurope	56.67	38.02	7871	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO891	NorthernEurope	EarlyFarmer	12	2	2	Roskilde Fjord (syd for Jyllinge)	Denmark	NorthernEurope	55.73	12.1	5661	thisStudy	Early Farmer
+StoneAgeAncient	NEO896	NorthernEurope	EarlyFarmer	6	2	3	Mandemarke	Denmark	NorthernEurope	54.97	12.49	5446	thisStudy	Early Farmer
+StoneAgeAncient	NEO898	NorthernEurope	Hunter-GathererE	4	2	2	Svinninge Vejle	Denmark	NorthernEurope	55.74	11.43	5080	thisStudy	Hunter-Gatherer (E)
+StoneAgeAncient	NEO91	NorthernEurope	Hunter-GathererW	7	2	2	Str√∏by Gr√∏ftemark	Denmark	NorthernEurope	55.39	12.31	9122	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO925	NorthernEurope	EarlyFarmer	6	3	2	Myrebjerg mose	Denmark	NorthernEurope	54.77	10.68	4947	thisStudy	Early Farmer
+StoneAgeAncient	NEO92	NorthernEurope	Yamnaya	9	2	2	Barh√∏j (Str√∏by Egede)	Denmark	NorthernEurope	55.4	12.27	4188	thisStudy	Yamnaya
+StoneAgeAncient	NEO933	NorthernEurope	EarlyFarmer	6	2	3	Sludeg√•rd S√∏mose	Denmark	NorthernEurope	55.25	10.75	5337	thisStudy	Early Farmer
+StoneAgeAncient	NEO938	SouthernEurope	Hunter-GathererW	3	2	1	El Mazo	Spain	SouthernEurope	43.4	-4.71	7878	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO93	NorthernEurope	Yamnaya	7	2	2	Str√∏by Ladeplads	Denmark	NorthernEurope	55.41	12.29	3735	thisStudy	Yamnaya
+StoneAgeAncient	NEO941	NorthernEurope	Hunter-GathererW	4	2	3	Havn√∏	Denmark	NorthernEurope	56.71	10.17	6372	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	NEO943	NorthernEurope	EarlyFarmer	6	2	2	Stenderup Hage	Denmark	NorthernEurope	55.46	9.69	4614	thisStudy	Early Farmer
+StoneAgeAncient	NEO945	NorthernEurope	EarlyFarmer	2	2	2	L√¶sten Mose	Denmark	NorthernEurope	56.49	9.83	5445	thisStudy	Early Farmer
+StoneAgeAncient	NEO951	NorthernEurope	Yamnaya	4	2	2	Kl√¶strup Holm Mose	Denmark	NorthernEurope	57.29	10.03	3242	thisStudy	Yamnaya
+StoneAgeAncient	NEO960	NorthernEurope	Hunter-GathererW	4	2	2	Ravnsbjergg√•rd II	Denmark	NorthernEurope	55.58	11.58	5926	thisStudy	Hunter-Gatherer (W)
+StoneAgeAncient	RISE109	CentralEasternEurope	Yamnaya	6	2	1	Wojkowice	Poland	CentralEasternEurope	50.98	17.07	3813	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE154	CentralEasternEurope	Yamnaya	6	3	2	Szczepankowice	Poland	CentralEasternEurope	50.95	16.94	3795	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE174	NorthernEurope	Yamnaya	7	2	1	Oxie 7	Sweden	NorthernEurope	55.55	13.1	1431	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE240	CentralEasternEurope	Yamnaya	8	2	1	Sukhaya Termista I	Russia	CentralEasternEurope	46.58	43.68	4706	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE247	CentralEasternEurope	EarlyFarmer	9	2	2	Sz√°zhalombatta-F√∂ldv√°r	Hungary	CentralEasternEurope	47.33	18.96	3628.5	Allentoft_Nature_2015	Early Farmer
+StoneAgeAncient	RISE373	CentralEasternEurope	EarlyFarmer	6	3	5	Sz√∂reg, Sziv Utca	Hungary	CentralEasternEurope	46.22	20.2	3741	Allentoft_Nature_2015	Early Farmer
+StoneAgeAncient	RISE374	CentralEasternEurope	EarlyFarmer	3	2	1	Sz√∂reg, Sziv Utca	Hungary	CentralEasternEurope	46.22	20.2	3692.5	Allentoft_Nature_2015	Early Farmer
+StoneAgeAncient	RISE397	WesternAsia	Yamnaya	9	2	3	Kapan	Armenia	WesternAsia	39.2	46.4	2901.5	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE407	WesternAsia	EarlyFarmer	8	2	2	Norabak	Armenia	WesternAsia	40.15	45.86	2955	Allentoft_Nature_2015	Early Farmer
+StoneAgeAncient	RISE446	WesternEurope	Yamnaya	4	2	2	Bergrheinfeld	Germany	WesternEurope	50.01	10.18	4597	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE479	CentralEasternEurope	Yamnaya	10	3	3	Erd 4	Hungary	CentralEasternEurope	47.34	18.9	3700	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE480	CentralEasternEurope	EarlyFarmer	12	2	2	Erd 4	Hungary	CentralEasternEurope	47.34	18.9	3550	Allentoft_Nature_2015	Early Farmer
+StoneAgeAncient	RISE484	CentralEasternEurope	EarlyFarmer	8	2	2	Erd 4	Hungary	CentralEasternEurope	47.34	18.9	3700	Allentoft_Nature_2015	Early Farmer
+StoneAgeAncient	RISE494	NorthAsia	Yamnaya	13	2	2	Sabinka 2	Russia	NorthAsia	53.15	91.05	3292	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE499	NorthAsia	Yamnaya	7	2	2	Bystrovka	Russia	NorthAsia	51.91	88.57	3100	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE500	NorthAsia	Yamnaya	5	2	2	Kytmanovo	Russia	NorthAsia	53.46	85.45	3550	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE503	NorthAsia	Yamnaya	4	2	2	Kytmanovo	Russia	NorthAsia	53.46	85.45	3569	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE507	NorthAsia	Yamnaya	5	2	0	River Kuyum	Russia	NorthAsia	51.5	85.97	5077	Allentoft_2015_Nature	Yamnaya
+StoneAgeAncient	RISE510	NorthAsia	Yamnaya	11	2	2	Middle Yenisei region, Afanasieva Gora	Russia	NorthAsia	54.36	90.92	4609.5	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE523	CentralEasternEurope	Yamnaya	5	2	2	Kapova cave	Russia	CentralEasternEurope	53.04	57.07	3448	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE525	CentralEasternEurope	Yamnaya	9	2	2	Kapova cave	Russia	CentralEasternEurope	53.04	57.07	3000	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE546	CentralEasternEurope	Yamnaya	6	2	3	Temrta IV	Russia	CentralEasternEurope	46.54	43.7	4850	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE547	CentralEasternEurope	Yamnaya	15	3	5	Temrta IV	Russia	CentralEasternEurope	46.54	43.7	4710.5	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE548	CentralEasternEurope	Yamnaya	13	2	3	Temrta IV	Russia	CentralEasternEurope	46.54	43.7	4850	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE550	CentralEasternEurope	Yamnaya	9	2	2	Peshany V	Russia	CentralEasternEurope	46.56	43.68	4934.5	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE555	CentralEasternEurope	Yamnaya	6	2	4	Stalingrad Quarry	Russia	CentralEasternEurope	48.72	44.5	4627	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE559	WesternEurope	EarlyFarmer	9	3	2	Augsburg	Germany	WesternEurope	48.33	10.9	4284	Allentoft_Nature_2015	Early Farmer
+StoneAgeAncient	RISE563	WesternEurope	Yamnaya	8	2	1	Osterhofen-Altenmarkt	Germany	WesternEurope	48.69	13.02	4492	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE566	CentralEasternEurope	Yamnaya	8	2	2	Knezeves	CzechRepublic	CentralEasternEurope	50.12	14.26	4106	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE569	CentralEasternEurope	Yamnaya	8	3	3	Brandysek	CzechRepublic	CentralEasternEurope	50.19	14.16	1235	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE577	CentralEasternEurope	Yamnaya	7	2	2	Velk√© P≈ô√≠lepy	CzechRepublic	CentralEasternEurope	50.17	14.32	4000	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE586	CentralEasternEurope	Yamnaya	7	2	2	Moravsk√° Nov√° Ves	CzechRepublic	CentralEasternEurope	48.8	17.02	4000	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE71	NorthernEurope	Yamnaya	6	2	2	Falsh√∂j	Denmark	NorthernEurope	56.68	10.03	4059.5	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE94	NorthernEurope	Yamnaya	5	2	3	Viby	Sweden	NorthernEurope	56.03	14.23	4496.5	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	RISE97	NorthernEurope	Yamnaya	11	2	2	Fredriksberg	Sweden	NorthernEurope	55.56	13.06	3905	Allentoft_Nature_2015	Yamnaya
+StoneAgeAncient	VK113	NorthernEurope	Yamnaya	4	2	1	Trondheim	Norway	NorthernEurope	63.43	10.39	650	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK114	NorthernEurope	Yamnaya	6	2	3	Trondheim	Norway	NorthernEurope	63.43	10.39	650	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK117	NorthernEurope	Yamnaya	16	6	6	Trondheim	Norway	NorthernEurope	63.43	10.39	650	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK118	NorthernEurope	Yamnaya	10	2	2	Trondheim	Norway	NorthernEurope	63.43	10.39	650	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK122	NorthernEurope	Yamnaya	5	2	1	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK123	NorthernEurope	Yamnaya	6	2	2	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK124	NorthernEurope	Yamnaya	6	2	1	Trondheim	Norway	NorthernEurope	63.43	10.39	650	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK127	NorthernEurope	Yamnaya	10	2	2	Iceland	Iceland	NorthernEurope	65.71	-23.75	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK128	NorthernEurope	Yamnaya	8	2	2	Iceland	Iceland	NorthernEurope	65.71	-23.75	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK129	NorthernEurope	Yamnaya	6	2	2	Iceland	Iceland	NorthernEurope	65.79	-17.34	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK134	NorthernEurope	Yamnaya	4	2	1	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK138	NorthernEurope	Yamnaya	11	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK139	NorthernEurope	Yamnaya	4	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK141	NorthernEurope	Yamnaya	10	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK143	WesternEurope	Yamnaya	6	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK144	WesternEurope	Yamnaya	4	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK145	WesternEurope	Yamnaya	8	3	3	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK146	WesternEurope	Yamnaya	4	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK147	WesternEurope	Yamnaya	8	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK14	CentralEasternEurope	Yamnaya	4	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK150	WesternEurope	Yamnaya	10	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK151	WesternEurope	Yamnaya	2	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK156	CentralEasternEurope	Yamnaya	4	2	1	Bodzia	Poland	CentralEasternEurope	52.7	18.9	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK159	CentralEasternEurope	Yamnaya	2	2	1	Pskov	Russia	CentralEasternEurope	57.81	28.34	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK15	CentralEasternEurope	Yamnaya	5	3	3	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK160	CentralEasternEurope	Yamnaya	7	2	1	Kurevanikka	Russia	CentralEasternEurope	58.78	36.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK165	WesternEurope	Yamnaya	4	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK166	WesternEurope	Yamnaya	10	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK168	WesternEurope	Yamnaya	13	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK16	CentralEasternEurope	Yamnaya	4	2	0	Ladoga	Russia	CentralEasternEurope	60	32.3	839	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK170	WesternEurope	Yamnaya	10	4	4	Balladoole	UK	WesternEurope	54.08	-4.68	950	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK171	WesternEurope	Yamnaya	2	3	2	Cardiff	UK	WesternEurope	53.3	-4.22	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK172	WesternEurope	Yamnaya	7	2	1	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK173	WesternEurope	Yamnaya	6	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK174	WesternEurope	Yamnaya	2	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK175	WesternEurope	Yamnaya	13	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK177	WesternEurope	Yamnaya	10	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK178	WesternEurope	Yamnaya	10	2	2	Oxford	UK	WesternEurope	51.76	-1.26	1010	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK179	NorthernEurope	Yamnaya	10	3	2	Greenland	Greenland	NorthernEurope	61.18	-45.68	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK17	CentralEasternEurope	Yamnaya	6	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK183	NorthernEurope	Yamnaya	8	2	1	Greenland	Greenland	NorthernEurope	61.18	-45.68	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK184	NorthernEurope	Yamnaya	6	2	2	Greenland	Greenland	NorthernEurope	61.18	-45.68	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK186	NorthernEurope	Yamnaya	5	2	1	Greenland	Greenland	NorthernEurope	60.99	-45.42	903	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK187	NorthernEurope	Yamnaya	4	2	2	Greenland	Greenland	NorthernEurope	60.99	-45.42	849	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK18	CentralEasternEurope	Yamnaya	7	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK19	CentralEasternEurope	Yamnaya	9	2	3	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK201	WesternEurope	Yamnaya	10	2	2	Orkney_Buckquoy	UK	WesternEurope	59.13	-3.32	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK202	WesternEurope	Yamnaya	10	3	4	Orkney_Buckquoy	UK	WesternEurope	59.13	-3.32	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK203	WesternEurope	Yamnaya	7	2	2	Orkney	UK	WesternEurope	59.13	-3.32	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK204	WesternEurope	Yamnaya	5	2	1	Orkney_Newark	UK	WesternEurope	58.93	-2.75	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK205	WesternEurope	Yamnaya	4	2	3	Orkney_Newark	UK	WesternEurope	58.93	-2.75	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK207	WesternEurope	Yamnaya	6	2	2	Orkney	UK	WesternEurope	59.13	-3.32	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK20	CentralEasternEurope	Yamnaya	8	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	888	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK211	CentralEasternEurope	Yamnaya	6	2	2	Cedynia	Poland	CentralEasternEurope	52.88	14.2	700	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK212	CentralEasternEurope	Yamnaya	7	2	1	Cedynia	Poland	CentralEasternEurope	52.88	14.2	889	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK213	NorthernEurope	Yamnaya	6	2	3	Gerdrup	Denmark	NorthernEurope	55.73	12.12	1491	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK214	NorthernEurope	Yamnaya	5	2	2	Gerdrup	Denmark	NorthernEurope	55.73	12.12	3782	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK217	NorthernEurope	Yamnaya	6	2	2	Ljungbacka	Sweden	NorthernEurope	55.54	13.05	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK218	CentralEasternEurope	Yamnaya	4	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK219	CentralEasternEurope	Yamnaya	4	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	958	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK21	CentralEasternEurope	Yamnaya	4	3	4	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK221	CentralEasternEurope	Yamnaya	10	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	1039	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK223	CentralEasternEurope	Yamnaya	4	3	2	Gnezdovo	Russia	CentralEasternEurope	54.78	31.87	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK224	CentralEasternEurope	Yamnaya	6	2	2	Gnezdovo	Russia	CentralEasternEurope	54.78	31.87	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK225	NorthernEurope	Yamnaya	10	2	2	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK227	NorthernEurope	Yamnaya	5	2	1	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK22	CentralEasternEurope	Yamnaya	6	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK230	NorthernEurope	Yamnaya	3	2	1	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK232	NorthernEurope	Yamnaya	7	2	1	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK237	NorthernEurope	Yamnaya	6	2	2	Faroe	Faroes	NorthernEurope	61.85	-6.8	250	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK238	NorthernEurope	Yamnaya	4	2	2	Faroe	Faroes	NorthernEurope	61.85	-6.8	250	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK23	CentralEasternEurope	Yamnaya	6	2	3	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK241	NorthernEurope	Yamnaya	4	2	2	Faroe	Faroes	NorthernEurope	61.85	-6.8	250	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK244	NorthernEurope	Yamnaya	12	2	2	Faroe	Faroes	NorthernEurope	61.85	-6.8	250	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK24	NorthernEurope	Yamnaya	8	3	2	Faroe	Faroes	NorthernEurope	61.6	-6.96	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK254	CentralEasternEurope	Yamnaya	6	2	2	Gnezdovo	Russia	CentralEasternEurope	54.78	31.87	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK256	WesternEurope	Yamnaya	11	3	3	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK257	WesternEurope	Yamnaya	6	2	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK258	WesternEurope	Yamnaya	6	2	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK259	WesternEurope	Yamnaya	4	3	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK260	WesternEurope	Yamnaya	6	2	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK261	WesternEurope	Yamnaya	10	2	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK262	WesternEurope	Yamnaya	6	2	1	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK263	WesternEurope	Yamnaya	10	2	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK264	WesternEurope	Yamnaya	10	2	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK265	NorthernEurope	Yamnaya	6	2	2	Karda	Sweden	NorthernEurope	57.18	13.93	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK266	NorthernEurope	Yamnaya	8	2	2	Karda	Sweden	NorthernEurope	57.18	13.93	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK268	NorthernEurope	Yamnaya	6	2	3	Karda	Sweden	NorthernEurope	57.18	13.93	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK272	CentralEasternEurope	Yamnaya	6	2	1	Gnezdovo	Russia	CentralEasternEurope	54.78	31.87	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK273	CentralEasternEurope	Yamnaya	9	2	3	Gnezdovo	Russia	CentralEasternEurope	54.78	31.87	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK274	NorthernEurope	Yamnaya	6	2	2	Kaargarden	Denmark	NorthernEurope	54.85	10.78	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK275	NorthernEurope	Yamnaya	8	2	3	Kaargarden	Denmark	NorthernEurope	54.85	10.78	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK276	NorthernEurope	Yamnaya	11	2	0	Kaargarden	Denmark	NorthernEurope	54.85	10.78	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK278	NorthernEurope	Yamnaya	6	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK279	NorthernEurope	Yamnaya	11	3	3	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK27	NorthernEurope	Yamnaya	8	3	3	Faroe	Faroes	NorthernEurope	61.85	-6.8	250	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK280	NorthernEurope	Yamnaya	8	2	3	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK281	NorthernEurope	Yamnaya	4	2	2	Barse	Denmark	NorthernEurope	55.13	11.95	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK282	NorthernEurope	Yamnaya	6	2	2	Stengade	Denmark	NorthernEurope	54.96	10.83	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK284	NorthernEurope	Yamnaya	5	3	3	Grydehoj	Denmark	NorthernEurope	55.65	12.14	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK285	NorthernEurope	Yamnaya	6	2	2	Kaargarden	Denmark	NorthernEurope	54.85	10.78	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK286	NorthernEurope	Yamnaya	17	2	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK287	NorthernEurope	Yamnaya	4	2	2	Kaargarden	Denmark	NorthernEurope	54.85	10.78	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK288	NorthernEurope	Yamnaya	4	2	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK289	NorthernEurope	Yamnaya	8	2	2	Bodkergarden	Denmark	NorthernEurope	54.8	10.69	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK290	NorthernEurope	Yamnaya	6	2	2	Kumle	Denmark	NorthernEurope	54.89	10.74	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK291	NorthernEurope	Yamnaya	10	2	2	Bodkergarden	Denmark	NorthernEurope	54.8	10.69	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK292	NorthernEurope	Yamnaya	4	2	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK294	NorthernEurope	Yamnaya	9	2	2	Bakkendrup	Denmark	NorthernEurope	55.56	11.25	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK295	NorthernEurope	Yamnaya	6	2	2	Hessum	Denmark	NorthernEurope	55.51	10.45	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK296	NorthernEurope	Yamnaya	6	2	2	Hundstrup	Denmark	NorthernEurope	55.15	11.87	1230	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK297	NorthernEurope	Yamnaya	4	2	2	Hundstrup	Denmark	NorthernEurope	55.15	11.87	1200	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK298	NorthernEurope	Yamnaya	5	2	2	Besser	Denmark	NorthernEurope	55.85	10.64	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK300	NorthernEurope	Yamnaya	7	2	2	Hesselbjerg	Denmark	NorthernEurope	55.95	10.2	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK301	NorthernEurope	Yamnaya	7	3	3	Ladby	Denmark	NorthernEurope	55.43	10.61	1185	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK303	NorthernEurope	Yamnaya	8	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK306	NorthernEurope	Yamnaya	5	3	3	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK308	NorthernEurope	Yamnaya	8	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK309	NorthernEurope	Yamnaya	11	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK30	NorthernEurope	Yamnaya	10	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK312	NorthernEurope	Yamnaya	8	2	3	Rantzausminde	Denmark	NorthernEurope	55.05	10.53	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK313	NorthernEurope	Yamnaya	4	2	1	Rantzausminde	Denmark	NorthernEurope	55.05	10.53	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK314	NorthernEurope	Yamnaya	7	2	2	Rantzausminde	Denmark	NorthernEurope	55.05	10.53	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK315	NorthernEurope	Yamnaya	3	2	2	Bakkendrup	Denmark	NorthernEurope	55.56	11.25	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK316	NorthernEurope	Yamnaya	4	2	2	Hessum	Denmark	NorthernEurope	55.51	10.45	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK317	NorthernEurope	Yamnaya	10	2	2	Kaargarden	Denmark	NorthernEurope	54.85	10.78	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK319	NorthernEurope	Yamnaya	8	3	3	Ladby	Denmark	NorthernEurope	55.43	10.61	1150	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK31	NorthernEurope	Yamnaya	12	3	3	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK320	NorthernEurope	Yamnaya	6	2	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK322	NorthernEurope	Yamnaya	6	2	2	Ribe	Denmark	NorthernEurope	55.33	8.76	866	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK323	NorthernEurope	Yamnaya	11	2	3	Ribe	Denmark	NorthernEurope	55.33	8.76	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK324	NorthernEurope	Yamnaya	12	2	2	Ribe	Denmark	NorthernEurope	55.33	8.76	938	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK325	NorthernEurope	Yamnaya	10	2	2	Ribe	Denmark	NorthernEurope	55.33	8.76	1091	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK326	NorthernEurope	Yamnaya	9	3	3	Ribe	Denmark	NorthernEurope	55.33	8.76	958	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK327	NorthernEurope	Yamnaya	6	2	2	Ribe	Denmark	NorthernEurope	55.33	8.76	945	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK328	NorthernEurope	Yamnaya	9	2	1	Ribe	Denmark	NorthernEurope	55.33	8.76	1079	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK330	NorthernEurope	Yamnaya	8	2	2	Ribe	Denmark	NorthernEurope	55.33	8.76	861	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK332	NorthernEurope	Yamnaya	10	2	2	Oland	Sweden	NorthernEurope	56.42	16.43	1092	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK333	NorthernEurope	Yamnaya	7	2	1	Oland	Sweden	NorthernEurope	56.58	16.46	1065	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK334	NorthernEurope	Yamnaya	13	2	2	Oland	Sweden	NorthernEurope	56.81	16.73	901	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK335	NorthernEurope	Yamnaya	10	3	3	Oland	Sweden	NorthernEurope	56.73	16.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK336	NorthernEurope	Yamnaya	4	2	2	Oland	Sweden	NorthernEurope	56.81	16.73	1097	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK337	NorthernEurope	Yamnaya	8	2	2	Oland	Sweden	NorthernEurope	56.48	16.58	1092	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK338	NorthernEurope	Yamnaya	9	2	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK340	NorthernEurope	Yamnaya	4	2	1	Hesselbjerg	Denmark	NorthernEurope	55.95	10.2	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK342	NorthernEurope	Yamnaya	8	2	2	Oland	Sweden	NorthernEurope	56.44	16.57	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK343	NorthernEurope	Yamnaya	8	2	2	Oland	Sweden	NorthernEurope	56.55	16.62	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK344	NorthernEurope	Yamnaya	8	2	2	Oland	Sweden	NorthernEurope	56.33	16.41	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK345	NorthernEurope	EarlyFarmer	12	2	2	Oland	Sweden	NorthernEurope	56.73	16.72	900	Margyaran_2020_Nature	Early Farmer
+StoneAgeAncient	VK346	NorthernEurope	Yamnaya	4	2	2	Oland	Sweden	NorthernEurope	56.73	16.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK348	NorthernEurope	Yamnaya	4	2	2	Oland	Sweden	NorthernEurope	56.88	16.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK349	NorthernEurope	Yamnaya	6	2	2	Oland	Sweden	NorthernEurope	56.46	16.43	1121	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK34	NorthernEurope	Yamnaya	6	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK350	NorthernEurope	Yamnaya	11	2	3	Oland	Sweden	NorthernEurope	56.73	16.72	1151	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK352	NorthernEurope	Yamnaya	6	2	2	Oland	Sweden	NorthernEurope	56.72	16.71	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK353	NorthernEurope	Yamnaya	5	2	1	Oland	Sweden	NorthernEurope	56.42	16.43	901	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK354	NorthernEurope	Yamnaya	5	3	2	Oland	Sweden	NorthernEurope	56.44	16.57	964	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK355	NorthernEurope	Yamnaya	8	2	2	Oland	Sweden	NorthernEurope	56.29	16.41	1102	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK357	NorthernEurope	Yamnaya	7	2	3	Oland	Sweden	NorthernEurope	56.42	16.43	897	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK358	NorthernEurope	Yamnaya	8	2	2	Oland	Sweden	NorthernEurope	56.81	16.73	1097	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK35	NorthernEurope	Yamnaya	6	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK361	NorthernEurope	Yamnaya	7	3	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK362	NorthernEurope	Yamnaya	10	2	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK363	NorthernEurope	Yamnaya	11	3	3	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK364	NorthernEurope	Yamnaya	4	2	2	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK365	NorthernEurope	Yamnaya	10	2	1	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK366	NorthernEurope	Yamnaya	5	2	1	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK367	NorthernEurope	Yamnaya	7	3	3	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK368	NorthernEurope	Yamnaya	12	3	3	Bogovej	Denmark	NorthernEurope	54.87	10.72	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK369	NorthernEurope	Yamnaya	6	2	2	Bakkendrup	Denmark	NorthernEurope	55.56	11.25	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK370	NorthernEurope	Yamnaya	4	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK371	NorthernEurope	Yamnaya	10	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	1065	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK372	NorthernEurope	Yamnaya	6	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK373	NorthernEurope	Yamnaya	13	3	3	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK380	NorthernEurope	Yamnaya	7	2	4	Oland	Sweden	NorthernEurope	57.34	17.02	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK384	NorthernEurope	Yamnaya	8	2	2	Hesselbjerg	Denmark	NorthernEurope	55.95	10.2	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK386	NorthernEurope	Yamnaya	6	2	2	Oppland	Norway	NorthernEurope	62.09	9.05	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK387	NorthernEurope	Yamnaya	12	2	2	Oppland	Norway	NorthernEurope	60.31	10.43	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK388	NorthernEurope	Yamnaya	10	2	2	Nordland	Norway	NorthernEurope	68.34	15.66	700	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK389	NorthernEurope	Yamnaya	6	2	2	Telemark	Norway	NorthernEurope	59.22	9.61	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK390	NorthernEurope	Yamnaya	4	2	2	Telemark	Norway	NorthernEurope	59.22	9.59	1350	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK391	NorthernEurope	Yamnaya	10	2	3	Telemark	Norway	NorthernEurope	59.22	9.59	1350	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK392	NorthernEurope	Yamnaya	7	3	3	Telemark	Norway	NorthernEurope	59.58	7.92	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK393	NorthernEurope	Yamnaya	7	2	1	Hedmark	Norway	NorthernEurope	60.84	11	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK394	NorthernEurope	Yamnaya	4	2	2	Hedmark	Norway	NorthernEurope	61.15	11.34	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK395	NorthernEurope	Yamnaya	10	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK396	NorthernEurope	Yamnaya	9	2	1	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK397	NorthernEurope	Yamnaya	8	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK398	NorthernEurope	Yamnaya	8	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK399	NorthernEurope	Yamnaya	6	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK39	NorthernEurope	Yamnaya	10	3	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK400	NorthernEurope	Yamnaya	5	2	1	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK401	NorthernEurope	Yamnaya	6	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK402	NorthernEurope	Yamnaya	6	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK403	NorthernEurope	Yamnaya	8	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK404	NorthernEurope	Yamnaya	10	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK405	NorthernEurope	Yamnaya	8	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK406	NorthernEurope	Yamnaya	5	3	3	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK407	NorthernEurope	Yamnaya	6	2	1	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK408	CentralEasternEurope	Yamnaya	6	2	2	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK409	CentralEasternEurope	Yamnaya	6	2	1	Ladoga	Russia	CentralEasternEurope	60	32.3	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK40	NorthernEurope	Yamnaya	7	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK410	CentralEasternEurope	Yamnaya	7	4	5	Ladoga	Russia	CentralEasternEurope	60	32.3	843	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK414	NorthernEurope	Yamnaya	8	2	2	Oppland	Norway	NorthernEurope	61.88	8.4	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK417	NorthernEurope	Yamnaya	10	2	2	Oppland	Norway	NorthernEurope	60.36	10.57	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK418	NorthernEurope	Yamnaya	6	2	2	Nordland	Norway	NorthernEurope	67.94	14.98	1500	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK420	NorthernEurope	Yamnaya	5	2	1	Hedmark	Norway	NorthernEurope	60.8	11.1	950	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK422	NorthernEurope	Yamnaya	6	2	2	Hedmark	Norway	NorthernEurope	61.15	11.34	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK424	NorthernEurope	Yamnaya	9	2	3	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK425	NorthernEurope	Yamnaya	6	2	1	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK426	NorthernEurope	Yamnaya	8	2	2	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK427	NorthernEurope	Yamnaya	5	3	0	Skara	Sweden	NorthernEurope	58.38	13.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK428	NorthernEurope	Yamnaya	5	2	1	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK429	NorthernEurope	Yamnaya	8	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK430	NorthernEurope	Yamnaya	7	2	3	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK431	NorthernEurope	Yamnaya	6	2	3	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK432	NorthernEurope	Yamnaya	3	2	1	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK433	NorthernEurope	Yamnaya	7	2	1	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK434	NorthernEurope	Yamnaya	6	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK438	NorthernEurope	Yamnaya	7	2	3	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK439	NorthernEurope	Yamnaya	6	2	3	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK442	NorthernEurope	Yamnaya	6	2	2	Oland	Sweden	NorthernEurope	56.42	16.43	1102	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK443	NorthernEurope	Yamnaya	6	2	2	Oland	Sweden	NorthernEurope	57.34	17.02	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK444	NorthernEurope	Yamnaya	4	2	2	Oland	Sweden	NorthernEurope	56.42	16.43	1102	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK445	NorthernEurope	Yamnaya	12	2	2	Lejre	Denmark	NorthernEurope	55.62	11.97	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK446	NorthernEurope	Yamnaya	4	2	2	Galgedil	Denmark	NorthernEurope	55.5	10.33	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK448	NorthernEurope	Yamnaya	10	3	3	Hedmark	Norway	NorthernEurope	60.8	10.87	950	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK449	WesternEurope	Yamnaya	10	2	2	Dorset	UK	WesternEurope	50.67	-2.47	953	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK44	NorthernEurope	Yamnaya	6	2	2	Faroe	Faroes	NorthernEurope	61.85	-6.8	250	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK450	NorthernEurope	Yamnaya	10	2	1	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK452	NorthernEurope	Yamnaya	11	2	3	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK453	NorthernEurope	Yamnaya	4	2	1	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK454	NorthernEurope	Yamnaya	6	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK455	NorthernEurope	Yamnaya	6	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK456	NorthernEurope	Yamnaya	6	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK457	NorthernEurope	Yamnaya	6	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK458	NorthernEurope	Yamnaya	10	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK459	NorthernEurope	Yamnaya	4	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK460	NorthernEurope	Yamnaya	7	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK461	NorthernEurope	Yamnaya	4	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK463	NorthernEurope	Yamnaya	6	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK466	CentralEasternEurope	Yamnaya	9	2	2	Gnezdovo	Russia	CentralEasternEurope	54.78	31.87	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK468	NorthernEurope	Yamnaya	16	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK469	NorthernEurope	Yamnaya	6	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK46	NorthernEurope	Yamnaya	6	2	2	Faroe	Faroes	NorthernEurope	61.85	-6.8	250	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK471	NorthernEurope	Yamnaya	7	2	1	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK473	NorthernEurope	Yamnaya	4	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK474	NorthernEurope	Yamnaya	6	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK476	NorthernEurope	Yamnaya	15	2	1	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK477	NorthernEurope	Yamnaya	4	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK478	NorthernEurope	Yamnaya	12	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK479	NorthernEurope	Yamnaya	11	3	3	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK480	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK481	NorthernEurope	Yamnaya	4	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK482	NorthernEurope	Yamnaya	8	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK483	NorthernEurope	Yamnaya	2	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK484	NorthernEurope	Yamnaya	8	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK486	NorthernEurope	Yamnaya	10	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK487	NorthernEurope	Yamnaya	10	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK488	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK489	NorthernEurope	Yamnaya	13	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK48	NorthernEurope	Yamnaya	9	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK491	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK492	NorthernEurope	Yamnaya	3	2	1	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK493	NorthernEurope	Yamnaya	12	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK494	CentralEasternEurope	Yamnaya	7	2	1	Sandomierz	Poland	CentralEasternEurope	50.68	21.75	850	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK495	NorthernEurope	Yamnaya	4	2	0	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK496	NorthernEurope	Yamnaya	10	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK498	NorthernEurope	Yamnaya	10	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK504	NorthernEurope	Yamnaya	11	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK505	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK506	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK507	NorthernEurope	Yamnaya	4	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK508	NorthernEurope	Yamnaya	10	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK509	NorthernEurope	Yamnaya	10	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK510	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK511	NorthernEurope	Yamnaya	7	3	3	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK512	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK513	NorthernEurope	Yamnaya	8	2	2	Greenland	Greenland	NorthernEurope	61.18	-45.68	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK514	NorthernEurope	Yamnaya	13	2	2	Nordland	Norway	NorthernEurope	67.91	15.13	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK515	NorthernEurope	Yamnaya	4	2	2	Nordland	Norway	NorthernEurope	67.28	14.39	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK516	NorthernEurope	Yamnaya	8	2	2	Sor-Trondelag	Norway	NorthernEurope	63.7	9.75	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK519	NorthernEurope	Yamnaya	8	2	2	Nordland	Norway	NorthernEurope	67.93	14.96	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK51	NorthernEurope	Yamnaya	7	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK520	NorthernEurope	Yamnaya	8	2	2	Troms	Norway	NorthernEurope	69.65	18.13	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK521	NorthernEurope	Yamnaya	6	2	2	Brondsager Torsiinre	Denmark	NorthernEurope	55.64	12.24	1650	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK523	NorthernEurope	Yamnaya	4	2	2	Sor-Trondelag	Norway	NorthernEurope	63.83	9.7	1800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK524	NorthernEurope	Yamnaya	4	2	2	Nordland	Norway	NorthernEurope	66.26	12.73	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK525	NorthernEurope	Yamnaya	6	2	2	Nordland	Norway	NorthernEurope	66.18	12.72	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK526	NorthernEurope	Yamnaya	11	3	3	Nordland	Norway	NorthernEurope	65.97	12.27	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK527	NorthernEurope	Yamnaya	6	2	2	Uppsala	Sweden	NorthernEurope	59.86	17.65	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK528	NorthernEurope	Yamnaya	8	2	2	Troms	Norway	NorthernEurope	69.65	18.16	1050	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK529	NorthernEurope	Yamnaya	8	2	2	Nordland	Norway	NorthernEurope	67.64	14.79	1050	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK530	NorthernEurope	Yamnaya	6	2	2	Nordland	Norway	NorthernEurope	67.28	14.39	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK531	NorthernEurope	Hunter-GathererE	5	2	1	Tromso	Norway	NorthernEurope	69.47	18	4350	Margyaran_2020_Nature	Hunter-Gatherer (E)
+StoneAgeAncient	VK532	NorthernEurope	Yamnaya	6	2	2	Kragehave Odetofter	Denmark	NorthernEurope	55.66	12.25	950	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK533	NorthernEurope	Yamnaya	8	2	2	Oland	Sweden	NorthernEurope	56.81	16.73	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK534	SouthernEurope	EarlyFarmer	4	2	2	Foggia	Italy	SouthernEurope	41.42	15.58	800	Margyaran_2020_Nature	Early Farmer
+StoneAgeAncient	VK535	SouthernEurope	EarlyFarmer	10	2	2	Foggia	Italy	SouthernEurope	41.42	15.58	713	Margyaran_2020_Nature	Early Farmer
+StoneAgeAncient	VK536	SouthernEurope	EarlyFarmer	13	2	2	Foggia	Italy	SouthernEurope	41.34	15.26	700	Margyaran_2020_Nature	Early Farmer
+StoneAgeAncient	VK537	SouthernEurope	EarlyFarmer	5	3	3	Foggia	Italy	SouthernEurope	41.34	15.26	700	Margyaran_2020_Nature	Early Farmer
+StoneAgeAncient	VK538	SouthernEurope	Yamnaya	9	3	3	Foggia	Italy	SouthernEurope	41.34	15.26	700	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK539	CentralEasternEurope	Yamnaya	7	2	1	Shestovitsa	Ukraine	CentralEasternEurope	51.37	31.18	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK53	NorthernEurope	Yamnaya	8	2	2	Gotland_Kopparsvik	Sweden	NorthernEurope	57.63	18.28	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK542	CentralEasternEurope	Yamnaya	10	2	2	Chernigov	Ukraine	CentralEasternEurope	51.49	31.31	800	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK543	WesternEurope	Yamnaya	7	3	3	Ireland	Ireland	WesternEurope	53.51	-10.13	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK544	WesternEurope	Yamnaya	14	2	2	Ireland	Ireland	WesternEurope	53.39	-6.3	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK545	WesternEurope	Yamnaya	8	2	2	Ireland	Ireland	WesternEurope	53.34	-6.27	1185	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK548	NorthernEurope	Yamnaya	6	2	2	Nord-Trondelag	Norway	NorthernEurope	63.44	11.22	1000	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK549	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK550	NorthernEurope	Yamnaya	9	3	3	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK551	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK552	NorthernEurope	Yamnaya	11	2	1	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK553	NorthernEurope	Yamnaya	10	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK554	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK555	NorthernEurope	Yamnaya	6	2	2	Salme	Estonia	NorthernEurope	58.17	22.25	1100	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK56	NorthernEurope	Yamnaya	9	2	1	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK57	NorthernEurope	Yamnaya	6	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK60	NorthernEurope	Yamnaya	4	2	0	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK63	NorthernEurope	Yamnaya	13	2	1	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK64	NorthernEurope	Yamnaya	14	2	2	Gotland_Frojel	Sweden	NorthernEurope	57.34	18.19	975	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK65	NorthernEurope	Yamnaya	6	2	2	Tollemosegard	Denmark	NorthernEurope	55.87	12.08	1200	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK69	NorthernEurope	Yamnaya	6	3	3	Tollemosegard	Denmark	NorthernEurope	55.87	12.08	1200	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK71	NorthernEurope	Yamnaya	8	3	4	Tollemosegard	Denmark	NorthernEurope	55.87	12.08	1200	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK75	NorthernEurope	Yamnaya	7	2	1	Greenland	Greenland	NorthernEurope	64.25	-50.1	654	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK84	NorthernEurope	Yamnaya	3	2	1	Hesselbjerg	Denmark	NorthernEurope	55.95	10.2	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK87	NorthernEurope	Yamnaya	4	2	2	Hesselbjerg	Denmark	NorthernEurope	55.95	10.2	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK90	NorthernEurope	Yamnaya	7	2	2	Lejre	Denmark	NorthernEurope	55.6	11.95	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK92	NorthernEurope	Yamnaya	7	2	2	Lejre	Denmark	NorthernEurope	55.6	11.95	1075	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK94	NorthernEurope	Yamnaya	10	2	1	Lejre	Denmark	NorthernEurope	55.62	11.97	900	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK95	NorthernEurope	Yamnaya	4	2	1	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK98	NorthernEurope	Yamnaya	7	2	2	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya
+StoneAgeAncient	VK99	NorthernEurope	Yamnaya	5	2	2	Iceland	Iceland	NorthernEurope	65.61	-17.16	750	Margyaran_2020_Nature	Yamnaya

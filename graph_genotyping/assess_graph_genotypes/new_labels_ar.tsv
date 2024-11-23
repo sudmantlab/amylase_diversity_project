@@ -1,0 +1,535 @@
+sample	source_ar	p2_ar
+NEO281	Allentoft_Sikora_etal2024	CHG
+NEO100	Allentoft_Sikora_etal2024	EHG
+NEO113	Allentoft_Sikora_etal2024	EHG
+NEO160	Allentoft_Sikora_etal2024	EHG
+NEO163	Allentoft_Sikora_etal2024	EHG
+NEO166	Allentoft_Sikora_etal2024	EHG
+NEO167	Allentoft_Sikora_etal2024	EHG
+NEO170	Allentoft_Sikora_etal2024	EHG
+NEO171	Allentoft_Sikora_etal2024	EHG
+NEO173	Allentoft_Sikora_etal2024	EHG
+NEO174	Allentoft_Sikora_etal2024	EHG
+NEO178	Allentoft_Sikora_etal2024	EHG
+NEO179	Allentoft_Sikora_etal2024	EHG
+NEO17	Allentoft_Sikora_etal2024	EHG
+NEO180	Allentoft_Sikora_etal2024	EHG
+NEO184	Allentoft_Sikora_etal2024	EHG
+NEO185	Allentoft_Sikora_etal2024	EHG
+NEO186	Allentoft_Sikora_etal2024	EHG
+NEO187	Allentoft_Sikora_etal2024	EHG
+NEO189	Allentoft_Sikora_etal2024	EHG
+NEO192	Allentoft_Sikora_etal2024	EHG
+NEO193	Allentoft_Sikora_etal2024	EHG
+NEO194	Allentoft_Sikora_etal2024	EHG
+NEO195	Allentoft_Sikora_etal2024	EHG
+NEO197	Allentoft_Sikora_etal2024	EHG
+NEO202	Allentoft_Sikora_etal2024	EHG
+NEO270	Allentoft_Sikora_etal2024	EHG
+NEO27	Allentoft_Sikora_etal2024	EHG
+NEO300	Allentoft_Sikora_etal2024	EHG
+NEO302	Allentoft_Sikora_etal2024	EHG
+NEO304	Allentoft_Sikora_etal2024	EHG
+NEO498	Allentoft_Sikora_etal2024	EHG
+NEO501	Allentoft_Sikora_etal2024	EHG
+NEO502	Allentoft_Sikora_etal2024	EHG
+NEO503	Allentoft_Sikora_etal2024	EHG
+NEO507	Allentoft_Sikora_etal2024	EHG
+NEO509	Allentoft_Sikora_etal2024	EHG
+NEO516	Allentoft_Sikora_etal2024	EHG
+NEO521	Allentoft_Sikora_etal2024	EHG
+NEO528	Allentoft_Sikora_etal2024	EHG
+NEO536	Allentoft_Sikora_etal2024	EHG
+NEO539	Allentoft_Sikora_etal2024	EHG
+NEO552	Allentoft_Sikora_etal2024	EHG
+NEO555	Allentoft_Sikora_etal2024	EHG
+NEO556	Allentoft_Sikora_etal2024	EHG
+NEO560	Allentoft_Sikora_etal2024	EHG
+NEO687	Allentoft_Sikora_etal2024	EHG
+NEO87	Allentoft_Sikora_etal2024	EHG
+NEO88	Allentoft_Sikora_etal2024	EHG
+NEO898	Allentoft_Sikora_etal2024	EHG
+AKT16-2	Marchi_etal2022	Farmers
+Asp6	Marchi_etal2022	Farmers
+BAR25-1	Marchi_etal2022	Farmers
+Dil16	Marchi_etal2022	Farmers
+Ess7	Marchi_etal2022	Farmers
+Herx	Marchi_etal2022	Farmers
+Klein7	Marchi_etal2022	Farmers
+LEPE48-2	Marchi_etal2022	Farmers
+LEPE52-1	Marchi_etal2022	Farmers
+Nea2	Marchi_etal2022	Farmers
+Nea3	Marchi_etal2022	Farmers
+STAR1	Marchi_etal2022	Farmers
+VC3-2	Marchi_etal2022	Farmers
+NEO137	Allentoft_Sikora_etal2024	Farmers
+NEO140	Allentoft_Sikora_etal2024	Farmers
+NEO142	Allentoft_Sikora_etal2024	Farmers
+NEO145	Allentoft_Sikora_etal2024	Farmers
+NEO147	Allentoft_Sikora_etal2024	Farmers
+NEO641	Allentoft_Sikora_etal2024	Farmers
+NEO655	Allentoft_Sikora_etal2024	WHG
+NEO674	Allentoft_Sikora_etal2024	Farmers
+NEO695	Allentoft_Sikora_etal2024	Farmers
+NEO23	Allentoft_Sikora_etal2024	Farmers
+NEO25	Allentoft_Sikora_etal2024	Farmers
+NEO28	Allentoft_Sikora_etal2024	Farmers
+NEO29	Allentoft_Sikora_etal2024	Farmers
+NEO39	Allentoft_Sikora_etal2024	Farmers
+NEO43	Allentoft_Sikora_etal2024	Farmers
+NEO595	Allentoft_Sikora_etal2024	Farmers
+NEO597	Allentoft_Sikora_etal2024	Farmers
+NEO599	Allentoft_Sikora_etal2024	Farmers
+NEO640	Allentoft_Sikora_etal2024	Farmers
+NEO744	Allentoft_Sikora_etal2024	Farmers
+NEO753	Allentoft_Sikora_etal2024	Farmers
+NEO757	Allentoft_Sikora_etal2024	Farmers
+NEO790	Allentoft_Sikora_etal2024	Farmers
+NEO886	Allentoft_Sikora_etal2024	Farmers
+NEO891	Allentoft_Sikora_etal2024	Farmers
+NEO896	Allentoft_Sikora_etal2024	Farmers
+NEO925	Allentoft_Sikora_etal2024	Farmers
+NEO933	Allentoft_Sikora_etal2024	Farmers
+NEO943	Allentoft_Sikora_etal2024	Farmers
+NEO945	Allentoft_Sikora_etal2024	Farmers
+NEO119	Allentoft_Sikora_etal2024	Farmers
+NEO121	Allentoft_Sikora_etal2024	Farmers
+NEO609	Allentoft_Sikora_etal2024	Farmers
+NEO624	Allentoft_Sikora_etal2024	Farmers
+NEO626	Allentoft_Sikora_etal2024	Farmers
+NEO627	Allentoft_Sikora_etal2024	Farmers
+NEO630	Allentoft_Sikora_etal2024	Farmers
+NEO631	Allentoft_Sikora_etal2024	Farmers
+NEO653	Allentoft_Sikora_etal2024	WHG
+NEO717	Allentoft_Sikora_etal2024	Farmers
+NEO721	Allentoft_Sikora_etal2024	Farmers
+NEO823	Allentoft_Sikora_etal2024	Farmers
+NEO830	Allentoft_Sikora_etal2024	Farmers
+NEO310	Allentoft_Sikora_etal2024	Farmers
+NEO816	Allentoft_Sikora_etal2024	Farmers
+RISE247	Allentoft_etal2015	Bronze Age
+RISE373	Allentoft_etal2015	Bronze Age
+RISE374	Allentoft_etal2015	Bronze Age
+RISE407	Allentoft_etal2015	Bronze Age
+RISE480	Allentoft_etal2015	Bronze Age
+RISE484	Allentoft_etal2015	Bronze Age
+RISE559	Allentoft_etal2015	Bronze Age
+RISE569	Allentoft_etal2015	Iron Age
+RISE174	Allentoft_etal2015	Iron Age
+NEO590	Allentoft_Sikora_etal2024	Bronze Age
+NEO563	Allentoft_Sikora_etal2024	Bronze Age
+NEO93	Allentoft_Sikora_etal2024	Bronze Age
+NEO225	Allentoft_Sikora_etal2024	Farmers
+RISE479	Allentoft_etal2015	Bronze Age
+NEO228	Allentoft_Sikora_etal2024	Farmers
+NEO261	Allentoft_Sikora_etal2024	Farmers
+NEO224	Allentoft_Sikora_etal2024	Farmers
+RISE154	Allentoft_etal2015	Bronze Age
+RISE109	Allentoft_etal2015	Bronze Age
+NEO227	Allentoft_Sikora_etal2024	Farmers
+NEO220	Allentoft_Sikora_etal2024	Farmers
+RISE97	Allentoft_etal2015	Farmers
+NEO951	Allentoft_Sikora_etal2024	Bronze Age
+NEO860	Allentoft_Sikora_etal2024	Farmers
+NEO52	Allentoft_Sikora_etal2024	Farmers
+NEO875	Allentoft_Sikora_etal2024	Farmers
+NEO735	Allentoft_Sikora_etal2024	Farmers
+RISE577	Allentoft_etal2015	Bronze Age
+RISE586	Allentoft_etal2015	Bronze Age
+NEO878	Allentoft_Sikora_etal2024	Farmers
+NEO861	Allentoft_Sikora_etal2024	Farmers
+NEO738	Allentoft_Sikora_etal2024	Farmers
+NEO737	Allentoft_Sikora_etal2024	Farmers
+RISE566	Allentoft_etal2015	Bronze Age
+NEO649	Allentoft_Sikora_etal2024	Bronze Age
+NEO92	Allentoft_Sikora_etal2024	Farmers
+NEO870	Allentoft_Sikora_etal2024	Farmers
+NEO51	Allentoft_Sikora_etal2024	Bronze Age
+NEO44	Allentoft_Sikora_etal2024	Bronze Age
+NEO306	Allentoft_Sikora_etal2024	Bronze Age
+RISE563	Allentoft_etal2015	Bronze Age
+RISE446	Allentoft_etal2015	Farmers
+NEO806	Allentoft_Sikora_etal2024	Bronze Age
+RISE397	Allentoft_etal2015	Bronze Age
+RISE71	Allentoft_etal2015	Farmers
+RISE94	Allentoft_etal2015	Bronze Age
+VK390	Margaryan_etal2020	Iron Age
+VK391	Margaryan_etal2020	Iron Age
+VK213	Margaryan_etal2020	Iron Age
+VK418	Margaryan_etal2020	Iron Age
+VK521	Margaryan_etal2020	Iron Age
+VK523	Margaryan_etal2020	Iron Age
+VK237	Margaryan_etal2020	Medieval Early Modern
+VK238	Margaryan_etal2020	Medieval Early Modern
+VK241	Margaryan_etal2020	Medieval Early Modern
+VK244	Margaryan_etal2020	Medieval Early Modern
+VK27	Margaryan_etal2020	Medieval Early Modern
+VK44	Margaryan_etal2020	Medieval Early Modern
+VK46	Margaryan_etal2020	Medieval Early Modern
+VK113	Margaryan_etal2020	Medieval Early Modern
+VK114	Margaryan_etal2020	Medieval Early Modern
+VK117	Margaryan_etal2020	Medieval Early Modern
+VK118	Margaryan_etal2020	Medieval Early Modern
+VK124	Margaryan_etal2020	Medieval Early Modern
+VK211	Margaryan_etal2020	Medieval Early Modern
+VK534	Margaryan_etal2020	Medieval Early Modern
+VK535	Margaryan_etal2020	Medieval Early Modern
+VK536	Margaryan_etal2020	Medieval Early Modern
+VK537	Margaryan_etal2020	Medieval Early Modern
+NEO518	Allentoft_Sikora_etal2024	Steppe
+NEO175	Allentoft_Sikora_etal2024	Steppe
+RISE525	Allentoft_etal2015	Steppe
+RISE499	Allentoft_etal2015	Steppe
+RISE494	Allentoft_etal2015	Steppe
+RISE523	Allentoft_etal2015	Steppe
+RISE500	Allentoft_etal2015	Steppe
+RISE503	Allentoft_etal2015	Steppe
+VK214	Margaryan_etal2020	Steppe
+VK531	Margaryan_etal2020	Steppe
+RISE555	Allentoft_etal2015	Steppe
+RISE240	Allentoft_etal2015	Steppe
+RISE546	Allentoft_etal2015	Steppe
+RISE548	Allentoft_etal2015	Steppe
+RISE507	Allentoft_etal2015	Steppe
+RISE510	Allentoft_etal2015	Steppe
+RISE547	Allentoft_etal2015	Steppe
+RISE550	Allentoft_etal2015	Steppe
+VK75	Margaryan_etal2020	Viking Age
+VK388	Margaryan_etal2020	Viking Age
+VK538	Margaryan_etal2020	Viking Age
+VK122	Margaryan_etal2020	Viking Age
+VK123	Margaryan_etal2020	Viking Age
+VK160	Margaryan_etal2020	Viking Age
+VK225	Margaryan_etal2020	Viking Age
+VK227	Margaryan_etal2020	Viking Age
+VK230	Margaryan_etal2020	Viking Age
+VK95	Margaryan_etal2020	Viking Age
+VK98	Margaryan_etal2020	Viking Age
+VK99	Margaryan_etal2020	Viking Age
+VK14	Margaryan_etal2020	Viking Age
+VK15	Margaryan_etal2020	Viking Age
+VK179	Margaryan_etal2020	Viking Age
+VK17	Margaryan_etal2020	Viking Age
+VK183	Margaryan_etal2020	Viking Age
+VK184	Margaryan_etal2020	Viking Age
+VK18	Margaryan_etal2020	Viking Age
+VK19	Margaryan_etal2020	Viking Age
+VK218	Margaryan_etal2020	Viking Age
+VK21	Margaryan_etal2020	Viking Age
+VK22	Margaryan_etal2020	Viking Age
+VK23	Margaryan_etal2020	Viking Age
+VK24	Margaryan_etal2020	Viking Age
+VK303	Margaryan_etal2020	Viking Age
+VK306	Margaryan_etal2020	Viking Age
+VK308	Margaryan_etal2020	Viking Age
+VK309	Margaryan_etal2020	Viking Age
+VK30	Margaryan_etal2020	Viking Age
+VK31	Margaryan_etal2020	Viking Age
+VK34	Margaryan_etal2020	Viking Age
+VK35	Margaryan_etal2020	Viking Age
+VK395	Margaryan_etal2020	Viking Age
+VK396	Margaryan_etal2020	Viking Age
+VK397	Margaryan_etal2020	Viking Age
+VK398	Margaryan_etal2020	Viking Age
+VK399	Margaryan_etal2020	Viking Age
+VK39	Margaryan_etal2020	Viking Age
+VK400	Margaryan_etal2020	Viking Age
+VK401	Margaryan_etal2020	Viking Age
+VK402	Margaryan_etal2020	Viking Age
+VK403	Margaryan_etal2020	Viking Age
+VK404	Margaryan_etal2020	Viking Age
+VK405	Margaryan_etal2020	Viking Age
+VK406	Margaryan_etal2020	Viking Age
+VK407	Margaryan_etal2020	Viking Age
+VK408	Margaryan_etal2020	Viking Age
+VK409	Margaryan_etal2020	Viking Age
+VK40	Margaryan_etal2020	Viking Age
+VK424	Margaryan_etal2020	Viking Age
+VK425	Margaryan_etal2020	Viking Age
+VK426	Margaryan_etal2020	Viking Age
+VK427	Margaryan_etal2020	Viking Age
+VK513	Margaryan_etal2020	Viking Age
+VK527	Margaryan_etal2020	Viking Age
+VK539	Margaryan_etal2020	Viking Age
+VK542	Margaryan_etal2020	Viking Age
+VK16	Margaryan_etal2020	Viking Age
+VK410	Margaryan_etal2020	Viking Age
+VK187	Margaryan_etal2020	Viking Age
+VK156	Margaryan_etal2020	Viking Age
+VK159	Margaryan_etal2020	Viking Age
+VK171	Margaryan_etal2020	Viking Age
+VK217	Margaryan_etal2020	Viking Age
+VK223	Margaryan_etal2020	Viking Age
+VK224	Margaryan_etal2020	Viking Age
+VK254	Margaryan_etal2020	Viking Age
+VK272	Margaryan_etal2020	Viking Age
+VK273	Margaryan_etal2020	Viking Age
+VK387	Margaryan_etal2020	Viking Age
+VK414	Margaryan_etal2020	Viking Age
+VK466	Margaryan_etal2020	Viking Age
+VK494	Margaryan_etal2020	Viking Age
+VK330	Margaryan_etal2020	Viking Age
+VK322	Margaryan_etal2020	Viking Age
+VK20	Margaryan_etal2020	Viking Age
+VK212	Margaryan_etal2020	Viking Age
+VK357	Margaryan_etal2020	Viking Age
+VK127	Margaryan_etal2020	Viking Age
+VK128	Margaryan_etal2020	Viking Age
+VK129	Margaryan_etal2020	Viking Age
+VK134	Margaryan_etal2020	Viking Age
+VK138	Margaryan_etal2020	Viking Age
+VK139	Margaryan_etal2020	Viking Age
+VK141	Margaryan_etal2020	Viking Age
+VK201	Margaryan_etal2020	Viking Age
+VK202	Margaryan_etal2020	Viking Age
+VK203	Margaryan_etal2020	Viking Age
+VK204	Margaryan_etal2020	Viking Age
+VK205	Margaryan_etal2020	Viking Age
+VK207	Margaryan_etal2020	Viking Age
+VK265	Margaryan_etal2020	Viking Age
+VK266	Margaryan_etal2020	Viking Age
+VK268	Margaryan_etal2020	Viking Age
+VK274	Margaryan_etal2020	Viking Age
+VK275	Margaryan_etal2020	Viking Age
+VK276	Margaryan_etal2020	Viking Age
+VK278	Margaryan_etal2020	Viking Age
+VK279	Margaryan_etal2020	Viking Age
+VK280	Margaryan_etal2020	Viking Age
+VK281	Margaryan_etal2020	Viking Age
+VK282	Margaryan_etal2020	Viking Age
+VK284	Margaryan_etal2020	Viking Age
+VK285	Margaryan_etal2020	Viking Age
+VK286	Margaryan_etal2020	Viking Age
+VK287	Margaryan_etal2020	Viking Age
+VK288	Margaryan_etal2020	Viking Age
+VK290	Margaryan_etal2020	Viking Age
+VK292	Margaryan_etal2020	Viking Age
+VK295	Margaryan_etal2020	Viking Age
+VK298	Margaryan_etal2020	Viking Age
+VK316	Margaryan_etal2020	Viking Age
+VK317	Margaryan_etal2020	Viking Age
+VK320	Margaryan_etal2020	Viking Age
+VK323	Margaryan_etal2020	Viking Age
+VK335	Margaryan_etal2020	Viking Age
+VK338	Margaryan_etal2020	Viking Age
+VK342	Margaryan_etal2020	Viking Age
+VK343	Margaryan_etal2020	Viking Age
+VK344	Margaryan_etal2020	Viking Age
+VK346	Margaryan_etal2020	Viking Age
+VK348	Margaryan_etal2020	Viking Age
+VK352	Margaryan_etal2020	Viking Age
+VK361	Margaryan_etal2020	Viking Age
+VK362	Margaryan_etal2020	Viking Age
+VK363	Margaryan_etal2020	Viking Age
+VK364	Margaryan_etal2020	Viking Age
+VK365	Margaryan_etal2020	Viking Age
+VK366	Margaryan_etal2020	Viking Age
+VK367	Margaryan_etal2020	Viking Age
+VK368	Margaryan_etal2020	Viking Age
+VK370	Margaryan_etal2020	Viking Age
+VK372	Margaryan_etal2020	Viking Age
+VK373	Margaryan_etal2020	Viking Age
+VK380	Margaryan_etal2020	Viking Age
+VK386	Margaryan_etal2020	Viking Age
+VK389	Margaryan_etal2020	Viking Age
+VK393	Margaryan_etal2020	Viking Age
+VK394	Margaryan_etal2020	Viking Age
+VK422	Margaryan_etal2020	Viking Age
+VK443	Margaryan_etal2020	Viking Age
+VK445	Margaryan_etal2020	Viking Age
+VK446	Margaryan_etal2020	Viking Age
+VK515	Margaryan_etal2020	Viking Age
+VK516	Margaryan_etal2020	Viking Age
+VK520	Margaryan_etal2020	Viking Age
+VK524	Margaryan_etal2020	Viking Age
+VK530	Margaryan_etal2020	Viking Age
+VK533	Margaryan_etal2020	Viking Age
+VK94	Margaryan_etal2020	Viking Age
+VK334	Margaryan_etal2020	Viking Age
+VK353	Margaryan_etal2020	Viking Age
+VK186	Margaryan_etal2020	Viking Age
+VK324	Margaryan_etal2020	Viking Age
+VK327	Margaryan_etal2020	Viking Age
+VK170	Margaryan_etal2020	Viking Age
+VK420	Margaryan_etal2020	Viking Age
+VK448	Margaryan_etal2020	Viking Age
+VK532	Margaryan_etal2020	Viking Age
+VK256	Margaryan_etal2020	Viking Age
+VK257	Margaryan_etal2020	Viking Age
+VK258	Margaryan_etal2020	Viking Age
+VK259	Margaryan_etal2020	Viking Age
+VK260	Margaryan_etal2020	Viking Age
+VK261	Margaryan_etal2020	Viking Age
+VK262	Margaryan_etal2020	Viking Age
+VK263	Margaryan_etal2020	Viking Age
+VK264	Margaryan_etal2020	Viking Age
+VK449	Margaryan_etal2020	Viking Age
+VK219	Margaryan_etal2020	Viking Age
+VK326	Margaryan_etal2020	Viking Age
+VK354	Margaryan_etal2020	Viking Age
+VK232	Margaryan_etal2020	Viking Age
+VK428	Margaryan_etal2020	Viking Age
+VK429	Margaryan_etal2020	Viking Age
+VK430	Margaryan_etal2020	Viking Age
+VK431	Margaryan_etal2020	Viking Age
+VK432	Margaryan_etal2020	Viking Age
+VK433	Margaryan_etal2020	Viking Age
+VK434	Margaryan_etal2020	Viking Age
+VK438	Margaryan_etal2020	Viking Age
+VK439	Margaryan_etal2020	Viking Age
+VK450	Margaryan_etal2020	Viking Age
+VK452	Margaryan_etal2020	Viking Age
+VK453	Margaryan_etal2020	Viking Age
+VK454	Margaryan_etal2020	Viking Age
+VK455	Margaryan_etal2020	Viking Age
+VK456	Margaryan_etal2020	Viking Age
+VK345	Margaryan_etal2020	Viking Age
+VK457	Margaryan_etal2020	Viking Age
+VK458	Margaryan_etal2020	Viking Age
+VK459	Margaryan_etal2020	Viking Age
+VK460	Margaryan_etal2020	Viking Age
+VK461	Margaryan_etal2020	Viking Age
+VK463	Margaryan_etal2020	Viking Age
+VK468	Margaryan_etal2020	Viking Age
+VK469	Margaryan_etal2020	Viking Age
+VK471	Margaryan_etal2020	Viking Age
+VK473	Margaryan_etal2020	Viking Age
+VK474	Margaryan_etal2020	Viking Age
+VK476	Margaryan_etal2020	Viking Age
+VK477	Margaryan_etal2020	Viking Age
+VK478	Margaryan_etal2020	Viking Age
+VK479	Margaryan_etal2020	Viking Age
+VK48	Margaryan_etal2020	Viking Age
+VK51	Margaryan_etal2020	Viking Age
+VK53	Margaryan_etal2020	Viking Age
+VK56	Margaryan_etal2020	Viking Age
+VK57	Margaryan_etal2020	Viking Age
+VK60	Margaryan_etal2020	Viking Age
+VK63	Margaryan_etal2020	Viking Age
+VK64	Margaryan_etal2020	Viking Age
+VK289	Margaryan_etal2020	Viking Age
+VK291	Margaryan_etal2020	Viking Age
+VK392	Margaryan_etal2020	Viking Age
+VK417	Margaryan_etal2020	Viking Age
+VK525	Margaryan_etal2020	Viking Age
+VK526	Margaryan_etal2020	Viking Age
+VK543	Margaryan_etal2020	Viking Age
+VK544	Margaryan_etal2020	Viking Age
+VK548	Margaryan_etal2020	Viking Age
+VK143	Margaryan_etal2020	Viking Age
+VK144	Margaryan_etal2020	Viking Age
+VK145	Margaryan_etal2020	Viking Age
+VK146	Margaryan_etal2020	Viking Age
+VK147	Margaryan_etal2020	Viking Age
+VK150	Margaryan_etal2020	Viking Age
+VK151	Margaryan_etal2020	Viking Age
+VK165	Margaryan_etal2020	Viking Age
+VK166	Margaryan_etal2020	Viking Age
+VK168	Margaryan_etal2020	Viking Age
+VK172	Margaryan_etal2020	Viking Age
+VK173	Margaryan_etal2020	Viking Age
+VK174	Margaryan_etal2020	Viking Age
+VK175	Margaryan_etal2020	Viking Age
+VK177	Margaryan_etal2020	Viking Age
+VK178	Margaryan_etal2020	Viking Age
+VK221	Margaryan_etal2020	Viking Age
+VK528	Margaryan_etal2020	Viking Age
+VK529	Margaryan_etal2020	Viking Age
+VK333	Margaryan_etal2020	Viking Age
+VK371	Margaryan_etal2020	Viking Age
+VK294	Margaryan_etal2020	Viking Age
+VK300	Margaryan_etal2020	Viking Age
+VK312	Margaryan_etal2020	Viking Age
+VK313	Margaryan_etal2020	Viking Age
+VK314	Margaryan_etal2020	Viking Age
+VK315	Margaryan_etal2020	Viking Age
+VK340	Margaryan_etal2020	Viking Age
+VK369	Margaryan_etal2020	Viking Age
+VK384	Margaryan_etal2020	Viking Age
+VK84	Margaryan_etal2020	Viking Age
+VK87	Margaryan_etal2020	Viking Age
+VK90	Margaryan_etal2020	Viking Age
+VK92	Margaryan_etal2020	Viking Age
+VK328	Margaryan_etal2020	Viking Age
+VK325	Margaryan_etal2020	Viking Age
+VK332	Margaryan_etal2020	Viking Age
+VK337	Margaryan_etal2020	Viking Age
+VK336	Margaryan_etal2020	Viking Age
+VK358	Margaryan_etal2020	Viking Age
+VK480	Margaryan_etal2020	Viking Age
+VK481	Margaryan_etal2020	Viking Age
+VK482	Margaryan_etal2020	Viking Age
+VK483	Margaryan_etal2020	Viking Age
+VK484	Margaryan_etal2020	Viking Age
+VK486	Margaryan_etal2020	Viking Age
+VK487	Margaryan_etal2020	Viking Age
+VK488	Margaryan_etal2020	Viking Age
+VK489	Margaryan_etal2020	Viking Age
+VK491	Margaryan_etal2020	Viking Age
+VK492	Margaryan_etal2020	Viking Age
+VK493	Margaryan_etal2020	Viking Age
+VK495	Margaryan_etal2020	Viking Age
+VK496	Margaryan_etal2020	Viking Age
+VK498	Margaryan_etal2020	Viking Age
+VK504	Margaryan_etal2020	Viking Age
+VK505	Margaryan_etal2020	Viking Age
+VK506	Margaryan_etal2020	Viking Age
+VK507	Margaryan_etal2020	Viking Age
+VK508	Margaryan_etal2020	Viking Age
+VK509	Margaryan_etal2020	Viking Age
+VK510	Margaryan_etal2020	Viking Age
+VK511	Margaryan_etal2020	Viking Age
+VK512	Margaryan_etal2020	Viking Age
+VK514	Margaryan_etal2020	Viking Age
+VK519	Margaryan_etal2020	Viking Age
+VK549	Margaryan_etal2020	Viking Age
+VK550	Margaryan_etal2020	Viking Age
+VK551	Margaryan_etal2020	Viking Age
+VK552	Margaryan_etal2020	Viking Age
+VK553	Margaryan_etal2020	Viking Age
+VK554	Margaryan_etal2020	Viking Age
+VK555	Margaryan_etal2020	Viking Age
+VK355	Margaryan_etal2020	Viking Age
+VK442	Margaryan_etal2020	Viking Age
+VK444	Margaryan_etal2020	Viking Age
+VK349	Margaryan_etal2020	Viking Age
+VK319	Margaryan_etal2020	Viking Age
+VK350	Margaryan_etal2020	Viking Age
+VK301	Margaryan_etal2020	Viking Age
+VK545	Margaryan_etal2020	Viking Age
+VK297	Margaryan_etal2020	Viking Age
+VK65	Margaryan_etal2020	Viking Age
+VK69	Margaryan_etal2020	Viking Age
+VK71	Margaryan_etal2020	Viking Age
+VK296	Margaryan_etal2020	Viking Age
+VLASA32-2	Marchi_etal2022	WHG
+VLASA7-3	Marchi_etal2022	WHG
+NEO122	Allentoft_Sikora_etal2024	WHG
+NEO123	Allentoft_Sikora_etal2024	WHG
+NEO19	Allentoft_Sikora_etal2024	WHG
+NEO254	Allentoft_Sikora_etal2024	WHG
+NEO260	Allentoft_Sikora_etal2024	WHG
+NEO307	Allentoft_Sikora_etal2024	WHG
+NEO568	Allentoft_Sikora_etal2024	WHG
+NEO570	Allentoft_Sikora_etal2024	WHG
+NEO583	Allentoft_Sikora_etal2024	WHG
+NEO586	Allentoft_Sikora_etal2024	WHG
+NEO598	Allentoft_Sikora_etal2024	WHG
+NEO645	Allentoft_Sikora_etal2024	WHG
+NEO646	Allentoft_Sikora_etal2024	WHG
+NEO648	Allentoft_Sikora_etal2024	WHG
+NEO658	Allentoft_Sikora_etal2024	WHG
+NEO669	Allentoft_Sikora_etal2024	WHG
+NEO672	Allentoft_Sikora_etal2024	WHG
+NEO679	Allentoft_Sikora_etal2024	WHG
+NEO694	Allentoft_Sikora_etal2024	WHG
+NEO745	Allentoft_Sikora_etal2024	WHG
+NEO751	Allentoft_Sikora_etal2024	WHG
+NEO759	Allentoft_Sikora_etal2024	WHG
+NEO852	Allentoft_Sikora_etal2024	WHG
+NEO855	Allentoft_Sikora_etal2024	WHG
+NEO856	Allentoft_Sikora_etal2024	WHG
+NEO91	Allentoft_Sikora_etal2024	WHG
+NEO938	Allentoft_Sikora_etal2024	WHG
+NEO941	Allentoft_Sikora_etal2024	WHG
+NEO960	Allentoft_Sikora_etal2024	WHG
